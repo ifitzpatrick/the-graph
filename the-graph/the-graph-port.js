@@ -196,7 +196,7 @@
           children: label
         };
         var tailTextOptions = {
-          style: style ,
+          style: {fill: "url(#greyfade)"} ,
           children: tail,
           x: (maxChars-3)*4,
           width: 12
