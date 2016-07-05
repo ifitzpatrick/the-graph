@@ -20,6 +20,10 @@
     text: {
       ref: "label",
       className: "port-label drag"
+    },
+    tailText: {
+      ref: "label",
+      className: "port-label drag tail"
     }
   };
 
@@ -132,11 +136,24 @@
       });
       event.relatedTarget.dispatchEvent(dropEvent);
     },
+    shouldComponentUpdate: function (nextProps, nextState) {
+      return (
+        nextProps.x !== this.props.x ||
+        nextProps.y !== this.props.y ||
+        nextProps.nodeWidth !== this.props.nodeWidth
+      );
+    },
     render: function() {
       var style;
-      if (this.props.label.length > 7) {
-        var fontSize = 6 * (30 / (4 * this.props.label.length));
-        style = { 'fontSize': fontSize+'px' };
+      var maxChars = Math.floor(
+        this.props.labelWidth * ((this.props.nodeWidth - 12) / 4)
+      );
+      var label = this.props.label;
+      var tail = null;
+      if (label.length > maxChars) {
+        tail = label.substring(maxChars - 3, maxChars);
+        var oldLabel = label;
+        label = label.substring(0, maxChars - 3);
       }
       var r = 4;
       // Highlight matching ports
@@ -163,20 +180,46 @@
       innerCircleOptions = TheGraph.merge(TheGraph.config.port.innerCircle, innerCircleOptions);
       var innerCircle = TheGraph.factories.port.createPortInnerCircle.call(this, innerCircleOptions);
 
-      var labelTextOptions = {
-        x: (this.props.isIn ? 5 : -5),
-        style: style,
-        children: this.props.label
-      };
-      labelTextOptions = TheGraph.merge(TheGraph.config.port.text, labelTextOptions);
-      var labelText = TheGraph.factories.port.createPortLabelText.call(this, labelTextOptions);
-
       var portContents = [
         backgroundCircle,
         arc,
-        innerCircle,
-        labelText
+        innerCircle
       ];
+
+      if (tail) {
+        var labelGroupOptions = {
+          transform: "translate(" + (this.props.isIn ? 5 : -4*maxChars + 5) + ", 0)",
+        };
+
+        var labelTextOptions = {
+          style: style,
+          children: label
+        };
+        var tailTextOptions = {
+          style: style ,
+          children: tail,
+          x: (maxChars-3)*4,
+          width: 12
+        };
+
+        labelTextOptions = TheGraph.merge(TheGraph.config.port.text, labelTextOptions);
+        tailTextOptions = TheGraph.merge(TheGraph.config.port.tailText, tailTextOptions);
+        var labelText = TheGraph.factories.port.createPortLabelText.call(this, labelTextOptions);
+        var tailText = TheGraph.factories.port.createPortLabelText.call(this, tailTextOptions);
+        var labelGroup = TheGraph.factories.createGroup.call(this, labelGroupOptions, [
+          labelText, tailText
+        ]);
+        portContents.push(labelGroup);
+      } else {
+        var labelTextOptions = {
+          x: (this.props.isIn ? 5 : -5),
+          style: style,
+          children: label
+        };
+        labelTextOptions = TheGraph.merge(TheGraph.config.port.text, labelTextOptions);
+        var labelText = TheGraph.factories.port.createPortLabelText.call(this, labelTextOptions);
+        portContents.push(labelText);
+      }
 
       var containerOptions = TheGraph.merge(TheGraph.config.port.container, { title: this.props.label, transform: "translate("+this.props.x+","+this.props.y+")" });
       return TheGraph.factories.port.createPortGroup.call(this, containerOptions, portContents);

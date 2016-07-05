@@ -432,7 +432,9 @@
         if (node.metadata.width === undefined) { 
           node.metadata.width = TheGraph.config.nodeWidth; 
         }
-        node.metadata.height = TheGraph.config.nodeHeight;
+        if (node.metadata.height === undefined) { 
+          node.metadata.height = TheGraph.config.nodeHeight;
+        }
         if (TheGraph.config.autoSizeNode && componentInfo) {
           // Adjust node height based on number of ports.
           var portCount = Math.max(componentInfo.inports.length, componentInfo.outports.length);
