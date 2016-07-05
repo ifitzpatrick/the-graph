@@ -57,6 +57,26 @@ svg {
   stroke: none;
 }
 
+.resize {
+  opacity: 0;
+}
+
+.resize .top, .resize .bottom {
+  cursor: ns-resize;
+}
+
+.resize .right, .resize .left {
+  cursor: ew-resize;
+}
+
+.resize .topleft, .resize .bottomright {
+  cursor: nwse-resize;
+}
+
+.resize .topright, .resize .bottomleft {
+  cursor: nesw-resize;
+}
+
 @-webkit-keyframes error {
   0% { fill: var-node; }
   100% { fill: var-node-error; }
@@ -252,6 +272,9 @@ text {
   fill: var-type-a;
   text-anchor: middle;
   dominant-baseline: central;
+}
+text.tail {
+  fill: url(#greyfade);
 }
 
 .text-bg-rect {

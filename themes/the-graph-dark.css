@@ -37,6 +37,29 @@
   fill: rgba(230,238,240,0.94);
   stroke: none;
 }
+.the-graph-dark .resize {
+  opacity: 0;
+}
+.the-graph-dark .resize .top,
+.the-graph-dark .resize .bottom {
+  cursor: ns-resize;
+  fill: #008000;
+}
+.the-graph-dark .resize .right,
+.the-graph-dark .resize .left {
+  cursor: ew-resize;
+  fill: #00f;
+}
+.the-graph-dark .resize .topleft,
+.the-graph-dark .resize .bottomright {
+  cursor: nwse-resize;
+  fill: #ff0;
+}
+.the-graph-dark .resize .topright,
+.the-graph-dark .resize .bottomleft {
+  cursor: nesw-resize;
+  fill: #800080;
+}
 @-webkit-keyframes error {
   0% {
     fill: rgba(230,238,240,0.94);
@@ -247,6 +270,10 @@
   fill: #fff;
   text-anchor: middle;
   dominant-baseline: central;
+  text-overflow: ellipsis;
+}
+.the-graph-dark text.tail {
+  fill: url("#greyfade");
 }
 .the-graph-dark .text-bg-rect {
   fill: rgba(0,0,0,0.5);

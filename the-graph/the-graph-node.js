@@ -1,3 +1,4 @@
+var wedidit = false;
 (function (context) {
   "use strict";
 
@@ -63,6 +64,8 @@
     createNodeBackgroundRect: TheGraph.factories.createRect,
     createNodeBorderRect: TheGraph.factories.createRect,
     createNodeInnerRect: TheGraph.factories.createRect,
+    createNodeResizeRect: TheGraph.factories.createRect,
+    createNodeResizeGroup: TheGraph.factories.createGroup,
     createNodeIconText: TheGraph.factories.createText,
     createNodeIconSVG: TheGraph.factories.createImg,
     createNodeInportsGroup: TheGraph.factories.createGroup,
@@ -137,59 +140,119 @@
       if (this.props.app.pinching) { return; }
 
       var domNode = ReactDOM.findDOMNode(this);
-      domNode.addEventListener("track", this.onTrack);
-      domNode.addEventListener("trackend", this.onTrackEnd);
+
+      var resize = event.target.parentNode.classList.contains('resize');
+      var onTrack = this.getOnTrack(resize);
+      var onTrackEnd = this.getOnTrackEnd(resize, onTrack);
+      domNode.addEventListener("track", onTrack);
+      domNode.addEventListener("trackend", onTrackEnd);
 
       // Moving a node should only be a single transaction
-      if (this.props.export) {
+      if (resize) {
+        this.props.graph.startTransaction('resizenode');
+      } else if (this.props.export) {
         this.props.graph.startTransaction('moveexport');
       } else {
         this.props.graph.startTransaction('movenode');
       }
     },
-    onTrack: function (event) {
-      // Don't fire on graph
-      event.stopPropagation();
+    getOnTrack: function (resize) {
+      var originalX = this.props.x;
+      var originalY = this.props.y;
+      var originalWidth = this.props.width;
+      var originalHeight = this.props.height;
+      return function (event) {
+        // Don't fire on graph
+        event.stopPropagation();
 
-      var scale = this.props.app.state.scale;
-      var deltaX = Math.round( event.ddx / scale );
-      var deltaY = Math.round( event.ddy / scale );
+        var scale = this.props.app.state.scale;
+        var deltaX = Math.round( event.ddx / scale );
+        var deltaY = Math.round( event.ddy / scale );
 
-      // Fires a change event on noflo graph, which triggers redraw
-      if (this.props.export) {
-        var newPos = {
-          x: this.props.export.metadata.x + deltaX,
-          y: this.props.export.metadata.y + deltaY
-        };
-        if (this.props.isIn) {
-          this.props.graph.setInportMetadata(this.props.exportKey, newPos);
-        } else {
-          this.props.graph.setOutportMetadata(this.props.exportKey, newPos);
-        }
-      } else {
-        this.props.graph.setNodeMetadata(this.props.nodeID, {
-          x: this.props.node.metadata.x + deltaX,
-          y: this.props.node.metadata.y + deltaY
-        });
-      }
-    },
-    onTrackEnd: function (event) {
-      // Don't fire on graph
-      event.stopPropagation();
+        // Fires a change event on noflo graph, which triggers redraw
+        if (resize) {
+          var width = this.props.width;
+          var height = this.props.height;
 
-      var domNode = ReactDOM.findDOMNode(this);
-      domNode.removeEventListener("track", this.onTrack);
-      domNode.removeEventListener("trackend", this.onTrackEnd);
+          var min = 72;
 
-      // Snap to grid
-      var snapToGrid = true;
-      var snap = TheGraph.config.node.snap / 2;
-      if (snapToGrid) {
-        var x, y;
-        if (this.props.export) {
+          var x = this.props.x,
+              y = this.props.y;
+
+          var resizers = {
+            top: function () {
+              if (event.dy > originalHeight - min && height === min) {
+                return {};
+              }
+              var props = {};
+              var newHeight = height - deltaY;
+              if (newHeight >= min) {
+                props.height = newHeight;
+                props.y = y + deltaY;
+              } else {
+                props.height = min;
+                props.y = originalY + (originalHeight - min);
+              }
+              return props;
+            },
+            left: function () {
+              if (event.dx > originalWidth - min && width === min) {
+                return {};
+              }
+              var props = {};
+              var newWidth = width - deltaX;
+              if (newWidth >= min) {
+                props.width = newWidth;
+                props.x = x + deltaX;
+              } else {
+                props.width = min;
+                props.x = originalX;
+              }
+              var newHeight = height - deltaY;
+              return props;
+            },
+            bottom: function () {
+              if (event.dy < 0 && height === min) {
+                return {};
+              }
+              var newHeight = height + deltaY;
+              return {
+                height: newHeight < min ? min : newHeight
+              };
+            },
+            right: function () {
+              if (event.dx < 0 && width === min) {
+                return {};
+              }
+              var newWidth = width + deltaX;
+              return {
+                width: newWidth < min ? min : newWidth,
+              };
+            },
+            bottomright: function () {
+              return TheGraph.merge(this.bottom(), this.right());
+            },
+            topleft: function () {
+              return TheGraph.merge(this.top(), this.left());
+            },
+            bottomleft: function () {
+              return TheGraph.merge(this.bottom(), this.left());
+            },
+            topright: function () {
+              return TheGraph.merge(this.top(), this.right());
+            }
+          };
+          var resizeType = event.target.classList[0];
+          var resizer = resizers[resizeType]();
+          if (this.props.export) {
+            return;
+          } else {
+            this.props.graph.setNodeMetadata(this.props.nodeID, resizer);
+          }
+        } else if (this.props.export) {
           var newPos = {
-            x: Math.round(this.props.export.metadata.x/snap) * snap,
-            y: Math.round(this.props.export.metadata.y/snap) * snap
+            x: this.props.export.metadata.x + deltaX,
+            y: this.props.export.metadata.y + deltaY
           };
           if (this.props.isIn) {
             this.props.graph.setInportMetadata(this.props.exportKey, newPos);
@@ -198,18 +261,54 @@
           }
         } else {
           this.props.graph.setNodeMetadata(this.props.nodeID, {
-            x: Math.round(this.props.node.metadata.x/snap) * snap,
-            y: Math.round(this.props.node.metadata.y/snap) * snap
+            x: this.props.node.metadata.x + deltaX,
+            y: this.props.node.metadata.y + deltaY
           });
         }
-      }
+      }.bind(this);
+    },
+    getOnTrackEnd: function (resize, onTrack) {
+      var onTrackEnd = function (event) {
+        // Don't fire on graph
+        event.stopPropagation();
 
-      // Moving a node should only be a single transaction
-      if (this.props.export) {
-        this.props.graph.endTransaction('moveexport');
-      } else {
-        this.props.graph.endTransaction('movenode');
-      }
+        var domNode = ReactDOM.findDOMNode(this);
+        domNode.removeEventListener("track", onTrack);
+        domNode.removeEventListener("trackend", onTrackEnd);
+
+        // Snap to grid
+        var snapToGrid = true;
+        var snap = TheGraph.config.node.snap / 2;
+        if (snapToGrid) {
+          var x, y;
+          if (this.props.export) {
+            var newPos = {
+              x: Math.round(this.props.export.metadata.x/snap) * snap,
+              y: Math.round(this.props.export.metadata.y/snap) * snap
+            };
+            if (this.props.isIn) {
+              this.props.graph.setInportMetadata(this.props.exportKey, newPos);
+            } else {
+              this.props.graph.setOutportMetadata(this.props.exportKey, newPos);
+            }
+          } else {
+            this.props.graph.setNodeMetadata(this.props.nodeID, {
+              x: Math.round(this.props.node.metadata.x/snap) * snap,
+              y: Math.round(this.props.node.metadata.y/snap) * snap
+            });
+          }
+        }
+
+        // Moving a node should only be a single transaction
+        if (resize) {
+          this.props.graph.endTransaction('resizenode');
+        } else if (this.props.export) {
+          this.props.graph.endTransaction('moveexport');
+        } else {
+          this.props.graph.endTransaction('movenode');
+        }
+      }.bind(this);
+      return onTrackEnd;
     },
     showContext: function (event) {
       // Don't show native context menu
@@ -327,8 +426,10 @@
     shouldComponentUpdate: function (nextProps, nextState) {
       // Only rerender if changed
       return (
-        nextProps.x !== this.props.x || 
+        nextProps.x !== this.props.x ||
         nextProps.y !== this.props.y ||
+        nextProps.width !== this.props.width ||
+        nextProps.height !== this.props.height ||
         nextProps.icon !== this.props.icon ||
         nextProps.label !== this.props.label ||
         nextProps.sublabel !== this.props.sublabel ||
@@ -364,14 +465,38 @@
       var isExport = (this.props.export !== undefined);
       var showContext = this.props.showContext;
       var highlightPort = this.props.highlightPort;
+      var inports = this.props.ports.inports;
+      var outports = this.props.ports.outports;
+      var maxInports = Object.keys(inports).reduce(function (max, key) {
+        var len = inports[key].label.length;
+        return max >= len ? max : len;
+      }, 0);
+      var maxOutports = Object.keys(outports).reduce(function (max, key) {
+        var len = outports[key].label.length;
+        return max >= len ? max : len;
+      }, 0);
+      var minLabelWidth = 12/(width - 12);
+      var maxLabelWidth = 1 - minLabelWidth;
+      var inportLabelWidth = maxInports / (maxInports + maxOutports);
+      var outportLabelWidth = maxOutports / (maxInports + maxOutports);
+      if (inportLabelWidth < minLabelWidth) {
+        inportLabelWidth = minLabelWidth;
+      } else if (inportLabelWidth > maxLabelWidth) {
+        inportLabelWidth = maxLabelWidth;
+      }
+      if (outportLabelWidth < minLabelWidth) {
+        outportLabelWidth = minLabelWidth;
+      } else if (outportLabelWidth > maxLabelWidth) {
+        outportLabelWidth = maxLabelWidth;
+      }
 
       // Inports
-      var inports = this.props.ports.inports;
       keys = Object.keys(inports);
       count = keys.length;
       // Make views
-      var inportViews = keys.map(function(key){
+      var inportViews = keys.map(function(key, i){
         var info = inports[key];
+        info.y = height / (count+1) * (i+1);
         var props = {
           app: app,
           graph: graph,
@@ -390,17 +515,19 @@
           port: {process:processKey, port:info.label, type:info.type},
           highlightPort: highlightPort,
           route: info.route,
-          showContext: showContext
+          showContext: showContext,
+          labelWidth: inportLabelWidth
         };
         return TheGraph.factories.node.createNodePort(props);
       });
 
       // Outports
-      var outports = this.props.ports.outports;
       keys = Object.keys(outports);
       count = keys.length;
-      var outportViews = keys.map(function(key){
+      var outportViews = keys.map(function(key, i){
         var info = outports[key];
+        info.x = width;
+        info.y = height / (count+1) * (i+1);
         var props = {
           app: app,
           graph: graph,
@@ -414,12 +541,13 @@
           nodeY: y,
           nodeWidth: width,
           nodeHeight: height,
-          x: info.x,
+          x: width,
           y: info.y,
           port: {process:processKey, port:info.label, type:info.type},
           highlightPort: highlightPort,
           route: info.route,
-          showContext: showContext
+          showContext: showContext,
+          labelWidth: outportLabelWidth
         };
         return TheGraph.factories.node.createNodePort(props);
       });
@@ -483,6 +611,98 @@
       var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
       var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
 
+      var resizeWidth = 10;
+      var resizeOffset = 3;
+      var translate = function (x, y) {
+        return 'translate(' + x + ', ' + y + ')';
+      };
+      var resizeCornerConfig = {
+        width: resizeWidth,
+        height: resizeWidth
+      };
+      var horizontalConfig = {
+        width: this.props.width - resizeWidth*2 + resizeOffset*2,
+        height: resizeWidth
+      };
+      var verticalConfig = {
+        width: resizeWidth,
+        height: this.props.height - resizeWidth*2 + resizeOffset*2
+      };
+      var cornerConfigs = [
+        {
+          className: 'topleft',
+          transform: translate(-1 * resizeOffset, -1 * resizeOffset)
+        },
+        {
+          className: 'topright',
+          transform: translate(
+            this.props.width - resizeWidth + resizeOffset,
+            -1 * resizeOffset
+          )
+        },
+        {
+          className: 'bottomleft',
+          transform: translate(
+            -1 * resizeOffset,
+            this.props.height - resizeWidth + resizeOffset
+          )
+        },
+        {
+          className: 'bottomright',
+          transform: translate(
+            this.props.width - resizeWidth + resizeOffset,
+            this.props.height - resizeWidth + resizeOffset
+          )
+        }
+      ];
+      var horizontalEdgeConfigs = [
+        {
+          className: 'top',
+          transform: translate(resizeWidth - resizeOffset, -1*resizeOffset)
+        },
+        {
+          className: 'bottom',
+          transform: translate(
+            resizeWidth - resizeOffset,
+            this.props.height - resizeWidth + resizeOffset
+          )
+        },
+      ];
+      var verticalEdgeConfigs = [
+        {
+          className: 'left',
+          transform: translate(-1*resizeOffset, resizeWidth - resizeOffset)
+        },
+        {
+          className: 'right',
+          transform: translate(
+            this.props.width - resizeWidth + resizeOffset,
+            resizeWidth - resizeOffset
+          )
+        },
+      ];
+
+      var resizeRectGroup = TheGraph.factories.node.createNodeResizeGroup.call(
+        this,
+        {className: 'resize'},
+        cornerConfigs.map(function (config) {
+          return TheGraph.factories.node.createNodeResizeRect.call(
+            this,
+            TheGraph.merge(resizeCornerConfig, config)
+          );
+        }.bind(this)).concat(verticalEdgeConfigs.map(function (config) {
+          return TheGraph.factories.node.createNodeResizeRect.call(
+            this,
+            TheGraph.merge(verticalConfig, config)
+          );
+        }.bind(this))).concat(horizontalEdgeConfigs.map(function (config) {
+          return TheGraph.factories.node.createNodeResizeRect.call(
+            this,
+            TheGraph.merge(horizontalConfig, config)
+          );
+        }.bind(this)))
+      );
+
       var nodeContents = [
         backgroundRect,
         borderRect,
@@ -494,6 +714,11 @@
         sublabelGroup
       ];
 
+      if (!this.props.export) {
+        nodeContents.push(resizeRectGroup);
+
+      }
+
       var nodeOptions = {
         className: "node drag"+
           (this.props.selected ? " selected" : "")+
@@ -501,7 +726,7 @@
         name: this.props.nodeID,
         key: this.props.nodeID,
         title: label,
-        transform: "translate("+x+","+y+")"
+        transform: translate(x, y)
       };
       nodeOptions = TheGraph.merge(TheGraph.config.node.container, nodeOptions);
 
