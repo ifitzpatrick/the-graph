@@ -43,22 +43,18 @@
 .the-graph-light .resize .top,
 .the-graph-light .resize .bottom {
   cursor: ns-resize;
-  fill: #008000;
 }
 .the-graph-light .resize .right,
 .the-graph-light .resize .left {
   cursor: ew-resize;
-  fill: #00f;
 }
 .the-graph-light .resize .topleft,
 .the-graph-light .resize .bottomright {
   cursor: nwse-resize;
-  fill: #ff0;
 }
 .the-graph-light .resize .topright,
 .the-graph-light .resize .bottomleft {
   cursor: nesw-resize;
-  fill: #800080;
 }
 @-webkit-keyframes error {
   0% {
@@ -270,7 +266,6 @@
   fill: #000;
   text-anchor: middle;
   dominant-baseline: central;
-  text-overflow: ellipsis;
 }
 .the-graph-light text.tail {
   fill: url("#greyfade");
