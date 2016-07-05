@@ -244,7 +244,11 @@ var wedidit = false;
           };
           var resizeType = event.target.classList[0];
           var resizer = resizers[resizeType]();
-          this.props.graph.setNodeMetadata(this.props.nodeID, resizer);
+          if (this.props.export) {
+            return;
+          } else {
+            this.props.graph.setNodeMetadata(this.props.nodeID, resizer);
+          }
         } else if (this.props.export) {
           var newPos = {
             x: this.props.export.metadata.x + deltaX,
@@ -707,9 +711,13 @@ var wedidit = false;
         inportsGroup,
         outportsGroup,
         labelGroup,
-        sublabelGroup,
-        resizeRectGroup
+        sublabelGroup
       ];
+
+      if (!this.props.export) {
+        nodeContents.push(resizeRectGroup);
+
+      }
 
       var nodeOptions = {
         className: "node drag"+
