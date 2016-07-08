@@ -348,7 +348,8 @@
               }
               component.outports.push({
                 name: edge.from.port,
-                type: 'all'
+                type: 'all',
+                addressable: !!edge.from.index
               });
             }
             if (edge.to.node === node.id) {
@@ -359,7 +360,8 @@
               }
               component.inports.push({
                 name: edge.to.port,
-                type: 'all'
+                type: 'all',
+                addressable: !!edge.to.index
               });
             }
           });

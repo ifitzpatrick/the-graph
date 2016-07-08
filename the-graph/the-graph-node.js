@@ -109,8 +109,10 @@ var wedidit = false;
 
       // Tap to select
       if (this.props.onNodeSelection) {
-        domNode.addEventListener("tap", this.onNodeSelection, true);
+        domNode.addEventListener("tap", this.onNodeSelection);
       }
+
+      domNode.addEventListener("the-graph-expand-port", this.expandPort);
 
       // Context menu
       if (this.props.showContext) {
@@ -310,6 +312,21 @@ var wedidit = false;
       }.bind(this);
       return onTrackEnd;
     },
+    expandPort: function (event) {
+      var expandedPorts = this.props.node.metadata.expandedPorts;
+      if (!expandedPorts) {
+        expandedPorts = {
+          inports: {},
+          outports: {}
+        };
+      }
+      expandedPorts[event.detail.isIn ? 'inports' : 'outports'][event.detail.port] =
+        event.detail.expand;
+
+      this.props.graph.setNodeMetadata(this.props.nodeID, {
+        expandedPorts: expandedPorts
+      });
+    },
     showContext: function (event) {
       // Don't show native context menu
       event.preventDefault();
@@ -465,14 +482,15 @@ var wedidit = false;
       var isExport = (this.props.export !== undefined);
       var showContext = this.props.showContext;
       var highlightPort = this.props.highlightPort;
+      var ports = this.props.ports;
       var inports = this.props.ports.inports;
       var outports = this.props.ports.outports;
       var maxInports = Object.keys(inports).reduce(function (max, key) {
-        var len = inports[key].label.length;
+        var len = inports[key].label.length + (inports[key].addressable ? 1 : 0);
         return max >= len ? max : len;
       }, 0);
       var maxOutports = Object.keys(outports).reduce(function (max, key) {
-        var len = outports[key].label.length;
+        var len = outports[key].label.length + (outports[key].addressable ? 1 : 0);
         return max >= len ? max : len;
       }, 0);
       var minLabelWidth = 12/(width - 12);
@@ -490,67 +508,95 @@ var wedidit = false;
         outportLabelWidth = maxLabelWidth;
       }
 
-      // Inports
-      keys = Object.keys(inports);
-      count = keys.length;
-      // Make views
-      var inportViews = keys.map(function(key, i){
-        var info = inports[key];
-        info.y = height / (count+1) * (i+1);
-        var props = {
-          app: app,
-          graph: graph,
-          node: node,
-          key: processKey + ".in." + info.label,
-          label: info.label,
-          processKey: processKey,
-          isIn: true,
-          isExport: isExport,
-          nodeX: x,
-          nodeY: y,
-          nodeWidth: width,
-          nodeHeight: height,
-          x: info.x,
-          y: info.y,
-          port: {process:processKey, port:info.label, type:info.type},
-          highlightPort: highlightPort,
-          route: info.route,
-          showContext: showContext,
-          labelWidth: inportLabelWidth
-        };
-        return TheGraph.factories.node.createNodePort(props);
+      var portViews = [{
+        ports: inports,
+        count: ports.inportCount,
+        type: 'in',
+        labelWidth: inportLabelWidth
+      }, {
+        ports: outports,
+        count: ports.outportCount,
+        type: 'out',
+        labelWidth: outportLabelWidth
+      }].map(function (config) {
+        var ports = config.ports;
+        var keys = Object.keys(ports);
+        var count = config.count || 0;
+        var views = [];
+        var i = 0;
+        var isIn = config.type === 'in';
+        keys.forEach(function(key){
+          var info = ports[key];
+          var props = {
+            app: app,
+            graph: graph,
+            node: node,
+            key: processKey + "." + config.type + "." + info.label,
+            label: info.label,
+            processKey: processKey,
+            isIn: isIn,
+            isExport: isExport,
+            nodeX: x,
+            nodeY: y,
+            nodeWidth: width,
+            nodeHeight: height,
+            x: info.x,
+            y: info.y,
+            expand: info.expand,
+            port: {
+              process: processKey,
+              port: info.label,
+              type: info.type,
+              addressable: info.addressable
+            },
+            highlightPort: highlightPort,
+            route: info.route,
+            showContext: showContext,
+            labelWidth: config.labelWidth
+          };
+          views.push(TheGraph.factories.node.createNodePort(props));
+          i++;
+          if (info.expand && info.indexList) {
+            info.indexList.map(function (connected, index) {
+              var info = ports[key];
+              var indexLabel = '[' + index + ']';
+              var x = info.x;
+              var y = height / (count+1) * (i+1);
+              var props = {
+                app: app,
+                graph: graph,
+                node: node,
+                key: processKey + "." + config.type + "." + info.label + indexLabel,
+                label: info.label + indexLabel,
+                processKey: processKey,
+                isIn: isIn,
+                isExport: isExport,
+                nodeX: x,
+                nodeY: y,
+                nodeWidth: width,
+                nodeHeight: height,
+                x: x,
+                y: y,
+                port: {
+                  process: processKey,
+                  port: info.label,
+                  type: info.type,
+                  index: index
+                },
+                highlightPort: highlightPort,
+                route: info.route,
+                showContext: showContext,
+                labelWidth: config.labelWidth
+              };
+              views.push(TheGraph.factories.node.createNodePort(props));
+              i++;
+            });
+          }
+        });
+        return views;
       });
-
-      // Outports
-      keys = Object.keys(outports);
-      count = keys.length;
-      var outportViews = keys.map(function(key, i){
-        var info = outports[key];
-        info.x = width;
-        info.y = height / (count+1) * (i+1);
-        var props = {
-          app: app,
-          graph: graph,
-          node: node,
-          key: processKey + ".out." + info.label,
-          label: info.label,
-          processKey: processKey,
-          isIn: false,
-          isExport: isExport,
-          nodeX: x,
-          nodeY: y,
-          nodeWidth: width,
-          nodeHeight: height,
-          x: width,
-          y: info.y,
-          port: {process:processKey, port:info.label, type:info.type},
-          highlightPort: highlightPort,
-          route: info.route,
-          showContext: showContext,
-          labelWidth: outportLabelWidth
-        };
-        return TheGraph.factories.node.createNodePort(props);
-      });
+      var inportViews = portViews[0];
+      var outportViews = portViews[1];
 
       // Node Icon
       var icon = TheGraph.FONT_AWESOME[ this.props.icon ];
@@ -581,7 +627,7 @@ var wedidit = false;
 
       var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
       var borderRect = TheGraph.factories.node.createNodeBorderRect.call(this, borderRectOptions);
-      
+
       var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { width: this.props.width - 6, height: this.props.height - 6 });
       var innerRect = TheGraph.factories.node.createNodeInnerRect.call(this, innerRectOptions);
 
@@ -707,17 +753,19 @@ var wedidit = false;
         backgroundRect,
         borderRect,
         innerRect,
-        iconContent,
-        inportsGroup,
-        outportsGroup,
-        labelGroup,
-        sublabelGroup
+        iconContent
       ];
 
       if (!this.props.export) {
         nodeContents.push(resizeRectGroup);
-
       }
+
+      var nodeContents = nodeContents.concat([
+        inportsGroup,
+        outportsGroup,
+        labelGroup,
+        sublabelGroup
+      ]);
 
       var nodeOptions = {
         className: "node drag"+

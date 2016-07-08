@@ -517,7 +517,8 @@ loadGraph({
       },
       "tgt": {
         "process": "seriously/SetTarget_kii7s",
-        "port": "source"
+        "port": "source",
+        "index": 0
       },
       "metadata": {
         "route": "5"
@@ -582,7 +583,8 @@ loadGraph({
       },
       "tgt": {
         "process": "seriously/SetTarget_kii7s",
-        "port": "source"
+        "port": "source",
+        "index": 1
       },
       "metadata": {
         "route": "5"
@@ -591,7 +593,8 @@ loadGraph({
     {
       "src": {
         "process": "routers/KickRouter_bzaiw",
-        "port": "out"
+        "port": "out",
+        "index": 0
       },
       "tgt": {
         "process": "seriously/Hex_lx162",
@@ -608,7 +611,8 @@ loadGraph({
       },
       "tgt": {
         "process": "seriously/SetTarget_kii7s",
-        "port": "source"
+        "port": "source",
+        "index": 1
       },
       "metadata": {
         "route": "5"
@@ -630,7 +634,8 @@ loadGraph({
     {
       "src": {
         "process": "routers/KickRouter_bzaiw",
-        "port": "out"
+        "port": "out",
+        "index": 1
       },
       "tgt": {
         "process": "core/Split_jx318",
@@ -660,7 +665,8 @@ loadGraph({
       },
       "tgt": {
         "process": "seriously/SetTarget_kii7s",
-        "port": "source"
+        "port": "source",
+        "index": 2
       },
       "metadata": {
         "route": "5"
@@ -734,7 +740,8 @@ loadGraph({
     {
       "src": {
         "process": "routers/KickRouter_bzaiw",
-        "port": "out"
+        "port": "out",
+        "index": 2
       },
       "tgt": {
         "process": "seriously/HueSaturation_bzfvt",
@@ -751,7 +758,8 @@ loadGraph({
       },
       "tgt": {
         "process": "seriously/SetTarget_kii7s",
-        "port": "source"
+        "port": "source",
+        "index": 3
       },
       "metadata": {
         "route": "5"
@@ -968,7 +976,8 @@ loadGraph({
     {
       "src": {
         "process": "routers/KickRouter_bzaiw",
-        "port": "out"
+        "port": "out",
+        "index": 3
       },
       "tgt": {
         "process": "seriously/Ascii_17c9q",
@@ -981,7 +990,8 @@ loadGraph({
     {
       "src": {
         "process": "routers/KickRouter_bzaiw",
-        "port": "out"
+        "port": "out",
+        "index": 4
       },
       "tgt": {
         "process": "seriously/TVGlitch_e1qre",

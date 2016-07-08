@@ -130,6 +130,28 @@
               type: 'boolean'
             });
             editor.registerComponent(component);
+
+            var originalKickRouter = editor.getComponent('routers/KickRouter');
+            if (!originalKickRouter) {
+              console.warn("Didn't find kickrouter. Something is amiss.");
+              return;
+            }
+            var kickRouter = JSON.parse(JSON.stringify(originalKickRouter));
+            kickRouter.outports[0].addressable = true;
+            kickRouter.outports.push({
+              name: 'otherport',
+              type: 'string'
+            });
+            editor.registerComponent(kickRouter);
+
+            var originalSetTarget = editor.getComponent('seriously/SetTarget');
+            if (!originalSetTarget) {
+              console.warn("Didn't find settarget. Something is amiss.");
+              return;
+            }
+            var setTarget = JSON.parse(JSON.stringify(originalSetTarget));
+            setTarget.inports[0].addressable = true;
+            editor.registerComponent(setTarget);
           }, 1000);
 
           // Simulate node icon updates

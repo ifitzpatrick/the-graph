@@ -101,18 +101,32 @@
     },
     componentDidMount: function () {
       // To change port colors
-      this.props.graph.on("addEdge", this.resetPortRoute);
+      this.props.graph.on("addEdge", this.didAddEdge);
+      this.props.graph.on("removeEdge", this.didRemoveEdge);
       this.props.graph.on("changeEdge", this.resetPortRoute);
-      this.props.graph.on("removeEdge", this.resetPortRoute);
       this.props.graph.on("removeInitial", this.resetPortRoute);
 
       // Listen to noflo graph object's events
-      this.props.graph.on("changeNode", this.markDirty);
+      this.props.graph.on("changeNode", this.didChangeNode);
       this.props.graph.on("changeInport", this.markDirty);
       this.props.graph.on("changeOutport", this.markDirty);
       this.props.graph.on("endTransaction", this.markDirty);
 
       ReactDOM.findDOMNode(this).addEventListener("the-graph-node-remove", this.removeNode);
+    },
+    didChangeNode: function (event) {
+      delete this.portInfo[event.id];
+      this.markDirty(event);
+    },
+    didAddEdge: function (edge) {
+      this.arrayPortInfo = null;
+      this.portInfo = {};
+      this.resetPortRoute(edge);
+    },
+    didRemoveEdge: function (edge) {
+      this.arrayPortInfo = null;
+      this.portInfo = {};
+      this.resetPortRoute(edge);
     },
     edgePreview: null,
     edgeStart: function (event) {
@@ -176,7 +190,34 @@
       this.markDirty();
     },
     addEdge: function (edge) {
-      this.state.graph.addEdge(edge.from.process, edge.from.port, edge.to.process, edge.to.port, edge.metadata);
+      var graph = this.state.graph,
+          fromIndex,
+          toIndex;
+
+
+      if (edge.from.addressable) {
+        fromIndex = this.getArrayPortInfo(
+          graph, edge.from.process, false, edge.from.port).length;
+      }
+
+      if (edge.from.hasOwnProperty('index')) {
+        fromIndex = edge.from.index;
+      }
+
+      if (edge.to.addressable) {
+        toIndex = this.getArrayPortInfo(
+          graph, edge.to.process, true, edge.to.port).length;
+      }
+
+      if (edge.to.hasOwnProperty('index')) {
+        toIndex = edge.to.index;
+      }
+
+      graph.addEdgeIndex(
+        edge.from.process, edge.from.port, fromIndex,
+        edge.to.process, edge.to.port, toIndex,
+        edge.metadata
+      );
     },
     moveGroup: function (nodes, dx, dy) {
       var graph = this.state.graph;
@@ -205,11 +246,57 @@
     getComponentInfo: function (componentName) {
       return this.props.library[componentName];
     },
+    arrayPortInfo: null,
+    getArrayPortInfo: function (graph, processName, isIn, port) {
+      if (!this.arrayPortInfo) {
+        var portInfo = {
+        };
+
+        graph.edges.forEach(function (edge) {
+          ['from', 'to'].forEach(function (portType) {
+            var portEnd = edge[portType];
+            var node = portEnd.node;
+            var port = portEnd.port;
+
+            if (!portInfo[node]) {
+              portInfo[node] = {
+                from: {},
+                to: {}
+              }
+            }
+
+            if (!portInfo[node][portType][port]) {
+              portInfo[node][portType][port] = [];
+            }
+
+            if (portEnd.hasOwnProperty('index')) {
+              portInfo[node][portType][port][portEnd.index] = true;
+            }
+          });
+        });
+
+        this.arrayPortInfo = portInfo;
+      }
+
+      var isInKey = isIn ? 'to' : 'from';
+      if (
+        this.arrayPortInfo[processName] &&
+        this.arrayPortInfo[processName][isInKey][port]
+      ) {
+        return this.arrayPortInfo[processName][isInKey][port] || [];
+      } else {
+        return [];
+      }
+    },
     portInfo: {},
     getPorts: function (graph, processName, componentName) {
       var node = graph.getNode(processName);
-
       var ports = this.portInfo[processName];
+      var expanded = node.metadata.expandedPorts || {
+        inports: {},
+        outports: {}
+      };
+
       if (!ports) {
         var inports = {};
         var outports = {};
@@ -222,7 +309,7 @@
               outports: outports
             };
           }
-          
+
           var i, port, len;
           for (i=0, len=component.outports.length; i<len; i++) {
             port = component.outports[i];
@@ -230,6 +317,14 @@
             outports[port.name] = {
               label: port.name,
               type: port.type,
+              addressable: port.addressable,
+              indexList: port.addressable ? this.getArrayPortInfo(
+                graph,
+                processName,
+                false,
+                port.name
+              ) : null,
+              expand: expanded.outports[port.name],
               x: node.metadata.width,
               y: node.metadata.height / (len+1) * (i+1)
             };
@@ -240,18 +335,92 @@
             inports[port.name] = {
               label: port.name,
               type: port.type,
+              addressable: port.addressable,
+              indexList: port.addressable ? this.getArrayPortInfo(
+                graph,
+                processName,
+                true,
+                port.name
+              ) : null,
+              expand: expanded.inports[port.name],
               x: 0,
               y: node.metadata.height / (len+1) * (i+1)
             };
           }
         }
+        var inportCount = Object.keys(inports).reduce(function (count, key) {
+          var port = inports[key];
+          var indexList = port.indexList || [];
+          var expand = port.expand;
+          return count + 1 + (expand ? indexList.length : 0);
+        }, 0);
+        var outportCount = Object.keys(outports).reduce(function (count, key) {
+          var port = outports[key];
+          var indexList = port.indexList || [];
+          var expand = port.expand;
+          return count + 1 + (expand ? indexList.length : 0);
+        }, 0);
         ports = {
           inports: inports,
-          outports: outports
+          outports: outports,
+          dirty: true,
+          count: Math.max(inportCount, outportCount),
+          inportCount: inportCount,
+          outportCount: outportCount,
+          height: null,//node.metadata.height
         };
         this.portInfo[processName] = ports;
       }
       return ports;
+    },
+    updatePortPositions: function (graph, processName) {
+      var node = graph.getNode(processName);
+      var nodeHeight = node.metadata.height;
+      var ports = this.portInfo[processName];
+
+      if (ports.height === nodeHeight) {
+        return;
+      }
+
+      ports.dirty = true;
+      ports.height = nodeHeight;
+
+      var i, len;
+      i = 0;
+      len = ports.outportCount;
+
+      var map = function (indexList, callback) {
+        var i, len, newList = [], item;
+        for (i = 0, len = indexList.length; i < len; i++) {
+          item = indexList[i];
+          indexList[i] = !!item;
+          newList.push(callback(item));
+        }
+        return newList;
+      };
+      var nextY = function () {
+        var portHeight = nodeHeight / (len+1) * (i+1)
+        i++;
+        return portHeight;
+      };
+
+      Object.keys(ports.outports).forEach(function (key) {
+        var port = ports.outports[key];
+        port.y = nextY();
+        if (port.expand) {
+          port.indexY = map(port.indexList, nextY);
+        }
+      });
+
+      i = 0;
+      len = ports.inportCount;
+      Object.keys(ports.inports).forEach(function (key) {
+        var port = ports.inports[key];
+        port.y = nextY();
+        if (port.expand) {
+          port.indexY = map(port.indexList, nextY);
+        }
+      });
     },
     getNodeOutport: function (graph, processName, portName, route, componentName) {
       var ports = this.getPorts(graph, processName, componentName);
@@ -404,6 +573,7 @@
       // Reset ports if library has changed
       if (this.libraryDirty) {
         this.libraryDirty = false;
+        this.arrayPortInfo = null;
         this.portInfo = {};
       }
 
@@ -435,14 +605,18 @@
         if (node.metadata.height === undefined) { 
           node.metadata.height = TheGraph.config.nodeHeight;
         }
+
+        var ports = self.getPorts(graph, key, node.component);
         if (TheGraph.config.autoSizeNode && componentInfo) {
           // Adjust node height based on number of ports.
-          var portCount = Math.max(componentInfo.inports.length, componentInfo.outports.length);
+          var portCount = ports.count;
           if (portCount > TheGraph.config.maxPortCount) {
             var diff = portCount - TheGraph.config.maxPortCount;
             node.metadata.height = TheGraph.config.nodeHeight + (diff * TheGraph.config.nodeHeightIncrement);
           }
         }
+        self.updatePortPositions(graph, key);
+
         if (!node.metadata.label || node.metadata.label === "") {
           node.metadata.label = key;
         }
@@ -475,7 +649,7 @@
           node: node,
           icon: icon,
           iconsvg: iconsvg,
-          ports: self.getPorts(graph, key, node.component),
+          ports: ports,
           onNodeSelection: self.props.onNodeSelection,
           selected: selected,
           error: (self.state.errorNodes[key] === true),
@@ -517,6 +691,12 @@
           (edge.to.hasOwnProperty('index') ? '['+edge.to.index+']' : '') + ' ' +
           edge.to.node + '()';
 
+        var sourceY = sourcePort.expand && sourcePort.indexY ?
+          sourcePort.indexY[edge.from.index] || sourcePort.y : sourcePort.y;
+
+        var targetY = targetPort.expand && targetPort.indexY ?
+          targetPort.indexY[edge.to.index] || targetPort.y : targetPort.y;
+
         var edgeOptions = {
           key: key,
           edgeID: key,
@@ -524,9 +704,9 @@
           edge: edge,
           app: self.props.app,
           sX: source.metadata.x + source.metadata.width,
-          sY: source.metadata.y + sourcePort.y,
+          sY: source.metadata.y + sourceY,
           tX: target.metadata.x,
-          tY: target.metadata.y + targetPort.y,
+          tY: target.metadata.y + targetY,
           label: label,
           route: route,
           onEdgeSelection: self.props.onEdgeSelection,
@@ -543,7 +723,7 @@
       var iips = graph.initializers.map(function (iip) {
         var target = graph.getNode(iip.to.node);
         if (!target) { return; }
-        
+
         var targetPort = self.getNodeInport(graph, iip.to.node, iip.to.port, 0, target.component);
         var tX = target.metadata.x;
         var tY = target.metadata.y + targetPort.y;
@@ -782,9 +962,13 @@
         if (edgePreview.from) {
           var source = graph.getNode(edgePreview.from.process);
           var sourcePort = this.getNodeOutport(graph, edgePreview.from.process, edgePreview.from.port);
+
+          var sourceY = sourcePort.expand && sourcePort.indexY ?
+            sourcePort.indexY[edgePreview.from.index] || sourcePort.y : sourcePort.y;
+
           edgePreviewOptions = {
             sX: source.metadata.x + source.metadata.width,
-            sY: source.metadata.y + sourcePort.y,
+            sY: source.metadata.y + sourceY,
             tX: this.state.edgePreviewX,
             tY: this.state.edgePreviewY,
             route: edgePreview.metadata.route
@@ -792,11 +976,15 @@
         } else {
           var target = graph.getNode(edgePreview.to.process);
           var targetPort = this.getNodeInport(graph, edgePreview.to.process, edgePreview.to.port);
+
+          var targetY = targetPort.expand && targetPort.indexY ?
+            targetPort.indexY[edgePreview.to.index] || targetPort.y : targetPort.y;
+
           edgePreviewOptions = {
             sX: this.state.edgePreviewX,
             sY: this.state.edgePreviewY,
             tX: target.metadata.x,
-            tY: target.metadata.y + targetPort.y,
+            tY: target.metadata.y + targetY,
             route: edgePreview.metadata.route
           };
         }
