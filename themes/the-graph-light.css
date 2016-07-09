@@ -339,6 +339,10 @@
 .the-graph-light text.tail {
   fill: url("#greyfade");
 }
+.the-graph-light text.expand {
+  cursor: pointer;
+  fill: #00f;
+}
 .the-graph-light .text-bg-rect {
   fill: rgba(255,255,255,0.5);
 }

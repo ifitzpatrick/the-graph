@@ -339,6 +339,10 @@
 .the-graph-dark text.tail {
   fill: url("#greyfade");
 }
+.the-graph-dark text.expand {
+  cursor: pointer;
+  fill: #00f;
+}
 .the-graph-dark .text-bg-rect {
   fill: rgba(0,0,0,0.5);
 }

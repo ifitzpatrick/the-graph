@@ -405,6 +405,9 @@
               var dInport = dInports[_j];
               if (cInport.name === dInport.name) {
                 exists = true;
+                if (cInport.addressable) {
+                  dInport.addressable = cInport.addressable;
+                }
               }
             }
             if (!exists) {
@@ -424,6 +427,9 @@
               var dOutport = dOutports[_j];
               if (cOutport.name === dOutport.name) {
                 exists = true;
+                if (cOutport.addressable) {
+                  dOutport.addressable = cOutport.addressable;
+                }
               }
             }
             if (!exists) {

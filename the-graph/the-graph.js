@@ -47,8 +47,8 @@
       var tooltipEvent = new CustomEvent('the-graph-tooltip', { 
         detail: {
           tooltip: this.props.label,
-          x: event.clientX,
-          y: event.clientY
+          x: event.clientX || event.x,
+          y: event.clientY || event.y
         }, 
         bubbles: true
       });

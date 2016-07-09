@@ -36,7 +36,8 @@
       var port = {
         process: this.props.processKey,
         port: this.props.label,
-        type: this.props.port.type
+        type: this.props.port.type,
+        addressable: this.props.port.addressable
       };
 
       var edgeStartEvent = new CustomEvent('the-graph-edge-start', { 
