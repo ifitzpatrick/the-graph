@@ -349,6 +349,9 @@
       domNode.addEventListener("the-graph-edge-start", this.edgeStart);
 
       domNode.addEventListener("contextmenu",this.onShowContext);
+      domNode.addEventListener("edge-preview", function (event) {
+        this.setState({edgePreview: event.detail});
+      }.bind(this));
 
       // Start zoom from middle if zoom before mouse move
       this.mouseX = Math.floor( this.props.width/2 );
@@ -378,16 +381,34 @@
       var x = event.x || event.clientX || 0;
       var y = event.y || event.clientY || 0;
 
-      // App.showContext
-      this.showContext({
-        element: this,
-        type: "main",
-        x: x,
-        y: y,
-        graph: this.props.graph,
-        itemKey: 'graph',
-        item: this.props.graph
-      });
+      if (this.state.edgePreview) {
+        var isIn = this.state.edgePreview.isIn;
+        var port = this.state.edgePreview[isIn ? 'to' : 'from'];
+        var graphState = this.refs.graph.state;
+        var portX = graphState.edgePreviewX;
+        var portY = graphState.edgePreviewY;
+        var port = TheGraph.merge({x: portX, y: portY}, port);
+        this.showContext({
+          element: this,
+          type: isIn ? 'nodeInport' : 'nodeOutport',
+          x: x,
+          y: y,
+          graph: this.props.graph,
+          itemKey: port.port,
+          item: port
+        });
+      } else {
+        // App.showContext
+        this.showContext({
+          element: this,
+          type: "main",
+          x: x,
+          y: y,
+          graph: this.props.graph,
+          itemKey: 'graph',
+          item: this.props.graph
+        });
+      }
     },
     keyDown: function (event) {
       // HACK metaKey global for taps https://github.com/Polymer/PointerGestures/issues/29

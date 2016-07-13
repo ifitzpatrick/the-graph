@@ -112,6 +112,7 @@
       this.props.graph.on("changeOutport", this.markDirty);
       this.props.graph.on("endTransaction", this.markDirty);
 
+      ReactDOM.findDOMNode(this).addEventListener("the-graph-cancel-preview-edge", this.cancelPreviewEdge);
       ReactDOM.findDOMNode(this).addEventListener("the-graph-node-remove", this.removeNode);
     },
     edgePreview: null,
@@ -150,6 +151,8 @@
       appDomNode.addEventListener("track", this.renderPreviewEdge);
       // TODO tap to add new node here
       appDomNode.addEventListener("tap", this.cancelPreviewEdge);
+      var edgePreviewEvent = new CustomEvent('edge-preview', {detail: edge});
+      appDomNode.dispatchEvent(edgePreviewEvent);
 
       this.setState({edgePreview: edge});
     },
@@ -158,6 +161,9 @@
       appDomNode.removeEventListener("mousemove", this.renderPreviewEdge);
       appDomNode.removeEventListener("track", this.renderPreviewEdge);
       appDomNode.removeEventListener("tap", this.cancelPreviewEdge);
+
+      var edgePreviewEvent = new CustomEvent('edge-preview', {detail: null});
+      appDomNode.dispatchEvent(edgePreviewEvent);
       if (this.state.edgePreview) {
         this.setState({edgePreview: null});
         this.markDirty();
@@ -714,6 +720,7 @@
 
 
       // Groups
+      var edgePreview = this.state.edgePreview;
       var groups = graph.groups.map(function (group) {
         if (group.nodes.length < 1) {
           return;
@@ -737,7 +744,8 @@
           description: group.metadata.description,
           color: group.metadata.color,
           triggerMoveGroup: self.moveGroup,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          edgePreview: edgePreview
         };
         groupOptions = TheGraph.merge(TheGraph.config.graph.nodeGroup, groupOptions);
         return TheGraph.factories.graph.createGraphGroup.call(this, groupOptions);
@@ -774,7 +782,6 @@
 
 
       // Edge preview
-      var edgePreview = this.state.edgePreview;
       if (edgePreview) {
         var edgePreviewOptions;
         if (edgePreview.from) {
