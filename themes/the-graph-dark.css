@@ -343,6 +343,10 @@
   cursor: pointer;
   fill: #00f;
 }
+.the-graph-dark text.menu-expand {
+  font-size: 120%;
+  font-weight: bold;
+}
 .the-graph-dark .text-bg-rect {
   fill: rgba(0,0,0,0.5);
 }

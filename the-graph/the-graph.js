@@ -353,7 +353,7 @@
 
     for (var key in src) {
       // Only copy properties, not functions.
-      if (typeof src[key] !== 'function' && (!dest[key] || overwrite))
+      if (typeof src[key] !== 'function' && (dest[key] === undefined || dest[key] === null || overwrite))
         dest[key] = src[key];
     }
 

@@ -343,6 +343,10 @@
   cursor: pointer;
   fill: #00f;
 }
+.the-graph-light text.menu-expand {
+  font-size: 120%;
+  font-weight: bold;
+}
 .the-graph-light .text-bg-rect {
   fill: rgba(255,255,255,0.5);
 }
