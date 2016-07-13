@@ -200,7 +200,7 @@
           graph, edge.from.process, false, edge.from.port).length;
       }
 
-      if (edge.from.hasOwnProperty('index')) {
+      if (typeof edge.from.index === 'number') {
         fromIndex = edge.from.index;
       }
 
@@ -209,7 +209,7 @@
           graph, edge.to.process, true, edge.to.port).length;
       }
 
-      if (edge.to.hasOwnProperty('index')) {
+      if (typeof edge.to.index === 'number') {
         toIndex = edge.to.index;
       }
 

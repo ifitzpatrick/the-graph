@@ -31,9 +31,19 @@
 
   TheGraph.NodeMenuPorts = React.createFactory( React.createClass({
     displayName: "TheGraphNodeMenuPorts",
+    componentDidMount: function () {
+      ReactDOM.findDOMNode(this).addEventListener("the-graph-expand-menu-port", this.expandPort);
+    },
+    expandPort: function (event) {
+      this.setState({expand: event.detail});
+    },
+    getInitialState: function () {
+      return {expand: null}
+    },
     render: function() {
       var portViews = [];
       var lines = [];
+      var lineAnchors = [];
 
       var scale = this.props.scale;
       var ports = this.props.ports;
@@ -56,8 +66,12 @@
         var lineOptions = TheGraph.merge(TheGraph.config.nodeMenuPorts.portPath, { d: [ "M", ox, oy, "L", x, y ].join(" ") });
         var line = TheGraph.factories.menuPorts.createNodeMenuPortsPortPath.call(this, lineOptions);
 
+        var label = key + (port.addressable ? '[]' : '');
+        var labelLen = label.length;
+        var width = (labelLen>12 ? labelLen*8+40 : 120);
         var portViewOptions = {
-          label: key,
+          label: label,
+          width: width,
           port: port,
           processKey: this.props.processKey,
           isIn: this.props.isIn,
@@ -71,6 +85,46 @@
 
         lines.push(line);
         portViews.push(portView);
+
+        if (this.state.expand === port) {
+          var anchorX = x + (this.props.isIn ? -1 : 1)*width;
+          var radius = 2;
+          var lineAnchorOptions = {
+            className: "fill route"+port.route,
+            cx: anchorX,
+            cy: y,
+            r: radius
+          };
+          var lineAnchor = TheGraph.factories.createCircle.call(this, lineAnchorOptions);
+          lineAnchors.push(lineAnchor);
+
+          for (var j = 0, indexLen = port.indexList.length; j < indexLen; j++) {
+            var indexPort = {
+              addressable: false,
+              index: j,
+              lastIndex: j === indexLen
+            };
+            var indexPort = TheGraph.merge(port, indexPort);
+            var indexPortViewOptions = TheGraph.merge(portViewOptions, {
+              port: indexPort,
+              x: x + (this.props.isIn ? -150 : 150),
+              y: y + TheGraph.contextPortSize*j,
+              label: key + '[' + j + ']'
+            });
+            var indexPortView = TheGraph.factories.menuPorts.createNodeMenuPortsNodeMenuPort.call(
+              this, indexPortViewOptions);
+            portViews.push(indexPortView);
+
+            var indexLineOptions = TheGraph.merge(TheGraph.config.nodeMenuPorts.portPath, {
+              d: [
+                "M", anchorX, y,
+                "L", indexPortViewOptions.x, indexPortViewOptions.y
+              ].join(" ") });
+
+            var indexLine = TheGraph.factories.menuPorts.createNodeMenuPortsPortPath.call(this, indexLineOptions);
+            lines.push(indexLine);
+          }
+        }
       }
 
       var transform = "";
@@ -78,13 +132,15 @@
         transform = "translate("+this.props.translateX+","+this.props.translateY+")";
       }
 
+      var lineAnchorsGroup = TheGraph.factories.createGroup.call(this, {children: lineAnchors});
+
       var linesGroupOptions = TheGraph.merge(TheGraph.config.nodeMenuPorts.linesGroup, { children: lines });
       var linesGroup = TheGraph.factories.menuPorts.createNodeMenuPortsLinesGroup.call(this, linesGroupOptions);
 
       var portsGroupOptions = TheGraph.merge(TheGraph.config.nodeMenuPorts.portsGroup, { children: portViews });
       var portsGroup = TheGraph.factories.menuPorts.createNodeMenuPortsGroup.call(this, portsGroupOptions);
 
-      var containerContents = [linesGroup, portsGroup];
+      var containerContents = [linesGroup, portsGroup, lineAnchorsGroup];
       var containerOptions = {
         className: "context-ports context-ports-"+(this.props.isIn ? "in" : "out"),
         transform: transform
