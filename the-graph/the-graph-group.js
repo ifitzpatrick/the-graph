@@ -53,6 +53,9 @@
       }
     },
     showContext: function (event) {
+      if (this.props.edgePreview) {
+        return;
+      }
       // Don't show native context menu
       event.preventDefault();
 

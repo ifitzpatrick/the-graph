@@ -86,6 +86,13 @@
             this.selectedEdges = newSelection;
           }.bind(this)
         };
+        var cancelPreview = function () {
+          var event = new CustomEvent('the-graph-cancel-preview-edge', {});
+          var node = ReactDOM.findDOMNode(this.$.graph.graphView);
+          if (node) {
+            node.dispatchEvent(event);
+          }
+        }.bind(this);
         this.menus = {
           main: {
             icon: "sitemap",
@@ -132,8 +139,11 @@
                   pub = item.port + count;
                 }
                 var priNode = graph.getNode(item.process);
-                var metadata = {x:priNode.metadata.x-144, y:priNode.metadata.y};
+                var x = item.x || priNode.metadata.x-144;
+                var y = item.y || priNode.metadata.y;
+                var metadata = {x: x, y: y};
                 graph.addInport(pub, item.process, item.port, metadata);
+                cancelPreview();
               }
             }
           },
@@ -150,8 +160,11 @@
                   pub = item.port + count;
                 }
                 var priNode = graph.getNode(item.process);
-                var metadata = {x:priNode.metadata.x+144, y:priNode.metadata.y};
+                var x = item.x || priNode.metadata.x+144;
+                var y = item.y || priNode.metadata.y;
+                var metadata = {x: x, y: y};
                 graph.addOutport(pub, item.process, item.port, metadata);
+                cancelPreview();
               }
             }
           },
