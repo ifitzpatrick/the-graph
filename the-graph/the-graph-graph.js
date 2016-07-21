@@ -395,10 +395,10 @@
       }
       return ports;
     },
-    updatePortPositions: function (graph, processName) {
+    updatePortPositions: function (graph, processName, component) {
       var node = graph.getNode(processName);
       var nodeHeight = node.metadata.height;
-      var ports = this.portInfo[processName];
+      var ports = this.getPorts(graph, processName, component);
 
       if (ports.height === nodeHeight) {
         return;
@@ -637,7 +637,7 @@
             node.metadata.height = TheGraph.config.nodeHeight + (diff * TheGraph.config.nodeHeightIncrement);
           }
         }
-        self.updatePortPositions(graph, key);
+        self.updatePortPositions(graph, key, node.component);
 
         if (!node.metadata.label || node.metadata.label === "") {
           node.metadata.label = key;
