@@ -678,17 +678,20 @@
         var sourcePort = self.getNodeOutport(graph, edge.from.node, edge.from.port, route, source.component);
         var targetPort = self.getNodeInport(graph, edge.to.node, edge.to.port, route, target.component);
 
+        var exists = function (value) {
+          return value !== undefined && value !== null;
+        };
         var label = source.metadata.label + '() ' +
           edge.from.port.toUpperCase() +
-          (edge.from.hasOwnProperty('index') ? '['+edge.from.index+']' : '') + ' -> ' +
+          (exists(edge.from.index) ? '['+edge.from.index+']' : '') + ' -> ' +
           edge.to.port.toUpperCase() +
-          (edge.to.hasOwnProperty('index') ? '['+edge.to.index+']' : '') + ' ' +
+          (exists(edge.to.index) ? '['+edge.to.index+']' : '') + ' ' +
           target.metadata.label + '()';
         var key = edge.from.node + '() ' +
           edge.from.port.toUpperCase() +
-          (edge.from.hasOwnProperty('index') ? '['+edge.from.index+']' : '') + ' -> ' +
+          (exists(edge.from.index) ? '['+edge.from.index+']' : '') + ' -> ' +
           edge.to.port.toUpperCase() +
-          (edge.to.hasOwnProperty('index') ? '['+edge.to.index+']' : '') + ' ' +
+          (exists(edge.to.index) ? '['+edge.to.index+']' : '') + ' ' +
           edge.to.node + '()';
 
         var sourceY = sourcePort.expand && sourcePort.indexY ?
