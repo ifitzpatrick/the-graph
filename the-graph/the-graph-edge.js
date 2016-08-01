@@ -269,7 +269,7 @@
 
       var arrow = TheGraph.factories.edge.createArrow({
         points: pointsArray,
-        className: 'arrow fill route' + this.props.route
+        className: 'arrow fill stroke route' + this.props.route
       });
 
       return TheGraph.factories.edge.createEdgeGroup(containerOptions,
