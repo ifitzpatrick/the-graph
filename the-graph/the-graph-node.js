@@ -181,16 +181,19 @@ var wedidit = false;
           var x = this.props.x,
               y = this.props.y;
 
+          var resizeDX = event.dx / scale,
+              resizeDY = event.dy / scale;
+
           var resizers = {
             top: function () {
               if (event.dy > originalHeight - min && height === min) {
                 return {};
               }
               var props = {};
-              var newHeight = height - deltaY;
+              var newHeight = originalHeight - resizeDY;
               if (newHeight >= min) {
                 props.height = newHeight;
-                props.y = y + deltaY;
+                props.y = originalY + resizeDY;
               } else {
                 props.height = min;
                 props.y = originalY + (originalHeight - min);
@@ -202,22 +205,21 @@ var wedidit = false;
                 return {};
               }
               var props = {};
-              var newWidth = width - deltaX;
+              var newWidth = originalWidth - resizeDX;
               if (newWidth >= min) {
                 props.width = newWidth;
-                props.x = x + deltaX;
+                props.x = originalX + resizeDX;
               } else {
                 props.width = min;
                 props.x = originalX;
               }
-              var newHeight = height - deltaY;
               return props;
             },
             bottom: function () {
               if (event.dy < 0 && height === min) {
                 return {};
               }
-              var newHeight = height + deltaY;
+              var newHeight = originalHeight + resizeDY;
               return {
                 height: newHeight < min ? min : newHeight
               };
@@ -226,7 +228,7 @@ var wedidit = false;
               if (event.dx < 0 && width === min) {
                 return {};
               }
-              var newWidth = width + deltaX;
+              var newWidth = originalWidth + resizeDX;
               return {
                 width: newWidth < min ? min : newWidth,
               };
