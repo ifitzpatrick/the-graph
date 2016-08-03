@@ -1052,7 +1052,12 @@
       var containerOptions = TheGraph.merge(TheGraph.config.graph.container, { className: 'graph' + selectedClass });
       return TheGraph.factories.graph.createGraphContainerGroup.call(this, containerOptions, containerContents);
 
+    },
+    componentDidUpdate: function () {
+      var appDomNode = ReactDOM.findDOMNode(this.props.app);
+      var event = new CustomEvent('rendersuccess', {detail: this.props.graph});
+      appDomNode.dispatchEvent(event);
     }
-  }));  
+  }));
 
 })(this);
