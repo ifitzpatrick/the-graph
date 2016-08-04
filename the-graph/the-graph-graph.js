@@ -586,6 +586,7 @@
     },
     render: function() {
       this.dirty = false;
+      var rendered = this.rendered;
 
       var self = this;
       var graph = this.state.graph;
@@ -683,6 +684,21 @@
         return TheGraph.factories.graph.createGraphNode.call(this, nodeOptions);
       });
 
+      var length = function (edgeOptions) {
+        return Math.sqrt(
+          Math.pow((edgeOptions.tX - edgeOptions.sX), 2) +
+          Math.pow((edgeOptions.tY - edgeOptions.sY), 2)
+        );
+      };
+
+      var opacity = function (len) {
+        var max = 1200,
+            min = 100,
+            oMin = 0.3;
+        return len <= min ? 1 : len >= max ? oMin :
+          ((1 - ((len - min) / (max-min))) * (1 - oMin) + oMin);
+      };
+
       // Edges
       var edges = graph.edges.map(function (edge) {
         var source = graph.getNode(edge.from.node);
@@ -737,11 +753,24 @@
           onEdgeSelection: self.props.onEdgeSelection,
           selected: (self.state.selectedEdges.indexOf(edge) !== -1),
           animated: (self.state.animatedEdges.indexOf(edge) !== -1),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          nodeSelected: (self.state.selectedNodes[edge.from.node] === true) ||
+            (self.state.selectedNodes[edge.to.node] === true)
         };
+
+        edgeOptions.length = length(edgeOptions);
+        edgeOptions.opacity = opacity(edgeOptions.length);
+
+        if (!rendered) {
+          //console.log(length, (1 - ((length - 100) / 900)), edgeOptions.opacity)
+        }
 
         edgeOptions = TheGraph.merge(TheGraph.config.graph.edge, edgeOptions);
         return TheGraph.factories.graph.createGraphEdge.call(this, edgeOptions);
+      }).sort(function (edgeA, edgeB) {
+        return (edgeA.props.selected && !edgeB.props.selected) ? 1 :
+          (edgeA.props.nodeSelected && !edgeB.props.nodeSelected) ? 1 :
+          (edgeA.props.length >= edgeB.props.length) ? -1 : 1;
       });
 
       // IIPs
@@ -837,8 +866,13 @@
           sY: expNode.y + TheGraph.config.nodeHeight / 2,
           tX: privateNode.metadata.x + privatePort.x,
           tY: privateNode.metadata.y + privatePort.y,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          nodeSelected: self.state.selectedNodes[privateNode.id] === true
         };
+
+        expEdge.length = length(expEdge);
+        expEdge.opacity = opacity(expEdge.length);
+
         expEdge = TheGraph.merge(TheGraph.config.graph.inportEdge, expEdge);
         edges.unshift(TheGraph.factories.graph.createGraphEdge.call(this, expEdge));
         return TheGraph.factories.graph.createGraphNode.call(this, expNode);
@@ -912,8 +946,13 @@
           sY: privateNode.metadata.y + privatePort.y,
           tX: expNode.x,
           tY: expNode.y + TheGraph.config.nodeHeight / 2,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          nodeSelected: self.state.selectedNodes[privateNode.id] === true
         };
+
+        expEdge.length = length(expEdge);
+        expEdge.opacity = opacity(expEdge.length);
+
         expEdge = TheGraph.merge(TheGraph.config.graph.outportEdge, expEdge);
         edges.unshift(TheGraph.factories.graph.createGraphEdge.call(this, expEdge));
         return TheGraph.factories.graph.createGraphNode.call(this, expNode);
@@ -1050,6 +1089,7 @@
                            selectedIds.length>0) ? ' selection' : '';
 
       var containerOptions = TheGraph.merge(TheGraph.config.graph.container, { className: 'graph' + selectedClass });
+      this.rendered = true;
       return TheGraph.factories.graph.createGraphContainerGroup.call(this, containerOptions, containerContents);
 
     },

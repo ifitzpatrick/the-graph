@@ -108,6 +108,7 @@
       this.props.onEdgeSelection(this.props.edgeID, this.props.edge, toggle);
     },
     showContext: function (event) {
+      console.log(this.props.length, this.props.opacity, this.props.nodeSelected);
       // Don't show native context menu
       event.preventDefault();
 
@@ -143,12 +144,13 @@
     shouldComponentUpdate: function (nextProps, nextState) {
       // Only rerender if changed
       return (
-        nextProps.sX !== this.props.sX || 
+        nextProps.sX !== this.props.sX ||
         nextProps.sY !== this.props.sY ||
-        nextProps.tX !== this.props.tX || 
+        nextProps.tX !== this.props.tX ||
         nextProps.tY !== this.props.tY ||
         nextProps.selected !== this.props.selected ||
         nextProps.animated !== this.props.animated ||
+        nextProps.nodeSelcted !== this.props.nodeSelected ||
         nextProps.route !== this.props.route
       );
     },
@@ -207,8 +209,11 @@
       var containerOptions = {
         className: "edge"+
           (this.props.selected ? " selected" : "")+
-          (this.props.animated ? " animated" : ""),
-        title: this.props.label
+          (this.props.animated ? " animated" : "")+
+          (this.props.nodeSelected ? " node-selected" : ""),
+        title: this.props.label,
+        style: (this.props.selected || this.props.nodeSelected) ? {} :
+          {opacity: this.props.opacity || 1}
       };
 
       containerOptions = TheGraph.merge(TheGraph.config.edge.container, containerOptions);

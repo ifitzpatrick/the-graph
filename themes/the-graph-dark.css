@@ -631,47 +631,58 @@
 .the-graph-dark .stroke,
 .the-graph-dark .stroke.route0,
 .the-graph-dark .selection .selected .stroke,
-.the-graph-dark .selection .selected .stroke.route0 {
+.the-graph-dark .selection .selected .stroke.route0,
+.the-graph-dark .selection .node-selected .stroke.route0 {
   stroke: #fff;
 }
 .the-graph-dark .stroke.route1,
-.the-graph-dark .selection .selected .stroke.route1 {
+.the-graph-dark .selection .selected .stroke.route1,
+.the-graph-dark .selection .node-selected .stroke.route1 {
   stroke: #e80202;
 }
 .the-graph-dark .stroke.route2,
-.the-graph-dark .selection .selected .stroke.route2 {
+.the-graph-dark .selection .selected .stroke.route2,
+.the-graph-dark .selection .node-selected .stroke.route2 {
   stroke: #e88802;
 }
 .the-graph-dark .stroke.route3,
-.the-graph-dark .selection .selected .stroke.route3 {
+.the-graph-dark .selection .selected .stroke.route3,
+.the-graph-dark .selection .node-selected .stroke.route3 {
   stroke: #e8e802;
 }
 .the-graph-dark .stroke.route4,
-.the-graph-dark .selection .selected .stroke.route4 {
+.the-graph-dark .selection .selected .stroke.route4,
+.the-graph-dark .selection .node-selected .stroke.route4 {
   stroke: #02e83c;
 }
 .the-graph-dark .stroke.route5,
-.the-graph-dark .selection .selected .stroke.route5 {
+.the-graph-dark .selection .selected .stroke.route5,
+.the-graph-dark .selection .node-selected .stroke.route5 {
   stroke: #02e89c;
 }
 .the-graph-dark .stroke.route6,
-.the-graph-dark .selection .selected .stroke.route6 {
+.the-graph-dark .selection .selected .stroke.route6,
+.the-graph-dark .selection .node-selected .stroke.route6 {
   stroke: #02d5e8;
 }
 .the-graph-dark .stroke.route7,
-.the-graph-dark .selection .selected .stroke.route7 {
+.the-graph-dark .selection .selected .stroke.route7,
+.the-graph-dark .selection .node-selected .stroke.route7 {
   stroke: #0275e8;
 }
 .the-graph-dark .stroke.route8,
-.the-graph-dark .selection .selected .stroke.route8 {
+.the-graph-dark .selection .selected .stroke.route8,
+.the-graph-dark .selection .node-selected .stroke.route8 {
   stroke: #af02e8;
 }
 .the-graph-dark .stroke.route9,
-.the-graph-dark .selection .selected .stroke.route9 {
+.the-graph-dark .selection .selected .stroke.route9,
+.the-graph-dark .selection .node-selected .stroke.route9 {
   stroke: #e802c2;
 }
 .the-graph-dark .stroke.route10,
-.the-graph-dark .selection .selected .stroke.route10 {
+.the-graph-dark .selection .selected .stroke.route10,
+.the-graph-dark .selection .node-selected .stroke.route10 {
   stroke: #e80262;
 }
 .the-graph-dark .selection .stroke,
@@ -711,47 +722,58 @@
 .the-graph-dark .fill,
 .the-graph-dark .fill.route0,
 .the-graph-dark .selection .selected .fill,
-.the-graph-dark .selection .selected .fill.route0 {
+.the-graph-dark .selection .selected .fill.route0,
+.the-graph-dark .selection .node-selected .fill.route0 {
   fill: #fff;
 }
 .the-graph-dark .fill.route1,
-.the-graph-dark .selection .selected .fill.route1 {
+.the-graph-dark .selection .selected .fill.route1,
+.the-graph-dark .selection .node-selected .fill.route1 {
   fill: #e80202;
 }
 .the-graph-dark .fill.route2,
-.the-graph-dark .selection .selected .fill.route2 {
+.the-graph-dark .selection .selected .fill.route2,
+.the-graph-dark .selection .node-selected .fill.route2 {
   fill: #e88802;
 }
 .the-graph-dark .fill.route3,
-.the-graph-dark .selection .selected .fill.route3 {
+.the-graph-dark .selection .selected .fill.route3,
+.the-graph-dark .selection .node-selected .fill.route3 {
   fill: #e8e802;
 }
 .the-graph-dark .fill.route4,
-.the-graph-dark .selection .selected .fill.route4 {
+.the-graph-dark .selection .selected .fill.route4,
+.the-graph-dark .selection .node-selected .fill.route4 {
   fill: #02e83c;
 }
 .the-graph-dark .fill.route5,
-.the-graph-dark .selection .selected .fill.route5 {
+.the-graph-dark .selection .selected .fill.route5,
+.the-graph-dark .selection .node-selected .fill.route5 {
   fill: #02e89c;
 }
 .the-graph-dark .fill.route6,
-.the-graph-dark .selection .selected .fill.route6 {
+.the-graph-dark .selection .selected .fill.route6,
+.the-graph-dark .selection .node-selected .fill.route6 {
   fill: #02d5e8;
 }
 .the-graph-dark .fill.route7,
-.the-graph-dark .selection .selected .fill.route7 {
+.the-graph-dark .selection .selected .fill.route7,
+.the-graph-dark .selection .node-selected .fill.route7 {
   fill: #0275e8;
 }
 .the-graph-dark .fill.route8,
-.the-graph-dark .selection .selected .fill.route8 {
+.the-graph-dark .selection .selected .fill.route8,
+.the-graph-dark .selection .node-selected .fill.route8 {
   fill: #af02e8;
 }
 .the-graph-dark .fill.route9,
-.the-graph-dark .selection .selected .fill.route9 {
+.the-graph-dark .selection .selected .fill.route9,
+.the-graph-dark .selection .node-selected .fill.route9 {
   fill: #e802c2;
 }
 .the-graph-dark .fill.route10,
-.the-graph-dark .selection .selected .fill.route10 {
+.the-graph-dark .selection .selected .fill.route10,
+.the-graph-dark .selection .node-selected .fill.route10 {
   fill: #e80262;
 }
 .the-graph-dark .selection .fill,
