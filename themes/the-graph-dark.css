@@ -16,6 +16,10 @@
   -ms-user-select: none;
   user-select: none;
 }
+.the-graph-dark svg#gradientcontainer {
+  height: 0px;
+  width: 0px;
+}
 .the-graph-dark .arrow {
   cursor: default;
 }
