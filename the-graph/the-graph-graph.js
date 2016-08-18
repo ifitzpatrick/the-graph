@@ -95,6 +95,7 @@
         errorNodes: [],
         selectedEdges: [],
         animatedEdges: [],
+        objectClassNames: {},
         offsetX: this.props.offsetX,
         offsetY: this.props.offsetY
       };
@@ -557,6 +558,12 @@
       });
       this.markDirty();
     },
+    setObjectClassNames: function (objectClassNames) {
+      this.setState({
+        objectClassNames: objectClassNames
+      });
+      this.markDirty();
+    },
     updatedIcons: {},
     updateIcon: function (nodeId, icon) {
       this.updatedIcons[nodeId] = icon;
@@ -657,6 +664,11 @@
           selectedIds.push(key);
         }
 
+        var nodeClassNames = self.state.objectClassNames.nodes || {};
+        var classNames = Object.keys(nodeClassNames).filter(function (className) {
+          return nodeClassNames[className](node);
+        }).join(" ");
+
         var nodeOptions = {
           key: key,
           nodeID: key,
@@ -677,7 +689,8 @@
           selected: selected,
           error: (self.state.errorNodes[key] === true),
           showContext: self.props.showContext,
-          highlightPort: highlightPort
+          highlightPort: highlightPort,
+          classNames: classNames
         };
 
         nodeOptions = TheGraph.merge(TheGraph.config.graph.node, nodeOptions);
@@ -738,6 +751,11 @@
         var targetY = targetPort.expand && targetPort.indexY ?
           targetPort.indexY[edge.to.index] || targetPort.y : targetPort.y;
 
+        var edgeClassNames = self.state.objectClassNames.edges || {};
+        var classNames = Object.keys(edgeClassNames).filter(function (className) {
+          return edgeClassNames[className](edge);
+        }).join(" ");
+
         var edgeOptions = {
           key: key,
           edgeID: key,
@@ -756,6 +774,7 @@
           showContext: self.props.showContext,
           nodeSelected: (self.state.selectedNodes[edge.from.node] === true) ||
             (self.state.selectedNodes[edge.to.node] === true)
+          classNames: classNames
         };
 
         edgeOptions.length = length(edgeOptions);
@@ -786,11 +805,17 @@
         var type = typeof data;
         var label = data === true || data === false || type === "number" || type === "string" ? data : type;
 
+        var iipClassNames = self.state.objectClassNames.iips || {};
+        var classNames = Object.keys(iipClassNames).filter(function (className) {
+          return iipClassNames[className](iip);
+        }).join(" ");
+
         var iipOptions = {
           graph: graph,
           label: label,
           x: tX,
-          y: tY
+          y: tY,
+          classNames: classNames
         };
 
         iipOptions = TheGraph.merge(TheGraph.config.graph.iip, iipOptions);
@@ -831,6 +856,12 @@
           console.warn("Node "+nodeKey+" not found for graph inport "+label);
           return;
         }
+
+        var inportClassNames = self.state.objectClassNames.inports || {};
+        var classNames = Object.keys(inportClassNames).filter(function (className) {
+          return inportClassNames[className](inport);
+        }).join(" ");
+
         // Node view
         var expNode = {
           key: "inport.node."+key,
@@ -848,7 +879,8 @@
           ports: self.getGraphInport(key),
           isIn: true,
           icon: (metadata.icon ? metadata.icon : "sign-in"),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          classNames: classNames
         };
         expNode = TheGraph.merge(TheGraph.config.graph.inportNode, expNode);
         // Edge view
@@ -868,6 +900,7 @@
           tY: privateNode.metadata.y + privatePort.y,
           showContext: self.props.showContext,
           nodeSelected: self.state.selectedNodes[privateNode.id] === true
+          classNames: classNames
         };
 
         expEdge.length = length(expEdge);
@@ -911,6 +944,12 @@
           console.warn("Node "+nodeKey+" not found for graph outport "+label);
           return;
         }
+
+        var outportClassNames = self.state.objectClassNames.outports || {};
+        var classNames = Object.keys(outportClassNames).filter(function (className) {
+          return outportClassNames[className](outport);
+        }).join(" ");
+
         // Node view
         var expNode = {
           key: "outport.node."+key,
@@ -928,7 +967,8 @@
           ports: self.getGraphOutport(key),
           isIn: false,
           icon: (metadata.icon ? metadata.icon : "sign-out"),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          classNames: classNames
         };
         expNode = TheGraph.merge(TheGraph.config.graph.outportNode, expNode);
         // Edge view
@@ -948,6 +988,7 @@
           tY: expNode.y + TheGraph.config.nodeHeight / 2,
           showContext: self.props.showContext,
           nodeSelected: self.state.selectedNodes[privateNode.id] === true
+          classNames: classNames
         };
 
         expEdge.length = length(expEdge);

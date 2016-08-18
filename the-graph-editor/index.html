@@ -135,6 +135,7 @@
               type: 'boolean'
             });
             editor.registerComponent(component);
+<<<<<<< HEAD
 
             var originalKickRouter = editor.getComponent('routers/KickRouter');
             if (!originalKickRouter) {
@@ -157,6 +158,24 @@
             var setTarget = JSON.parse(JSON.stringify(originalSetTarget));
             setTarget.inports[0].addressable = true;
             editor.registerComponent(setTarget);
+
+            editor.setObjectClassNames({
+              nodes: {
+                'test-node-class': function () {return true}
+              },
+              edges: {
+                'test-edge-class': function () {return true}
+              },
+              iips: {
+                'test-iip-class': function () {return true}
+              },
+              inports: {
+                'test-inport-class': function () {return true}
+              },
+              outports: {
+                'test-outport-class': function () {return true}
+              }
+            });
           }, 1000);
 
           // Simulate node icon updates
