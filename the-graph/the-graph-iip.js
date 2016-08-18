@@ -39,9 +39,10 @@
       // Only rerender if changed
 
       return (
-        nextProps.x !== this.props.x || 
+        nextProps.x !== this.props.x ||
         nextProps.y !== this.props.y ||
-        nextProps.label !== this.props.label
+        nextProps.label !== this.props.label ||
+        nextProps.classNames !== this.props.classNames
       );
     },
     render: function () {
@@ -68,7 +69,10 @@
 
       var containerContents = [iipPath, text];
 
-      var containerOptions = TheGraph.merge(TheGraph.config.iip.container, {title: this.props.label});
+      var containerOptions = TheGraph.merge(TheGraph.config.iip.container, {
+        title: this.props.label,
+        classNames: this.props.classNames || ""
+      });
       return TheGraph.factories.iip.createIIPContainer.call(this, containerOptions, containerContents);
     }
   }));

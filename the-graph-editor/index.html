@@ -130,6 +130,23 @@
               type: 'boolean'
             });
             editor.registerComponent(component);
+            editor.setObjectClassNames({
+              nodes: {
+                'test-node-class': function () {return true}
+              },
+              edges: {
+                'test-edge-class': function () {return true}
+              },
+              iips: {
+                'test-iip-class': function () {return true}
+              },
+              inports: {
+                'test-inport-class': function () {return true}
+              },
+              outports: {
+                'test-outport-class': function () {return true}
+              }
+            });
           }, 1000);
 
           // Simulate node icon updates

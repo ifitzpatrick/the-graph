@@ -149,7 +149,8 @@
         nextProps.tY !== this.props.tY ||
         nextProps.selected !== this.props.selected ||
         nextProps.animated !== this.props.animated ||
-        nextProps.route !== this.props.route
+        nextProps.route !== this.props.route ||
+        nextProps.classNames !== this.props.classNames
       );
     },
     getTooltipTrigger: function () {
@@ -207,7 +208,8 @@
       var containerOptions = {
         className: "edge"+
           (this.props.selected ? " selected" : "")+
-          (this.props.animated ? " animated" : ""),
+          (this.props.animated ? " animated" : "")+
+          (this.props.classNames ? " " + this.props.classNames : ""),
         title: this.props.label
       };
 

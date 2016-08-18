@@ -1,4 +1,4 @@
-<polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX" touch-action="none">
+<polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges objectClassNames getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX" touch-action="none">
 
 
   <template>
@@ -187,6 +187,9 @@
       animatedEdgesChanged: function () {
         if (!this.graphView) { return; }
         this.graphView.setAnimatedEdges(this.animatedEdges);
+      },
+      objectClassNamesChanged: function () {
+        this.graphView.setObjectClassNames(this.objectClassNames);
       },
       fireChanged: function (event) {
         this.fire("changed", this);

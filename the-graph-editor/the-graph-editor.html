@@ -412,6 +412,10 @@
       updateErrorNodes: function () {
         this.$.graph.errorNodesChanged();
       },
+      setObjectClassNames: function (objectClassNames) {
+        this.$.graph.objectClassNames = objectClassNames;
+        this.$.graph.objectClassNamesChanged();
+      },
       focusNode: function (node) {
         this.$.graph.focusNode(node);
       },

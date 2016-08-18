@@ -336,7 +336,8 @@
         nextProps.selected !== this.props.selected ||
         nextProps.error !== this.props.error ||
         nextProps.highlightPort !== this.props.highlightPort ||
-        nextProps.ports.dirty === true
+        nextProps.ports.dirty === true ||
+        nextProps.classNames !== this.props.classNames
       );
     },
     render: function() {
@@ -497,7 +498,8 @@
       var nodeOptions = {
         className: "node drag"+
           (this.props.selected ? " selected" : "")+
-          (this.props.error ? " error" : ""),
+          (this.props.error ? " error" : "")+
+          (this.props.classNames ? " " + this.props.classNames : ""),
         name: this.props.nodeID,
         key: this.props.nodeID,
         title: label,
