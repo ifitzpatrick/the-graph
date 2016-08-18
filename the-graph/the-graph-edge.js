@@ -150,13 +150,9 @@
         nextProps.tY !== this.props.tY ||
         nextProps.selected !== this.props.selected ||
         nextProps.animated !== this.props.animated ||
-<<<<<<< HEAD
-        nextProps.nodeSelcted !== this.props.nodeSelected ||
-        nextProps.route !== this.props.route
-=======
         nextProps.route !== this.props.route ||
+        nextProps.nodeSelcted !== this.props.nodeSelected ||
         nextProps.classNames !== this.props.classNames
->>>>>>> setobjectclassnames
       );
     },
     getTooltipTrigger: function () {
@@ -215,7 +211,7 @@
         className: "edge"+
           (this.props.selected ? " selected" : "")+
           (this.props.animated ? " animated" : "")+
-          (this.props.nodeSelected ? " node-selected" : ""),
+          (this.props.nodeSelected ? " node-selected" : "")+
           (this.props.classNames ? " " + this.props.classNames : ""),
         title: this.props.label,
         style: (this.props.selected || this.props.nodeSelected) ? {} :

@@ -773,7 +773,7 @@
           animated: (self.state.animatedEdges.indexOf(edge) !== -1),
           showContext: self.props.showContext,
           nodeSelected: (self.state.selectedNodes[edge.from.node] === true) ||
-            (self.state.selectedNodes[edge.to.node] === true)
+            (self.state.selectedNodes[edge.to.node] === true),
           classNames: classNames
         };
 
@@ -899,7 +899,7 @@
           tX: privateNode.metadata.x + privatePort.x,
           tY: privateNode.metadata.y + privatePort.y,
           showContext: self.props.showContext,
-          nodeSelected: self.state.selectedNodes[privateNode.id] === true
+          nodeSelected: self.state.selectedNodes[privateNode.id] === true,
           classNames: classNames
         };
 
@@ -987,7 +987,7 @@
           tX: expNode.x,
           tY: expNode.y + TheGraph.config.nodeHeight / 2,
           showContext: self.props.showContext,
-          nodeSelected: self.state.selectedNodes[privateNode.id] === true
+          nodeSelected: self.state.selectedNodes[privateNode.id] === true,
           classNames: classNames
         };
 
