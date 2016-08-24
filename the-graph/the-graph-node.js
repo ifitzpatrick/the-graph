@@ -283,7 +283,7 @@ var wedidit = false;
         // Snap to grid
         var snapToGrid = true;
         var snap = TheGraph.config.node.snap / 2;
-        if (snapToGrid) {
+        if (snapToGrid && !resize) {
           var x, y;
           if (this.props.export) {
             var newPos = {
