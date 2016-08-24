@@ -115,6 +115,103 @@
 
       ReactDOM.findDOMNode(this).addEventListener("the-graph-cancel-preview-edge", this.cancelPreviewEdge);
       ReactDOM.findDOMNode(this).addEventListener("the-graph-node-remove", this.removeNode);
+
+      var appDomNode = ReactDOM.findDOMNode(this.props.app);
+      appDomNode.addEventListener("mousedown", this.startMarqueeSelect);
+      window.addEventListener("mouseup", this.stopMarqueeSelect);
+      appDomNode.addEventListener("mousemove", this.moveMarqueeSelect);
+    },
+    startMarqueeSelect: function (event) {
+      if (event.button !== 1) {
+        return;
+      }
+
+      var appX = this.props.app.state.x;
+      var appY = this.props.app.state.y;
+      var scale = this.props.scale;
+
+      this.setState({
+        marqueeSelect: true,
+        marqueeSelectStartX: (event.x - appX)/scale,
+        marqueeSelectStartY: (event.y - appY)/scale,
+        marqueeSelectCurrentX: (event.x - appX)/scale,
+        marqueeSelectCurrentY: (event.y - appY)/scale
+      });
+      this.markDirty();
+    },
+    moveMarqueeSelect: function (event) {
+      if (!this.state.marqueeSelect) {
+        return;
+      }
+      var appX = this.props.app.state.x;
+      var appY = this.props.app.state.y;
+      var scale = this.props.scale;
+
+      var startX = this.state.marqueeSelectStartX;
+      var startY = this.state.marqueeSelectStartY;
+      var currentX = (event.x - appX)/scale;
+      var currentY = (event.y - appY)/scale;
+      var lowX, lowY, highX, highY;
+      if (startX <= currentX) {
+        lowX = startX;
+        highX = currentX;
+      } else {
+        lowX = currentX;
+        highX = startX;
+      }
+
+      lowX -= TheGraph.config.nodeWidth / 2;
+      highX += TheGraph.config.nodeWidth / 2;
+
+      if (startY <= currentY) {
+        lowY = startY;
+        highY = currentY;
+      } else {
+        lowY = currentY;
+        highY = startY;
+      }
+
+      lowY -= TheGraph.config.nodeWidth / 2;
+      highY += TheGraph.config.nodeWidth * 0.75;
+
+      var selectedNodes = this.state.graph.nodes.filter(function (node) {
+        return ((
+          (node.metadata.x >= lowX &&
+           node.metadata.x <= highX) ||
+          (node.metadata.x + node.metadata.width >= lowX &&
+           node.metadata.x + node.metadata.width <= highX)
+        ) && (
+          (node.metadata.y >= lowY &&
+           node.metadata.y <= highY) ||
+          (node.metadata.y + node.metadata.height >= lowY &&
+           node.metadata.y + node.metadata.height <= highY)
+        ))
+      }).reduce(function (selectedNodes, node) {
+        selectedNodes[node.id] = true;
+        return selectedNodes;
+      }, {});
+
+      this.setState({
+        marqueeSelectCurrentX: currentX,
+        marqueeSelectCurrentY: currentY,
+        selectedNodes: selectedNodes
+      });
+
+      this.markDirty();
+    },
+    stopMarqueeSelect: function (event) {
+      if (event.button !== 1) {
+        return;
+      }
+
+      this.setState({
+        marqueeSelect: false,
+        marqueeSelectStartX: null,
+        marqueeSelectStartY: null,
+        marqueeSelectCurrentX: null,
+        marqueeSelectCurrentY: null
+      });
+      this.markDirty();
     },
     didChangeNode: function (event) {
       delete this.portInfo[event.id];
@@ -1032,8 +1129,46 @@
         return TheGraph.factories.graph.createGraphGroup.call(this, groupOptions);
       });
 
+      if (this.state.marqueeSelect) {
+        if (this.state.marqueeSelectStartX < this.state.marqueeSelectCurrentX) {
+          var minX = this.state.marqueeSelectStartX;
+          var maxX = this.state.marqueeSelectCurrentX;
+        } else {
+          var minX = this.state.marqueeSelectCurrentX;
+          var maxX = this.state.marqueeSelectStartX;
+        }
+
+        if (this.state.marqueeSelectStartY < this.state.marqueeSelectCurrentY) {
+          var minY = this.state.marqueeSelectStartY;
+          var maxY = this.state.marqueeSelectCurrentY;
+        } else {
+          var minY = this.state.marqueeSelectCurrentY;
+          var maxY = this.state.marqueeSelectStartY;
+        }
+
+        var scale = self.props.scale;
+
+        //minX *= scale;
+        //minY *= scale;
+        //maxX *= scale;
+        //maxY *= scale;
+
+        var selectionGroupOptions = {
+          graph: graph,
+          app: self.props.app,
+          minX: minX,
+          minY: minY,
+          maxX: maxX,
+          maxY: maxY,
+          scale: scale,
+          color: 1
+        };
+        selectionGroupOptions = TheGraph.merge(TheGraph.config.graph.selectionGroup, selectionGroupOptions);
+        var selectionGroup = TheGraph.factories.graph.createGraphGroup.call(this, selectionGroupOptions);
+        groups.push(selectionGroup);
+      }
       // Selection pseudo-group
-      if (this.state.displaySelectionGroup &&
+      else if (this.state.displaySelectionGroup &&
           selectedIds.length >= 2) {
         var limits = TheGraph.findMinMax(graph, selectedIds);
         if (limits) {
