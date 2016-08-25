@@ -104,11 +104,9 @@
         var toIndex = edge.to.index;
         graph.addInitialIndex(
           iip.from.data, map[iip.to.node], iip.to.port, index, iipMeta);
-        console.log('iip index');
       } else {
         graph.addInitial(
           iip.from.data, map[iip.to.node], iip.to.port, iipMeta);
-        console.log('iip', iip);
       }
     }
     return pasted;
