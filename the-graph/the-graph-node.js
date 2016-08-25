@@ -1,4 +1,3 @@
-var wedidit = false;
 (function (context) {
   "use strict";
 
