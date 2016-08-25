@@ -24,7 +24,7 @@
     //Duplicate all the nodes before putting them in clipboard
     //this will make this work also with cut/Paste and once we
     //decide if/how we will implement cross-document copy&paste will work there too
-    clipboardContent = {nodes:[], edges:[]};
+    clipboardContent = {nodes:[], edges:[], iips:[]};
     var map = {};
     var i, len;
     for (i = 0, len = keys.length; i < len; i++) {
@@ -45,15 +45,37 @@
         clipboardContent.edges.push(newEdge);
       }
     }
-
+    for (i = 0, len = graph.initializers.length; i < len; i++) {
+      var iip = graph.initializers[i];
+      var toNode = iip.to.node;
+      if (map.hasOwnProperty(toNode)) {
+        var newIip = cloneObject(iip);
+        newIip.to.node = map[toNode];
+        clipboardContent.iips.push(newIip);
+      }
+    }
+    if (window.localStorage) {
+      window.localStorage.setItem(
+        'clipboard', JSON.stringify(clipboardContent));
+    }
   };
 
   TheGraph.Clipboard.paste = function (graph) {
     var map = {};
     var pasted = {nodes:[], edges:[]};
     var i, len;
-    for (i = 0, len = clipboardContent.nodes.length; i < len; i++) {
-      var node = clipboardContent.nodes[i];
+
+    var content;
+    if (window.localStorage) {
+      content = JSON.parse(window.localStorage.getItem('clipboard'));
+    }
+
+    if (!content) {
+      content = clipboardContent;
+    }
+
+    for (i = 0, len = content.nodes.length; i < len; i++) {
+      var node = content.nodes[i];
       var meta = cloneObject(node.metadata);
       meta.x += 36;
       meta.y += 36;
@@ -61,8 +83,8 @@
       map[node.id] = newNode.id;
       pasted.nodes.push(newNode);
     }
-    for (i = 0, len = clipboardContent.edges.length; i < len; i++) {
-      var edge = clipboardContent.edges[i];
+    for (i = 0, len = content.edges.length; i < len; i++) {
+      var edge = content.edges[i];
       var newEdgeMeta = cloneObject(edge.metadata);
       var newEdge;
       if (edge.from.hasOwnProperty('index') || edge.to.hasOwnProperty('index')) {
@@ -74,6 +96,20 @@
         newEdge = graph.addEdge(map[edge.from.node], edge.from.port, map[edge.to.node], edge.to.port, newEdgeMeta);
       }
       pasted.edges.push(newEdge);
+    }
+    for (i = 0, len = content.iips.length; i < len; i++) {
+      var iip = content.iips[i];
+      var iipMeta = cloneObject(iip.metadata);
+      if (iip.to.index !== null && iip.to.index !== undefined) {
+        var toIndex = edge.to.index;
+        graph.addInitialIndex(
+          iip.from.data, map[iip.to.node], iip.to.port, index, iipMeta);
+        console.log('iip index');
+      } else {
+        graph.addInitial(
+          iip.from.data, map[iip.to.node], iip.to.port, iipMeta);
+        console.log('iip', iip);
+      }
     }
     return pasted;
   };
