@@ -91,8 +91,10 @@
         edgePreviewX: 0,
         edgePreviewY: 0,
         forceSelection: false,
-        selectedNodes: [],
+        selectedNodes: {},
         errorNodes: [],
+        selectedInports: {},
+        selectedOutports: {},
         selectedEdges: [],
         animatedEdges: [],
         offsetX: this.props.offsetX,
@@ -460,6 +462,18 @@
       });
       this.markDirty();
     },
+    setSelectedInports: function (ports) {
+      this.setState({
+        selectedInports: ports
+      });
+      this.markDirty();
+    },
+    setSelectedOutports: function (ports) {
+      this.setState({
+        selectedOutports: ports
+      });
+      this.markDirty();
+    },
     setSelectedEdges: function (edges) {
       this.setState({
         selectedEdges: edges
@@ -506,6 +520,8 @@
       var graph = this.state.graph;
       var library = this.props.library;
       var selectedIds = [];
+      var selectedInports = [];
+      var selectedOutports = [];
 
       // Reset ports if library has changed
       if (this.libraryDirty) {
@@ -701,6 +717,10 @@
           console.warn("Node "+nodeKey+" not found for graph inport "+label);
           return;
         }
+        var selected = (self.state.selectedInports[key] === true);
+        if (selected) {
+          selectedInports.push(key);
+        }
         // Node view
         var expNode = {
           key: "inport.node."+key,
@@ -718,7 +738,9 @@
           ports: self.getGraphInport(key),
           isIn: true,
           icon: (metadata.icon ? metadata.icon : "sign-in"),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          onNodeSelection: self.props.onExportSelection,
+          selected: selected
         };
         expNode = TheGraph.merge(TheGraph.config.graph.inportNode, expNode);
         // Edge view
@@ -736,7 +758,8 @@
           sY: expNode.y + TheGraph.config.nodeHeight / 2,
           tX: privateNode.metadata.x + privatePort.x,
           tY: privateNode.metadata.y + privatePort.y,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          selected: selected
         };
         expEdge = TheGraph.merge(TheGraph.config.graph.inportEdge, expEdge);
         edges.unshift(TheGraph.factories.graph.createGraphEdge.call(this, expEdge));
@@ -776,6 +799,10 @@
           console.warn("Node "+nodeKey+" not found for graph outport "+label);
           return;
         }
+        var selected = (self.state.selectedOutports[key] === true);
+        if (selected) {
+          selectedOutports.push(key);
+        }
         // Node view
         var expNode = {
           key: "outport.node."+key,
@@ -793,7 +820,9 @@
           ports: self.getGraphOutport(key),
           isIn: false,
           icon: (metadata.icon ? metadata.icon : "sign-out"),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          onNodeSelection: self.props.onExportSelection,
+          selected: selected
         };
         expNode = TheGraph.merge(TheGraph.config.graph.outportNode, expNode);
         // Edge view
@@ -811,7 +840,8 @@
           sY: privateNode.metadata.y + privatePort.y,
           tX: expNode.x,
           tY: expNode.y + TheGraph.config.nodeHeight / 2,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          selected: selected
         };
         expEdge = TheGraph.merge(TheGraph.config.graph.outportEdge, expEdge);
         edges.unshift(TheGraph.factories.graph.createGraphEdge.call(this, expEdge));
@@ -888,13 +918,22 @@
         groups.push(selectionGroup);
       }
       // Selection pseudo-group
-      else if (this.state.displaySelectionGroup &&
-          selectedIds.length >= 2) {
-        var limits = TheGraph.findMinMax(graph, selectedIds);
+      else if (
+        this.state.displaySelectionGroup &&
+        (
+          selectedIds.length +
+          selectedInports.length +
+          selectedOutports.length
+        ) >= 2
+      ) {
+        var limits = TheGraph.findMinMax(
+          graph, selectedIds, selectedInports, selectedOutports);
         if (limits) {
           var pseudoGroup = {
             name: "selection",
             nodes: selectedIds,
+            inports: selectedInports,
+            outports: selectedOutports,
             metadata: {color:1}
           };
           var selectionGroupOptions = {
@@ -974,8 +1013,11 @@
         outportsGroup
       ];
 
-      var selectedClass = (this.state.forceSelection ||
-                           selectedIds.length>0) ? ' selection' : '';
+      var selectedClass = (this.state.forceSelection || (
+        selectedIds.length +
+        selectedInports.length +
+        selectedOutports.length
+      ) > 0) ? ' selection' : '';
 
       var containerOptions = TheGraph.merge(TheGraph.config.graph.container, { className: 'graph' + selectedClass });
       return TheGraph.factories.graph.createGraphContainerGroup.call(this, containerOptions, containerContents);

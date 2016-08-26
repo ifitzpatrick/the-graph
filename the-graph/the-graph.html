@@ -1,4 +1,4 @@
-<polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX" touch-action="none">
+<polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes selectedInports selectedOutports errorNodes selectedEdges animatedEdges getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX" touch-action="none">
 
 
   <template>
@@ -48,6 +48,10 @@
       errorNodes: {},
       selectedEdges: [],
       animatedEdges: [],
+      selectedInports: [],
+      selectedOutports: [],
+      selectedInportsHash: {},
+      selectedOutportsHash: {},
       autolayouter: null,
       displaySelectionGroup: true,
       forceSelection: false,
@@ -107,12 +111,15 @@
             editable: this.editable,
             onEdgeSelection: this.onEdgeSelection.bind(this),
             onNodeSelection: this.onNodeSelection.bind(this),
+            onExportSelection: this.onExportSelection.bind(this),
             onPanScale: this.onPanScale.bind(this),
             getMenuDef: this.getMenuDef,
             displaySelectionGroup: this.displaySelectionGroup,
             forceSelection: this.forceSelection,
             offsetY: this.offsetY,
-            offsetX: this.offsetX
+            offsetX: this.offsetX,
+            registerPanEvent: this.registerPanEvent,
+            registerMarqueeSelectEvent: this.registerMarqueeSelectEvent
           }),
           this.$.svgcontainer
         );
@@ -160,6 +167,10 @@
           }
         } else {
           this.selectedNodes = [item];
+          this.selectedInports = [];
+          this.selectedOutports = [];
+          this.fire('inports', this.selectedInports);
+          this.fire('outports', this.selectedOutports);
         }
         this.fire('nodes', this.selectedNodes);
       },
@@ -174,6 +185,61 @@
       selectedNodesHashChanged: function () {
         if (!this.graphView) { return; }
         this.graphView.setSelectedNodes(this.selectedNodesHash);
+      },
+      onExportSelection: function (exportKey, exportItem, isIn, toggle) {
+        var listKey = isIn ? 'selectedInports' : 'selectedOutports';
+        var otherKey = !isIn ? 'selectedInports' : 'selectedOutports'
+        var item = {
+          exportKey: exportKey,
+          export: exportItem
+        };
+        if (exportKey === undefined) {
+          this.selectedInports = [];
+          this.selectedOutports = [];
+          this.fire('inports', this.selectedInports);
+          this.fire('outports', this.selectedOutports);
+          return;
+        }
+
+        if (toggle) {
+          var index = this.selectedNodes.indexOf(item);
+          var isSelected = (index !== -1);
+          if (isSelected) {
+            this[listKey].splice(index, 1);
+          } else {
+            this[listKey].push(item);
+          }
+        } else {
+          this[listKey] = [item];
+          this[otherKey] = [];
+          this.selectedNodes = [];
+          this.fire(!isIn ? 'inports' : 'outports', this[otherKey]);
+          this.fire('nodes', this.selectedNodes);
+        }
+        this.fire(isIn ? 'inports' : 'outports', this[listKey]);
+      },
+      selectedInportsChanged: function () {
+        this.selectedExportsChanged(true, 'selectedInports', 'selectedInportsHash');
+      },
+      selectedOutportsChanged: function () {
+        this.selectedExportsChanged(false, 'selectedOutports', 'selectedOutportsHash');
+      },
+      selectedExportsChanged: function (isIn, listKey, hashKey) {
+        var hash = {};
+        var list = this[listKey];
+        for (var i=0, len = list.length; i<len; i++) {
+          hash[list[i].exportKey] = true;
+        }
+        this[hashKey] = hash;
+        this.fire(isIn ? 'inports' : 'outports', list);
+      },
+      selectedInportsHashChanged: function () {
+        if (!this.graphView) { return; }
+        this.graphView.setSelectedInports(this.selectedInportsHash);
+      },
+      selectedOutportsHashChanged: function () {
+        if (!this.graphView) { return; }
+        this.graphView.setSelectedOutports(this.selectedOutportsHash);
       },
       errorNodesChanged: function () {
         if (!this.graphView) { return; }

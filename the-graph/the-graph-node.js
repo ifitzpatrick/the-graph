@@ -121,7 +121,12 @@
       event.stopPropagation();
 
       var toggle = (TheGraph.metaKeyPressed || event.pointerType==="touch");
-      this.props.onNodeSelection(this.props.nodeID, this.props.node, toggle);
+      if (this.props.export) {
+        this.props.onNodeSelection(
+          this.props.exportKey, this.props.export, this.props.isIn, toggle);
+      } else {
+        this.props.onNodeSelection(this.props.nodeID, this.props.node, toggle);
+      }
     },
     onTrackStart: function (event) {
       // Don't drag graph
