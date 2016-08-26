@@ -601,6 +601,7 @@
         library: this.props.library,
         onNodeSelection: this.props.onNodeSelection,
         onExportSelection: this.props.onExportSelection,
+        onNodeGroupSelection: this.props.onNodeGroupSelection,
         onEdgeSelection: this.props.onEdgeSelection,
         showContext: this.showContext
       };

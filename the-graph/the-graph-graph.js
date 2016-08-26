@@ -147,6 +147,10 @@
       if (!this.state.marqueeSelect) {
         return;
       }
+      this.setState(this.calculateMarqueeSelect(event));
+      this.markDirty();
+    },
+    calculateMarqueeSelect: function (event) {
       var appX = this.props.app.state.x;
       var appY = this.props.app.state.y;
       var scale = this.props.scale;
@@ -178,11 +182,8 @@
       lowY -= TheGraph.config.nodeWidth / 2;
       highY += TheGraph.config.nodeWidth * 0.75;
 
-      var oldNodes = this.state.selectedNodes;
-      var selectedNodes = {};
-
-      this.state.graph.nodes.forEach(function (node) {
-        if ((
+      var filter = function (node) {
+        return (
           (node.metadata.x >= lowX &&
            node.metadata.x <= highX) ||
           (node.metadata.x + node.metadata.width >= lowX &&
@@ -192,28 +193,44 @@
            node.metadata.y <= highY) ||
           (node.metadata.y + node.metadata.height >= lowY &&
            node.metadata.y + node.metadata.height <= highY)
-        )) {
-          if (!oldNodes[node.id]) {
-            this.props.onNodeSelection(node.id, node, true);
-          }
-        } else {
-          if (oldNodes[node.id]) {
-            this.props.onNodeSelection(node.id, node, true);
-          }
-        }
-      }.bind(this));
+        )
+      };
 
-      this.setState({
-        marqueeSelectCurrentX: currentX,
-        marqueeSelectCurrentY: currentY
+      var nodes = this.state.graph.nodes.filter(filter);
+
+      var graphInports = this.state.graph.inports;
+      var inports = Object.keys(graphInports).map(function (key) {
+        return {
+          exportKey: key,
+          export: graphInports[key]
+        }
+      }).filter(function (exportItem) {
+        return filter(exportItem.export);
       });
 
-      this.markDirty();
+      var graphOutports = this.state.graph.outports;
+      var outports = Object.keys(graphOutports).map(function (key) {
+        return {
+          exportKey: key,
+          export: graphOutports[key]
+        }
+      }).filter(function (exportItem) {
+        return filter(exportItem.export);
+      });
+
+      this.props.onNodeGroupSelection(nodes, inports, outports);
+
+      return {
+        marqueeSelectCurrentX: currentX,
+        marqueeSelectCurrentY: currentY
+      };
     },
     stopMarqueeSelect: function (event) {
       if (event.button !== 1) {
         return;
       }
+
+      this.calculateMarqueeSelect(event);
 
       this.setState({
         marqueeSelect: false,
