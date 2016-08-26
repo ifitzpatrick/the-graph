@@ -490,6 +490,7 @@
     unselectAll: function (event) {
       // No arguments = clear selection
       this.props.onNodeSelection();
+      this.props.onExportSelection();
       this.props.onEdgeSelection();
     },
     renderGraph: function () {
@@ -599,6 +600,7 @@
         app: this,
         library: this.props.library,
         onNodeSelection: this.props.onNodeSelection,
+        onExportSelection: this.props.onExportSelection,
         onEdgeSelection: this.props.onEdgeSelection,
         showContext: this.showContext
       };
