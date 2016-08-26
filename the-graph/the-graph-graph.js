@@ -112,6 +112,8 @@
       this.props.graph.on("changeNode", this.markDirty);
       this.props.graph.on("changeInport", this.markDirty);
       this.props.graph.on("changeOutport", this.markDirty);
+      this.props.graph.on("renameInport", this.renameInport);
+      this.props.graph.on("renameOutport", this.renameOutport);
       this.props.graph.on("endTransaction", this.markDirty);
 
       ReactDOM.findDOMNode(this).addEventListener("the-graph-node-remove", this.removeNode);
@@ -302,6 +304,26 @@
     },
     addEdge: function (edge) {
       this.state.graph.addEdge(edge.from.process, edge.from.port, edge.to.process, edge.to.port, edge.metadata);
+    },
+    renameInport: function (oldName, newName) {
+      var graph = this.props.graph;
+      var inports = this.state.selectedInports;
+      var callback = this.props.onExportSelection;
+      if (inports[oldName]) {
+        var inport = graph.inports[newName];
+        callback(oldName, inport, true, true);
+        callback(newName, inport, true, true);
+      }
+    },
+    renameOutport: function () {
+      var graph = this.props.graph;
+      var outports = this.props.selectedOutports;
+      var callback = this.props.onExportSelection;
+      if (outports[oldName]) {
+        var inport = graph.outports[newName];
+        callback(oldName, outport, true, true);
+        callback(newName, outport, true, true);
+      }
     },
     moveGroup: function (nodes, dx, dy) {
       var graph = this.state.graph;

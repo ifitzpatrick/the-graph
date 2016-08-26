@@ -199,7 +199,10 @@
       },
       onExportSelection: function (exportKey, exportItem, isIn, toggle) {
         var listKey = isIn ? 'selectedInports' : 'selectedOutports';
-        var otherKey = !isIn ? 'selectedInports' : 'selectedOutports'
+        var list = this[listKey];
+        var otherKey = !isIn ? 'selectedInports' : 'selectedOutports';
+        var type = isIn ? 'inports' : 'outports';
+        var otherType = !isIn ? 'inports' : 'outports';
         var item = {
           exportKey: exportKey,
           export: exportItem
@@ -213,7 +216,18 @@
         }
 
         if (toggle) {
-          var index = this.selectedNodes.indexOf(item);
+          var listItem;
+          var index = -1;
+          for (var i = 0, len = list.length; i < len; i++) {
+            listItem = list[i];
+            if (
+                listItem.exportKey === item.exportKey &&
+                listItem.export === item.export
+            ) {
+              index = i;
+              break;
+            }
+          }
           var isSelected = (index !== -1);
           if (isSelected) {
             this[listKey].splice(index, 1);
@@ -224,8 +238,8 @@
           this[listKey] = [item];
           this[otherKey] = [];
           this.selectedNodes = [];
-          this.fire(!isIn ? 'inports' : 'outports', this[otherKey]);
-          this.fire('nodes', this.selectedNodes);
+          this.fire(otherType, this[otherKey]);
+          this.fire(type, this[listKey]);
         }
         this.fire(isIn ? 'inports' : 'outports', this[listKey]);
       },
