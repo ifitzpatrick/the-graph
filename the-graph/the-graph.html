@@ -112,6 +112,7 @@
             onEdgeSelection: this.onEdgeSelection.bind(this),
             onNodeSelection: this.onNodeSelection.bind(this),
             onExportSelection: this.onExportSelection.bind(this),
+            onNodeGroupSelection: this.onNodeGroupSelection.bind(this),
             onPanScale: this.onPanScale.bind(this),
             getMenuDef: this.getMenuDef,
             displaySelectionGroup: this.displaySelectionGroup,
@@ -173,6 +174,10 @@
           this.fire('outports', this.selectedOutports);
         }
         this.fire('nodes', this.selectedNodes);
+      },
+      onNodeGroupSelection: function (nodes) {
+        this.selectedNodes = nodes;
+        this.fire('nodes', nodes);
       },
       selectedNodesChanged: function () {
         var selectedNodesHash = {};
