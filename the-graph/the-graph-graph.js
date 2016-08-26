@@ -310,7 +310,7 @@
         oldName,
         newName,
         this.props.graph.inports,
-        this.props.selectedInports,
+        this.state.selectedInports,
         true
       );
     },
@@ -319,7 +319,7 @@
         oldName,
         newName,
         this.props.graph.outports,
-        this.props.selectedOutports,
+        this.state.selectedOutports,
         false
       );
     },
