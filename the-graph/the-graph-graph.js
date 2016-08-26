@@ -306,23 +306,29 @@
       this.state.graph.addEdge(edge.from.process, edge.from.port, edge.to.process, edge.to.port, edge.metadata);
     },
     renameInport: function (oldName, newName) {
-      var graph = this.props.graph;
-      var inports = this.state.selectedInports;
-      var callback = this.props.onExportSelection;
-      if (inports[oldName]) {
-        var inport = graph.inports[newName];
-        callback(oldName, inport, true, true);
-        callback(newName, inport, true, true);
-      }
+      this.renameExport(
+        oldName,
+        newName,
+        this.props.graph.inports,
+        this.props.selectedInports,
+        true
+      );
     },
-    renameOutport: function () {
-      var graph = this.props.graph;
-      var outports = this.props.selectedOutports;
+    renameOutport: function (oldName, newName) {
+      this.renameExport(
+        oldName,
+        newName,
+        this.props.graph.outports,
+        this.props.selectedOutports,
+        false
+      );
+    },
+    renameExport: function (oldName, newName, graphPorts, selected, isIn) {
       var callback = this.props.onExportSelection;
-      if (outports[oldName]) {
-        var inport = graph.outports[newName];
-        callback(oldName, outport, true, true);
-        callback(newName, outport, true, true);
+      if (selected[oldName]) {
+        var export = graphPorts[newName];
+        callback(oldName, export, isIn, true);
+        callback(newName, export, isIn, true);
       }
     },
     moveGroup: function (nodes, dx, dy) {
