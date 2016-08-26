@@ -569,6 +569,7 @@
         app: this,
         library: this.props.library,
         onNodeSelection: this.props.onNodeSelection,
+        onNodeGroupSelection: this.props.onNodeGroupSelection,
         onEdgeSelection: this.props.onEdgeSelection,
         showContext: this.showContext
       };

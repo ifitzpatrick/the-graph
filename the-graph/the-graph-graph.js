@@ -143,6 +143,10 @@
       if (!this.state.marqueeSelect) {
         return;
       }
+      this.setState(this.calculateMarqueeSelect(event));
+      this.markDirty();
+    },
+    calculateMarqueeSelect: function (event) {
       var appX = this.props.app.state.x;
       var appY = this.props.app.state.y;
       var scale = this.props.scale;
@@ -174,11 +178,8 @@
       lowY -= TheGraph.config.nodeWidth / 2;
       highY += TheGraph.config.nodeWidth * 0.75;
 
-      var oldNodes = this.state.selectedNodes;
-      var selectedNodes = {};
-
-      this.state.graph.nodes.forEach(function (node) {
-        if ((
+      var filter = function (node) {
+        return (
           (node.metadata.x >= lowX &&
            node.metadata.x <= highX) ||
           (node.metadata.x + node.metadata.width >= lowX &&
@@ -188,28 +189,23 @@
            node.metadata.y <= highY) ||
           (node.metadata.y + node.metadata.height >= lowY &&
            node.metadata.y + node.metadata.height <= highY)
-        )) {
-          if (!oldNodes[node.id]) {
-            this.props.onNodeSelection(node.id, node, true);
-          }
-        } else {
-          if (oldNodes[node.id]) {
-            this.props.onNodeSelection(node.id, node, true);
-          }
-        }
-      }.bind(this));
+        )
+      };
 
-      this.setState({
+      var nodes = this.state.graph.nodes.filter(filter);
+      this.props.onNodeGroupSelection(nodes);
+
+      return {
         marqueeSelectCurrentX: currentX,
         marqueeSelectCurrentY: currentY
-      });
-
-      this.markDirty();
+      };
     },
     stopMarqueeSelect: function (event) {
       if (event.button !== 1) {
         return;
       }
+
+      this.calculateMarqueeSelect(event);
 
       this.setState({
         marqueeSelect: false,
