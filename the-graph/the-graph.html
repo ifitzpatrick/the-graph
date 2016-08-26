@@ -175,9 +175,15 @@
         }
         this.fire('nodes', this.selectedNodes);
       },
-      onNodeGroupSelection: function (nodes) {
+      onNodeGroupSelection: function (nodes, inports, outports) {
         this.selectedNodes = nodes;
         this.fire('nodes', nodes);
+
+        this.selectedInports = inports;
+        this.fire('inports', inports);
+
+        this.selectedOutports = outports;
+        this.fire('outports', outports);
       },
       selectedNodesChanged: function () {
         var selectedNodesHash = {};

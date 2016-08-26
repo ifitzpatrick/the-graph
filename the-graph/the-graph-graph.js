@@ -195,7 +195,28 @@
       };
 
       var nodes = this.state.graph.nodes.filter(filter);
-      this.props.onNodeGroupSelection(nodes);
+
+      var graphInports = this.state.graph.inports;
+      var inports = Object.keys(graphInports).map(function (key) {
+        return {
+          exportKey: key,
+          export: graphInports[key]
+        }
+      }).filter(function (exportItem) {
+        return filter(exportItem.export);
+      });
+
+      var graphOutports = this.state.graph.outports;
+      var outports = Object.keys(graphOutports).map(function (key) {
+        return {
+          exportKey: key,
+          export: graphOutports[key]
+        }
+      }).filter(function (exportItem) {
+        return filter(exportItem.export);
+      });
+
+      this.props.onNodeGroupSelection(nodes, inports, outports);
 
       return {
         marqueeSelectCurrentX: currentX,
