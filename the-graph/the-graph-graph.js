@@ -390,9 +390,9 @@
     renameExport: function (oldName, newName, graphPorts, selected, isIn) {
       var callback = this.props.onExportSelection;
       if (selected[oldName]) {
-        var export = graphPorts[newName];
-        callback(oldName, export, isIn, true);
-        callback(newName, export, isIn, true);
+        var port = graphPorts[newName];
+        callback(oldName, port, isIn, true);
+        callback(newName, port, isIn, true);
       }
     },
     moveGroup: function (nodes, dx, dy) {
