@@ -121,14 +121,28 @@
       ReactDOM.findDOMNode(this).addEventListener("the-graph-node-remove", this.removeNode);
 
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
-      appDomNode.addEventListener("mousedown", this.startMarqueeSelect);
-      window.addEventListener("mouseup", this.stopMarqueeSelect);
-      appDomNode.addEventListener("mousemove", this.moveMarqueeSelect);
+      appDomNode.addEventListener(
+        this.getEvent('marqueeSelectStartEvent'), this.startMarqueeSelect);
+    },
+    defaultEventConfig: {
+      marqueeSelectStartEvent: 'mousedown',
+      marqueeSelectEndEvent: 'mouseup',
+      marqueeSelectEvent: 'mousemove',
+      marqueeSelectFilter: function (event) {return event.button === 1}
+    },
+    getEvent: function (key) {
+      return this.props.eventConfig[key] || this.defaultEventConfig[key];
     },
     startMarqueeSelect: function (event) {
-      if (event.button !== 1) {
+      if (!this.getEvent('marqueeSelectFilter')(event)) {
         return;
       }
+
+      var appDomNode = ReactDOM.findDOMNode(this.props.app);
+      window.addEventListener(
+        this.getEvent('marqueeSelectEndEvent'), this.stopMarqueeSelect);
+      appDomNode.addEventListener(
+        this.getEvent('marqueeSelectEvent'), this.moveMarqueeSelect);
 
       var appX = this.props.app.state.x;
       var appY = this.props.app.state.y;
@@ -228,10 +242,9 @@
       };
     },
     stopMarqueeSelect: function (event) {
-      if (event.button !== 1) {
+      if (!this.getEvent('marqueeSelectFilter')(event)) {
         return;
       }
-
       this.calculateMarqueeSelect(event);
 
       this.setState({
@@ -242,6 +255,14 @@
         marqueeSelectCurrentY: null
       });
       this.markDirty();
+
+      var appDomNode = ReactDOM.findDOMNode(this.props.app);
+      window.removeEventListener(
+        this.getEvent('marqueeSelectEndEvent'), this.stopMarqueeSelect);
+      appDomNode.removeEventListener(
+        this.getEvent('marqueeSelectEvent'), this.moveMarqueeSelect);
+
+
     },
     didChangeNode: function (event) {
       delete this.portInfo[event.id];

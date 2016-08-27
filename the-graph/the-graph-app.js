@@ -195,26 +195,53 @@
       // Hammer.js
       this.pinching = false;
     },
-    onTrackStart: function (event) {
-      event.preventTap();
+    onPanStart: function (event) {
+      if (!this.getEvent('panFilter')(event)) {
+        return;
+      }
+
+      if (event.preventTap) {
+        event.preventTap();
+      }
+
       var domNode = ReactDOM.findDOMNode(this);
-      domNode.addEventListener("track", this.onTrack);
-      domNode.addEventListener("trackend", this.onTrackEnd);
+      domNode.addEventListener(
+        this.getEvent('panEvent'), this.getOnPan(event));
+
+      if (this.props.panEndEvent === 'mouseup') {
+        window.addEventListener(
+          this.getEvent('panEndEvent'), this.onPanEnd);
+      } else {
+        domNode.addEventListener(
+          this.getEvent('panEndEvent'), this.onPanEnd);
+      }
     },
-    onTrack: function (event) {
-      if ( this.pinching ) { return; }
-      this.setState({
-        x: this.state.x + event.ddx,
-        y: this.state.y + event.ddy
-      });
+    onPan: null,
+    getOnPan: function (event) {
+      var startX = this.state.x;
+      var startY = this.state.y;
+      var startClientX = event.clientX;
+      var startClientY = event.clientY;
+
+      this.onPan = function (event) {
+        if ( this.pinching ) { return; }
+        this.setState({
+          x: startX + event.clientX - startClientX,
+          y: startY + event.clientY - startClientY
+        });
+      }.bind(this);
+      return this.onPan;
     },
-    onTrackEnd: function (event) {
+    onPanEnd: function (event) {
+      if (!this.getEvent('panFilter')(event)) {
+        return;
+      }
       // Don't click app (unselect)
       event.stopPropagation();
 
       var domNode = ReactDOM.findDOMNode(this);
-      domNode.removeEventListener("track", this.onTrack);
-      domNode.removeEventListener("trackend", this.onTrackEnd);
+      domNode.removeEventListener(this.props.panEvent, this.onPan);
+      domNode.removeEventListener(this.props.panEndEvent, this.onPanEnd);
     },
     onPanScale: function () {
       // Pass pan/scale out to the-graph
@@ -306,6 +333,15 @@
       this.refs.graph.edgeStart(event);
       this.hideContext();
     },
+    defaultEventConfig: {
+      panStartEvent: 'trackstart',
+      panStartFilter: function () {return true;},
+      panEvent: 'track',
+      panEndEvent: 'trackend'
+    },
+    getEvent: function (key) {
+      return this.props.eventConfig[key] || this.defaultEventConfig[key];
+    },
     componentDidMount: function () {
       var domNode = ReactDOM.findDOMNode(this);
 
@@ -332,7 +368,7 @@
       }
 
       // Pointer gesture event for pan
-      domNode.addEventListener("trackstart", this.onTrackStart);
+      domNode.addEventListener(this.getEvent('panStartEvent'), this.onPanStart);
 
       var isTouchDevice = 'ontouchstart' in document.documentElement;
       if( isTouchDevice && hammertime ){
@@ -603,7 +639,8 @@
         onExportSelection: this.props.onExportSelection,
         onNodeGroupSelection: this.props.onNodeGroupSelection,
         onEdgeSelection: this.props.onEdgeSelection,
-        showContext: this.showContext
+        showContext: this.showContext,
+        eventConfig: this.props.eventConfig
       };
       graphElementOptions = TheGraph.merge(TheGraph.config.app.graph, graphElementOptions);
       var graphElement = TheGraph.factories.app.createAppGraph.call(this, graphElementOptions);
