@@ -196,7 +196,7 @@
       this.pinching = false;
     },
     onPanStart: function (event) {
-      if (!this.getEvent('panFilter')(event)) {
+      if (!this.getEvent('panFilter')(event) || this.onPan) {
         return;
       }
 
@@ -208,13 +208,8 @@
       domNode.addEventListener(
         this.getEvent('panEvent'), this.getOnPan(event));
 
-      if (this.props.panEndEvent === 'mouseup') {
-        window.addEventListener(
-          this.getEvent('panEndEvent'), this.onPanEnd);
-      } else {
-        domNode.addEventListener(
-          this.getEvent('panEndEvent'), this.onPanEnd);
-      }
+      window.addEventListener(
+        this.getEvent('panEndEvent'), this.onPanEnd);
     },
     onPan: null,
     getOnPan: function (event) {
@@ -240,8 +235,11 @@
       event.stopPropagation();
 
       var domNode = ReactDOM.findDOMNode(this);
-      domNode.removeEventListener(this.props.panEvent, this.onPan);
-      domNode.removeEventListener(this.props.panEndEvent, this.onPanEnd);
+      domNode.removeEventListener(this.getEvent('panEvent'), this.onPan);
+      delete this.onPan;
+
+      window.removeEventListener(
+        this.getEvent('panEndEvent'), this.onPanEnd);
     },
     onPanScale: function () {
       // Pass pan/scale out to the-graph
@@ -335,7 +333,7 @@
     },
     defaultEventConfig: {
       panStartEvent: 'trackstart',
-      panStartFilter: function () {return true;},
+      panFilter: function () {return true;},
       panEvent: 'track',
       panEndEvent: 'trackend'
     },
