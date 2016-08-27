@@ -1,4 +1,4 @@
-<polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX" touch-action="none">
+<polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX eventConfig" touch-action="none">
 
 
   <template>
@@ -53,6 +53,7 @@
       forceSelection: false,
       offsetY: null,
       offsetX: null,
+      eventConfig: {},
       created: function () {
         this.library = {};
         // Default pan
@@ -113,7 +114,8 @@
             displaySelectionGroup: this.displaySelectionGroup,
             forceSelection: this.forceSelection,
             offsetY: this.offsetY,
-            offsetX: this.offsetX
+            offsetX: this.offsetX,
+            eventConfig: this.eventConfig
           }),
           this.$.svgcontainer
         );
