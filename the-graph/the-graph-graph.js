@@ -144,12 +144,14 @@
 
       this.props.onNodeSelection();
 
+      var startX = (event.clientX - appX)/scale;
+      var startY = (event.clientY - appY)/scale;
       this.setState({
         marqueeSelect: true,
-        marqueeSelectStartX: (event.x - appX)/scale,
-        marqueeSelectStartY: (event.y - appY)/scale,
-        marqueeSelectCurrentX: (event.x - appX)/scale,
-        marqueeSelectCurrentY: (event.y - appY)/scale
+        marqueeSelectStartX: startX,
+        marqueeSelectStartY: startY,
+        marqueeSelectCurrentX: startX,
+        marqueeSelectCurrentY: startY
       });
       this.markDirty();
     },
@@ -167,8 +169,8 @@
 
       var startX = this.state.marqueeSelectStartX;
       var startY = this.state.marqueeSelectStartY;
-      var currentX = (event.x - appX)/scale;
-      var currentY = (event.y - appY)/scale;
+      var currentX = (event.clientX - appX)/scale;
+      var currentY = (event.clientY - appY)/scale;
       var lowX, lowY, highX, highY;
       if (startX <= currentX) {
         lowX = startX;
@@ -218,6 +220,11 @@
       if (!this.getEvent('marqueeSelectFilter')(event)) {
         return;
       }
+      if (event.preventTap) {
+        event.preventTap();
+      }
+      event.preventDefault();
+      event.stopPropagation();
       this.calculateMarqueeSelect(event);
 
       this.setState({
@@ -234,8 +241,6 @@
         this.getEvent('marqueeSelectEndEvent'), this.stopMarqueeSelect);
       appDomNode.removeEventListener(
         this.getEvent('marqueeSelectEvent'), this.moveMarqueeSelect);
-
-
     },
     edgePreview: null,
     edgeStart: function (event) {
