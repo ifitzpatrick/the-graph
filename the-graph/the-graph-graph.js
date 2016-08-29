@@ -165,7 +165,20 @@
       if (!this.state.marqueeSelect) {
         return;
       }
-      this.setState(this.calculateMarqueeSelect(event));
+      var result = this.calculateMarqueeSelect(event);
+      result.state.selectedNodes = result.nodes.reduce(function (map, node) {
+        map[node.id] = true;
+        return map;
+      }, {});
+      result.state.selectedInports = result.inports.reduce(function (map, node) {
+        map[node.exportKey] = true;
+        return map;
+      }, {});
+      result.state.selectedOutports = result.outports.reduce(function (map, node) {
+        map[node.exportKey] = true;
+        return map;
+      }, {});
+      this.setState(result.state);
       this.markDirty();
     },
     calculateMarqueeSelect: function (event) {
@@ -236,11 +249,15 @@
         return filter(exportItem.export);
       });
 
-      this.props.onNodeGroupSelection(nodes, inports, outports);
 
       return {
-        marqueeSelectCurrentX: currentX,
-        marqueeSelectCurrentY: currentY
+        state: {
+          marqueeSelectCurrentX: currentX,
+          marqueeSelectCurrentY: currentY
+        },
+        nodes: nodes,
+        inports: inports,
+        outports: outports
       };
     },
     stopMarqueeSelect: function (event) {
@@ -252,7 +269,10 @@
       }
       event.preventDefault();
       event.stopPropagation();
-      this.calculateMarqueeSelect(event);
+
+      var result = this.calculateMarqueeSelect(event);
+      this.props.onNodeGroupSelection(
+        result.nodes, result.inports, result.outports);
 
       this.setState({
         marqueeSelect: false,
