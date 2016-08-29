@@ -143,7 +143,12 @@
       if (!this.state.marqueeSelect) {
         return;
       }
-      this.setState(this.calculateMarqueeSelect(event));
+      var result = this.calculateMarqueeSelect(event);
+      result.state.selectedNodes = result.nodes.reduce(function (map, node) {
+        map[node.id] = true;
+        return map;
+      }, {});
+      this.setState(result.state);
       this.markDirty();
     },
     calculateMarqueeSelect: function (event) {
@@ -193,11 +198,13 @@
       };
 
       var nodes = this.state.graph.nodes.filter(filter);
-      this.props.onNodeGroupSelection(nodes);
 
       return {
-        marqueeSelectCurrentX: currentX,
-        marqueeSelectCurrentY: currentY
+        state: {
+          marqueeSelectCurrentX: currentX,
+          marqueeSelectCurrentY: currentY
+        },
+        nodes: nodes
       };
     },
     stopMarqueeSelect: function (event) {
@@ -205,7 +212,8 @@
         return;
       }
 
-      this.calculateMarqueeSelect(event);
+      var result = this.calculateMarqueeSelect(event);
+      this.props.onNodeGroupSelection(result.nodes);
 
       this.setState({
         marqueeSelect: false,
