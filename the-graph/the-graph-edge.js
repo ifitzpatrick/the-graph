@@ -108,7 +108,6 @@
       this.props.onEdgeSelection(this.props.edgeID, this.props.edge, toggle);
     },
     showContext: function (event) {
-      console.log(this.props.length, this.props.opacity, this.props.nodeSelected);
       // Don't show native context menu
       event.preventDefault();
 
