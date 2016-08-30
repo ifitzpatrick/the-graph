@@ -1286,15 +1286,25 @@
         //maxX *= scale;
         //maxY *= scale;
 
+        var pseudoGroup = {
+          name: "selection",
+          nodes: selectedIds,
+          inports: selectedInports,
+          outports: selectedOutports,
+          metadata: {color:1}
+        };
         var selectionGroupOptions = {
           graph: graph,
           app: self.props.app,
+          item: pseudoGroup,
           minX: minX,
           minY: minY,
           maxX: maxX,
           maxY: maxY,
           scale: scale,
-          color: 1
+          color: 1,
+          triggerMoveGroup: self.moveGroup,
+          showContext: self.props.showContext
         };
         selectionGroupOptions = TheGraph.merge(TheGraph.config.graph.selectionGroup, selectionGroupOptions);
         var selectionGroup = TheGraph.factories.graph.createGraphGroup.call(this, selectionGroupOptions);
