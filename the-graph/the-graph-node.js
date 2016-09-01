@@ -100,7 +100,22 @@
     ],
     componentDidMount: function () {
       var domNode = ReactDOM.findDOMNode(this);
-      
+
+      domNode.addEventListener("dblclick", function () {
+        var detail;
+        if (this.props.export && this.props.isIn) {
+          detail = {inport: this.props.export};
+        } else if (this.props.export) {
+          detail = {outport: this.props.export};
+        } else {
+          detail = {node: this.props.node};
+        }
+        domNode.dispatchEvent(new CustomEvent("node-dblclick", {
+          detail: detail,
+          bubbles: true
+        }));
+      }.bind(this));
+
       // Dragging
       domNode.addEventListener("trackstart", this.onTrackStart);
 
