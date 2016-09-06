@@ -646,7 +646,8 @@
         onNodeGroupSelection: this.props.onNodeGroupSelection,
         onEdgeSelection: this.props.onEdgeSelection,
         showContext: this.showContext,
-        eventConfig: this.props.eventConfig
+        eventConfig: this.props.eventConfig,
+        disabled: this.props.disabled
       };
       graphElementOptions = TheGraph.merge(TheGraph.config.app.graph, graphElementOptions);
       var graphElement = TheGraph.factories.app.createAppGraph.call(this, graphElementOptions);

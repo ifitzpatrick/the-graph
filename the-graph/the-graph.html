@@ -1,5 +1,4 @@
-<polymer-element name="the-graph" attributes="graph menus library snap grid width height autolayout theme selectedNodes errorNodes selectedInports selectedOutports selectedEdges animatedEdges objectClassNames getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX eventConfig" touch-action="none">
-
+<polymer-element name="the-graph" attributes="graph menus library snap grid width height autolayout theme selectedNodes errorNodes selectedInports selectedOutports selectedEdges animatedEdges objectClassNames getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX eventConfig disabled" touch-action="none">
 
   <template>
     <link rel="stylesheet" href="../themes/the-graph-dark.css">
@@ -68,6 +67,7 @@
       offsetY: null,
       offsetX: null,
       eventConfig: {},
+      disabled: false,
       created: function () {
         this.library = {};
         // Default pan
@@ -134,11 +134,15 @@
             offsetX: this.offsetX,
             registerPanEvent: this.registerPanEvent,
             registerMarqueeSelectEvent: this.registerMarqueeSelectEvent,
-            eventConfig: this.eventConfig
+            eventConfig: this.eventConfig,
+            disabled: this.disabled
           }),
           this.$.svgcontainer
         );
         this.graphView = this.appView.refs.graph;
+      },
+      disabledChanged: function () {
+        this.graphView.setState({disabled: this.disabled});
       },
       onPanScale: function (x, y, scale) {
         this.pan[0] = x;
