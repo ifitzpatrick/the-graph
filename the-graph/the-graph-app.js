@@ -570,7 +570,8 @@
         library: this.props.library,
         onNodeSelection: this.props.onNodeSelection,
         onEdgeSelection: this.props.onEdgeSelection,
-        showContext: this.showContext
+        showContext: this.showContext,
+        disabled: this.props.disabled
       };
       graphElementOptions = TheGraph.merge(TheGraph.config.app.graph, graphElementOptions);
       var graphElement = TheGraph.factories.app.createAppGraph.call(this, graphElementOptions);

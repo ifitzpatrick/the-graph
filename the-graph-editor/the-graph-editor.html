@@ -1,6 +1,6 @@
 <link rel="import" href="../the-graph/the-graph.html">
 
-<polymer-element name="the-graph-editor" attributes="grid snap width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges onContextMenu displaySelectionGroup forceSelection" touch-action="none">
+<polymer-element name="the-graph-editor" attributes="grid snap width height autolayout theme selectedNodes errorNodes selectedEdges animatedEdges onContextMenu displaySelectionGroup forceSelection disabled" touch-action="none">
   <template>
     <the-graph id="graph"
       name="{{ graph.properties.name }}"
@@ -16,7 +16,8 @@
       animatedEdges="{{animatedEdges}}"
       displaySelectionGroup="{{displaySelectionGroup}}"
       forceSelection="{{forceSelection}}"
-      getMenuDef="{{getMenuDef}}">
+      getMenuDef="{{getMenuDef}}"
+      disabled="{{disabled}}">
     </the-graph>
   </template>
   <script>
@@ -42,9 +43,26 @@
       animatedEdges: [],
       displaySelectionGroup: true,
       forceSelection: false,
+      disabled: false,
+      disabledChanged: function () {
+        this.$.graph.disabled = this.disabled;
+      },
       created: function () {
+        var dispatchDisabledEvent = function (action) {
+          this.dispatchEvent(new CustomEvent('disabled-notification', {
+              detail: {
+                action: action
+              },
+              bubbles: true
+          }));
+        }.bind(this);
+
         this.pan = [0,0];
         var pasteAction = function (graph, itemKey, item) {
+          if (this.disabled) {
+            dispatchDisabledEvent('paste');
+            return;
+          }
           var pasted = TheGraph.Clipboard.paste(graph);
           this.selectedNodes = pasted.nodes;
           this.selectedEdges = [];
@@ -58,6 +76,10 @@
 
         var nodeActions = {
           delete: function (graph, itemKey, item) {
+            if (this.disabled) {
+              dispatchDisabledEvent('node-delete');
+              return;
+            }
             graph.removeNode(itemKey);
             // Remove selection
             var newSelection = [];
@@ -74,6 +96,10 @@
           }
         }, edgeActions = {
           delete: function (graph, itemKey, item) {
+            if (this.disabled) {
+              dispatchDisabledEvent('edge-delete');
+              return;
+            }
             graph.removeEdge(item.from.node, item.from.port, item.to.node, item.to.port);
             // Remove selection
             var newSelection = [];
@@ -118,6 +144,10 @@
               icon: "sign-in",
               iconLabel: "export",
               action: function (graph, itemKey, item) {
+                if (this.disabled) {
+                  dispatchDisabledEvent('inport-add');
+                  return;
+                }
                 var pub = item.port;
                 if (pub === 'start') {
                   pub = 'start1';
@@ -134,7 +164,7 @@
                 var priNode = graph.getNode(item.process);
                 var metadata = {x:priNode.metadata.x-144, y:priNode.metadata.y};
                 graph.addInport(pub, item.process, item.port, metadata);
-              }
+              }.bind(this)
             }
           },
           nodeOutport: {
@@ -142,6 +172,10 @@
               icon: "sign-out",
               iconLabel: "export",
               action: function (graph, itemKey, item) {
+                if (this.disabled) {
+                  dispatchDisabledEvent('outport-add');
+                  return;
+                }
                 var pub = item.port;
                 var count = 0;
                 // Make sure public is unique
@@ -152,7 +186,7 @@
                 var priNode = graph.getNode(item.process);
                 var metadata = {x:priNode.metadata.x+144, y:priNode.metadata.y};
                 graph.addOutport(pub, item.process, item.port, metadata);
-              }
+              }.bind(this)
             }
           },
           graphInport: {
@@ -165,8 +199,12 @@
               icon: "trash-o",
               iconLabel: "delete",
               action: function (graph, itemKey, item) {
+                if (this.disabled) {
+                  dispatchDisabledEvent('inport-delete');
+                  return;
+                }
                 graph.removeInport(itemKey);
-              }
+              }.bind(this)
             }
           },
           graphOutport: {
@@ -179,8 +217,12 @@
               icon: "trash-o",
               iconLabel: "delete",
               action: function (graph, itemKey, item) {
+                if (this.disabled) {
+                  dispatchDisabledEvent('outport-delete');
+                  return;
+                }
                 graph.removeOutport(itemKey);
-              }
+              }.bind(this)
             }
           },
           group: {
@@ -189,8 +231,12 @@
               icon: "trash-o",
               iconLabel: "ungroup",
               action: function (graph, itemKey, item) {
+                if (this.disabled) {
+                  dispatchDisabledEvent('group-delete');
+                  return;
+                }
                 graph.removeGroup(itemKey);
-              }
+              }.bind(this)
             },
             // TODO copy group?
             e4: pasteMenu

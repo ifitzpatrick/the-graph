@@ -96,7 +96,8 @@
         selectedEdges: [],
         animatedEdges: [],
         offsetX: this.props.offsetX,
-        offsetY: this.props.offsetY
+        offsetY: this.props.offsetY,
+        disabled: this.props.disabled
       };
     },
     componentDidMount: function () {
@@ -117,6 +118,19 @@
     edgePreview: null,
     edgeStart: function (event) {
       // Forwarded from App.edgeStart()
+
+      if (this.state.disabled) {
+        ReactDOM.findDOMNode(this).dispatchEvent(new CustomEvent('disabled-notification', {
+          detail: {
+            action: 'edge-start'
+          },
+          bubbles: true
+        }));
+        if (this.state.edgePreview) {
+          this.cancelPreviewEdge();
+        }
+        return;
+      }
 
       // Port that triggered this
       var port = event.detail.port;
@@ -400,6 +414,7 @@
       var graph = this.state.graph;
       var library = this.props.library;
       var selectedIds = [];
+      var disabled = this.state.disabled;
 
       // Reset ports if library has changed
       if (this.libraryDirty) {
@@ -478,7 +493,8 @@
           selected: selected,
           error: (self.state.errorNodes[key] === true),
           showContext: self.props.showContext,
-          highlightPort: highlightPort
+          highlightPort: highlightPort,
+          disabled: disabled
         };
 
         nodeOptions = TheGraph.merge(TheGraph.config.graph.node, nodeOptions);
@@ -530,7 +546,8 @@
           onEdgeSelection: self.props.onEdgeSelection,
           selected: (self.state.selectedEdges.indexOf(edge) !== -1),
           animated: (self.state.animatedEdges.indexOf(edge) !== -1),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          disabled: disabled
         };
 
         edgeOptions = TheGraph.merge(TheGraph.config.graph.edge, edgeOptions);
@@ -554,7 +571,8 @@
           graph: graph,
           label: label,
           x: tX,
-          y: tY
+          y: tY,
+          disabled: disabled
         };
 
         iipOptions = TheGraph.merge(TheGraph.config.graph.iip, iipOptions);
@@ -612,7 +630,8 @@
           ports: self.getGraphInport(key),
           isIn: true,
           icon: (metadata.icon ? metadata.icon : "sign-in"),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          disabled: disabled
         };
         expNode = TheGraph.merge(TheGraph.config.graph.inportNode, expNode);
         // Edge view
@@ -630,7 +649,8 @@
           sY: expNode.y + TheGraph.config.nodeHeight / 2,
           tX: privateNode.metadata.x + privatePort.x,
           tY: privateNode.metadata.y + privatePort.y,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          disabled: disabled
         };
         expEdge = TheGraph.merge(TheGraph.config.graph.inportEdge, expEdge);
         edges.unshift(TheGraph.factories.graph.createGraphEdge.call(this, expEdge));
@@ -687,7 +707,8 @@
           ports: self.getGraphOutport(key),
           isIn: false,
           icon: (metadata.icon ? metadata.icon : "sign-out"),
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          disabled: disabled
         };
         expNode = TheGraph.merge(TheGraph.config.graph.outportNode, expNode);
         // Edge view
@@ -705,13 +726,13 @@
           sY: privateNode.metadata.y + privatePort.y,
           tX: expNode.x,
           tY: expNode.y + TheGraph.config.nodeHeight / 2,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          disabled: disabled
         };
         expEdge = TheGraph.merge(TheGraph.config.graph.outportEdge, expEdge);
         edges.unshift(TheGraph.factories.graph.createGraphEdge.call(this, expEdge));
         return TheGraph.factories.graph.createGraphNode.call(this, expNode);
       });
-
 
       // Groups
       var groups = graph.groups.map(function (group) {
@@ -737,7 +758,8 @@
           description: group.metadata.description,
           color: group.metadata.color,
           triggerMoveGroup: self.moveGroup,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          disabled: disabled
         };
         groupOptions = TheGraph.merge(TheGraph.config.graph.nodeGroup, groupOptions);
         return TheGraph.factories.graph.createGraphGroup.call(this, groupOptions);
@@ -764,7 +786,8 @@
             scale: self.props.scale,
             color: pseudoGroup.metadata.color,
             triggerMoveGroup: self.moveGroup,
-            showContext: self.props.showContext
+            showContext: self.props.showContext,
+            disabled: disabled
           };
           selectionGroupOptions = TheGraph.merge(TheGraph.config.graph.selectionGroup, selectionGroupOptions);
           var selectionGroup = TheGraph.factories.graph.createGraphGroup.call(this, selectionGroupOptions);
