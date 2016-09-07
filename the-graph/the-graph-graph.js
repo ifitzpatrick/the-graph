@@ -470,6 +470,8 @@
           return nodeClassNames[className](node);
         }).join(" ");
 
+        var portClassNames = self.state.objectClassNames.ports || {};
+
         var nodeOptions = {
           key: key,
           nodeID: key,
@@ -491,7 +493,8 @@
           error: (self.state.errorNodes[key] === true),
           showContext: self.props.showContext,
           highlightPort: highlightPort,
-          classNames: classNames
+          classNames: classNames,
+          portClassNames: portClassNames
         };
 
         nodeOptions = TheGraph.merge(TheGraph.config.graph.node, nodeOptions);
