@@ -462,7 +462,8 @@
         nextProps.error !== this.props.error ||
         nextProps.highlightPort !== this.props.highlightPort ||
         nextProps.ports.dirty === true ||
-        nextProps.classNames !== this.props.classNames
+        nextProps.classNames !== this.props.classNames ||
+        nextProps.portClassNames !== this.props.portClassNames
       );
     },
     render: function() {
@@ -480,6 +481,7 @@
       var y = this.props.y;
       var width = this.props.width;
       var height = this.props.height;
+      var portClassNames = this.props.portClassNames;
 
       // Ports
       var keys, count;
@@ -560,7 +562,10 @@
             highlightPort: highlightPort,
             route: info.route,
             showContext: showContext,
-            labelWidth: config.labelWidth
+            labelWidth: config.labelWidth,
+            classNames: Object.keys(portClassNames || {}).filter(function (className) {
+              return portClassNames[className](node, info, isIn);
+            }).join(' ')
           };
           views.push(TheGraph.factories.node.createNodePort(props));
           i++;
@@ -594,7 +599,10 @@
                 highlightPort: highlightPort,
                 route: info.route,
                 showContext: showContext,
-                labelWidth: config.labelWidth
+                labelWidth: config.labelWidth,
+                classNames: Object.keys(portClassNames || {}).filter(function (className) {
+                  return portClassNames[className](node, info, isIn);
+                }).join(' ')
               };
               views.push(TheGraph.factories.node.createNodePort(props));
               i++;

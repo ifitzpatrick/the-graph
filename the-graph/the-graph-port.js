@@ -268,7 +268,12 @@
         labelGroup
       ];
 
-      var containerOptions = TheGraph.merge(TheGraph.config.port.container, { title: this.props.label, transform: "translate("+this.props.x+","+this.props.y+")" });
+      var containerOptions = TheGraph.merge(TheGraph.config.port.container, {
+        title: this.props.label,
+        transform: "translate("+this.props.x+","+this.props.y+")",
+        className: TheGraph.config.port.container.className + (
+          this.props.classNames ? ' ' + this.props.classNames : '')
+      });
       return TheGraph.factories.port.createPortGroup.call(this, containerOptions, portContents);
 
     }

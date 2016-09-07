@@ -897,6 +897,8 @@
           return nodeClassNames[className](node);
         }).join(" ");
 
+        var portClassNames = self.state.objectClassNames.ports || {};
+
         var nodeOptions = {
           key: key,
           nodeID: key,
@@ -921,7 +923,8 @@
           highlightPort: highlightPort,
           classNames: classNames,
           subgraph: componentInfo ? componentInfo.subgraph : false,
-          disabled: disabled
+          disabled: disabled,
+          portClassNames: portClassNames
         };
 
         nodeOptions = TheGraph.merge(TheGraph.config.graph.node, nodeOptions);
