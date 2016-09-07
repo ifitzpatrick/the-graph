@@ -163,7 +163,8 @@
         nextProps.port.addressable !== this.props.port.addressable ||
         nextProps.x !== this.props.x ||
         nextProps.y !== this.props.y ||
-        nextProps.nodeWidth !== this.props.nodeWidth
+        nextProps.nodeWidth !== this.props.nodeWidth ||
+        nextProps.classNames !== this.props.classNames
       );
     },
     render: function() {
