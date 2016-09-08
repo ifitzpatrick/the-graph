@@ -80,6 +80,13 @@
     componentDidMount: function () {
       var domNode = ReactDOM.findDOMNode(this);
 
+      domNode.addEventListener("dblclick", function () {
+        domNode.dispatchEvent(new CustomEvent("dblclick-edge", {
+          detail: this.props.edge,
+          bubbles: true
+        }));
+      }.bind(this));
+
       // Dragging
       domNode.addEventListener("trackstart", this.dontPan);
 

@@ -105,14 +105,18 @@
 
       domNode.addEventListener("dblclick", function () {
         var detail;
+        var event;
         if (this.props.export && this.props.isIn) {
           detail = {inport: this.props.export};
+          event = 'dblclick-inport';
         } else if (this.props.export) {
           detail = {outport: this.props.export};
+          event = 'dblclick-outport';
         } else {
           detail = {node: this.props.node};
+          event = 'dblclick-node';
         }
-        domNode.dispatchEvent(new CustomEvent("node-dblclick", {
+        domNode.dispatchEvent(new CustomEvent(event, {
           detail: detail,
           bubbles: true
         }));
