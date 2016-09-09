@@ -215,17 +215,25 @@
       highY += TheGraph.config.nodeWidth * 0.75;
 
       var filter = function (node) {
-        return (
+       return (
           (node.metadata.x >= lowX &&
            node.metadata.x <= highX) ||
           (node.metadata.x + node.metadata.width >= lowX &&
-           node.metadata.x + node.metadata.width <= highX)
+           node.metadata.x + node.metadata.width <= highX) ||
+          (lowX >= node.metadata.x &&
+           lowX <= node.metadata.x + node.metadata.width) ||
+          (highX >= node.metadata.x &&
+           highX <= node.metadata.x + node.metadata.width)
         ) && (
           (node.metadata.y >= lowY &&
            node.metadata.y <= highY) ||
           (node.metadata.y + node.metadata.height >= lowY &&
-           node.metadata.y + node.metadata.height <= highY)
-        )
+           node.metadata.y + node.metadata.height <= highY) ||
+          (lowY >= node.metadata.y &&
+           lowY <= node.metadata.y + node.metadata.height) ||
+          (highY >= node.metadata.y &&
+           highY <= node.metadata.y + node.metadata.height)
+        );
       };
 
       var nodes = this.state.graph.nodes.filter(filter);
