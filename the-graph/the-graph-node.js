@@ -105,13 +105,19 @@
         var detail;
         var event;
         if (this.props.export && this.props.isIn) {
-          detail = {inport: this.props.export};
+          detail = {
+            export: this.props.export,
+            exportKey: this.props.exportKey
+          };
           event = 'dblclick-inport';
         } else if (this.props.export) {
-          detail = {outport: this.props.export};
+          detail = {
+            export: this.props.export,
+            exportKey: this.props.exportKey
+          };
           event = 'dblclick-outport';
         } else {
-          detail = {node: this.props.node};
+          detail = this.props.node;
           event = 'dblclick-node';
         }
         domNode.dispatchEvent(new CustomEvent(event, {

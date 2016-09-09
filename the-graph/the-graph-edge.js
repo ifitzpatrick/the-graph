@@ -81,8 +81,28 @@
       var domNode = ReactDOM.findDOMNode(this);
 
       domNode.addEventListener("dblclick", function () {
-        domNode.dispatchEvent(new CustomEvent("dblclick-edge", {
-          detail: this.props.edge,
+        var event;
+        var detail;
+
+        if (this.props.export && this.props.isIn) {
+          event = 'dblclick-inport';
+          detail = {
+            export: this.props.export,
+            exportKey: this.props.exportKey
+          };
+        } else if (this.props.export) {
+          event = 'dblclick-outport';
+          detail = {
+            export: this.props.export,
+            exportKey: this.props.exportKey
+          };
+        } else {
+          event = 'dblclick-edge';
+          detail = this.props.edge;
+        }
+
+        domNode.dispatchEvent(new CustomEvent(event, {
+          detail: detail,
           bubbles: true
         }));
       }.bind(this));
