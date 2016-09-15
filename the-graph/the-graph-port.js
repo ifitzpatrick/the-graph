@@ -164,7 +164,8 @@
         nextProps.x !== this.props.x ||
         nextProps.y !== this.props.y ||
         nextProps.nodeWidth !== this.props.nodeWidth ||
-        nextProps.classNames !== this.props.classNames
+        nextProps.classNames !== this.props.classNames ||
+        nextProps.highlightPort !== this.props.highlightPort
       );
     },
     render: function() {
