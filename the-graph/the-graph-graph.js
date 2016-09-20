@@ -107,7 +107,7 @@
       this.props.graph.on("removeInitial", this.resetPortRoute);
 
       // Listen to noflo graph object's events
-      this.props.graph.on("changeNode", this.markDirty);
+      this.props.graph.on("changeNode", this.onChangeNode);
       this.props.graph.on("changeInport", this.markDirty);
       this.props.graph.on("changeOutport", this.markDirty);
       this.props.graph.on("endTransaction", this.markDirty);
@@ -200,6 +200,32 @@
             y: Math.round(node.metadata.y/snap) * snap
           });
         }
+      }
+    },
+    moveQueue: [],
+    triggerMoveNode: null,
+    onChangeNode: function (node, before) {
+      //var metadata = node.metadata;
+      //var onlyMove = Object.keys(before).reduce(function (onlyMove, key) {
+        //return onlyMove && (
+          //metadata[key] === before[key] ||
+          //['x', 'y'].indexOf(key) >= 0)
+      //}, true);
+
+      //if (!onlyMove) {
+        //this.markDirty();
+        //return
+      //}
+
+      //this.moveQueue.push(node);
+
+      if (!this.triggerMoveNode) {
+        this.triggerMoveNode = function () {
+          //this.moveQueue = [];
+          this.markDirty();
+          delete this.triggerMoveNode;
+        }.bind(this);
+        window.setTimeout(this.triggerMoveNode, 0);
       }
     },
     getComponentInfo: function (componentName) {
