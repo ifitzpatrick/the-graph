@@ -139,6 +139,21 @@
 
       this.props.graph.endTransaction('movegroup');
     },
+    shouldComponentUpdate: function (nextProps, nextState) {
+      return (
+        nextProps.minX !== this.props.minX ||
+        nextProps.minY !== this.props.minY ||
+        nextProps.maxX !== this.props.maxX ||
+        nextProps.maxY !== this.props.maxY ||
+        nextProps.scale !== this.props.scale ||
+        nextProps.label !== this.props.label ||
+        nextProps.nodes !== this.props.nodes ||
+        nextProps.description !== this.props.description ||
+        nextProps.color !== this.props.color ||
+        nextProps.edgePreview !== this.props.edgePreview ||
+        nextProps.disabled !== this.props.disabled
+      );
+    },
     render: function() {
       var x = this.props.minX - TheGraph.config.nodeWidth / 2;
       var y = this.props.minY - TheGraph.config.nodeHeight / 2;

@@ -905,7 +905,7 @@
           return nodeClassNames[className](node);
         }).join(" ");
 
-        var portClassNames = self.state.objectClassNames.ports || {};
+        var portClassNames = self.state.objectClassNames.ports || null;
 
         var nodeOptions = {
           key: key,

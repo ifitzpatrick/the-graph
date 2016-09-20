@@ -232,7 +232,7 @@
         nextProps.selected !== this.props.selected ||
         nextProps.animated !== this.props.animated ||
         nextProps.route !== this.props.route ||
-        nextProps.nodeSelcted !== this.props.nodeSelected ||
+        nextProps.nodeSelected !== this.props.nodeSelected ||
         nextProps.classNames !== this.props.classNames
       );
     },

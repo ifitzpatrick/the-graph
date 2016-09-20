@@ -486,7 +486,7 @@
         nextProps.selected !== this.props.selected ||
         nextProps.error !== this.props.error ||
         nextProps.highlightPort !== this.props.highlightPort ||
-        nextProps.ports.dirty === true ||
+        nextProps.ports.dirty ||
         nextProps.classNames !== this.props.classNames ||
         nextProps.portClassNames !== this.props.portClassNames
       );
