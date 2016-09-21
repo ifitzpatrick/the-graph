@@ -487,19 +487,24 @@
         updateNode(node.id, node.metadata, 'setNodeMetadata');
       }
 
-      len = outports.length;
-      for (i = 0; i < len; i++) {
-        var key = outports[i];
-        var port = this.props.graph.outports[key];
-        if (!port) { continue; }
-        updateNode(key, port.metadata, 'setOutportMetadata');
+      if (outports) {
+        len = outports.length;
+        for (i = 0; i < len; i++) {
+          var key = outports[i];
+          var port = this.props.graph.outports[key];
+          if (!port) { continue; }
+          updateNode(key, port.metadata, 'setOutportMetadata');
+        }
       }
-      len = inports.length;
-      for (i = 0; i < len; i++) {
-        var key = inports[i];
-        var port = this.props.graph.inports[key];
-        if (!port) { continue; }
-        updateNode(key, port.metadata, 'setInportMetadata');
+
+      if (inports) {
+        len = inports.length;
+        for (i = 0; i < len; i++) {
+          var key = inports[i];
+          var port = this.props.graph.inports[key];
+          if (!port) { continue; }
+          updateNode(key, port.metadata, 'setInportMetadata');
+        }
       }
     },
     triggerMoveNode: null,
