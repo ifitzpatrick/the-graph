@@ -312,7 +312,7 @@
         x: fit.x,
         y: fit.y,
         scale: fit.scale,
-      }, duration, 'out-quint');
+      }, duration, 'in-quint');
     },
     edgeStart: function (event) {
       // Listened from PortMenu.edgeStart() and Port.edgeStart()
