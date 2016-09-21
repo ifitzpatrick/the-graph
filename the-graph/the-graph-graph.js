@@ -459,28 +459,47 @@
         callback(newName, port, isIn, true);
       }
     },
-    moveGroup: function (nodes, dx, dy) {
+    moveGroup: function (nodes, inports, outports, dx, dy) {
       var graph = this.state.graph;
+
+      var updateNode = function (id, metadata, method) {
+        if (dx !== undefined) {
+          // Move by delta
+          graph[method](id, {
+            x: metadata.x + dx,
+            y: metadata.y + dy
+          });
+        } else {
+          // Snap to grid
+          var snap = this.props.snap;
+          graph[method](id, {
+            x: Math.round(metadata.x/snap) * snap,
+            y: Math.round(metadata.y/snap) * snap
+          });
+        }
+      }.bind(this);
 
       // Move each group member
       var len = nodes.length;
       for (var i=0; i<len; i++) {
         var node = graph.getNode(nodes[i]);
         if (!node) { continue; }
-        if (dx !== undefined) {
-          // Move by delta
-          graph.setNodeMetadata(node.id, {
-            x: node.metadata.x + dx,
-            y: node.metadata.y + dy
-          });
-        } else {
-          // Snap to grid
-          var snap = this.props.snap;
-          graph.setNodeMetadata(node.id, {
-            x: Math.round(node.metadata.x/snap) * snap,
-            y: Math.round(node.metadata.y/snap) * snap
-          });
-        }
+        updateNode(node.id, node.metadata, 'setNodeMetadata');
+      }
+
+      len = outports.length;
+      for (i = 0; i < len; i++) {
+        var key = outports[i];
+        var port = this.props.graph.outports[key];
+        if (!port) { continue; }
+        updateNode(key, port.metadata, 'setOutportMetadata');
+      }
+      len = inports.length;
+      for (i = 0; i < len; i++) {
+        var key = inports[i];
+        var port = this.props.graph.inports[key];
+        if (!port) { continue; }
+        updateNode(key, port.metadata, 'setInportMetadata');
       }
     },
     triggerMoveNode: null,

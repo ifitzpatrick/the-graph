@@ -115,7 +115,13 @@
       var deltaX = Math.round( event.ddx / this.props.scale );
       var deltaY = Math.round( event.ddy / this.props.scale );
 
-      this.props.triggerMoveGroup(this.props.item.nodes, deltaX, deltaY);
+      this.props.triggerMoveGroup(
+        this.props.item.nodes,
+        this.props.item.inports,
+        this.props.item.outports,
+        deltaX,
+        deltaY
+      );
     },
     onTrackEnd: function (event) {
       // Don't fire on graph
@@ -125,7 +131,11 @@
       event.preventTap();
 
       // Snap to grid
-      this.props.triggerMoveGroup(this.props.item.nodes);
+      this.props.triggerMoveGroup(
+        this.props.item.nodes,
+        this.props.item.inports,
+        this.props.item.outports
+      );
 
       if (this.props.isSelectionGroup) {
         var box = ReactDOM.findDOMNode(this.refs.box);
