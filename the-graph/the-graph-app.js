@@ -397,6 +397,12 @@
       this.bgContext = unwrap(this.bgCanvas.getContext('2d'));
       this.componentDidUpdate();
 
+      window.addEventListener('mousemove', function (event) {
+        this.mousePos = {
+          x: event.clientX,
+          y: event.clientY
+        };
+      }.bind(this));
 
       // Rerender graph once to fix edges
       setTimeout(function () {

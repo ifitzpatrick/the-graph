@@ -71,7 +71,7 @@
             dispatchDisabledEvent('paste');
             return;
           }
-          var pasted = TheGraph.Clipboard.paste(graph);
+          var pasted = TheGraph.Clipboard.paste(graph, this.$.graph.appView);
           this.selectedNodes = pasted.nodes;
           this.selectedEdges = [];
         }.bind(this);

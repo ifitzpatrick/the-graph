@@ -60,7 +60,7 @@
     }
   };
 
-  TheGraph.Clipboard.paste = function (graph) {
+  TheGraph.Clipboard.paste = function (graph, app) {
     var map = {};
     var pasted = {nodes:[], edges:[]};
     var i, len;
@@ -78,8 +78,13 @@
     for (i = 0, len = nodes.length; i < len; i++) {
       var node = nodes[i];
       var meta = cloneObject(node.metadata);
-      meta.x += 36;
-      meta.y += 36;
+      if (app.mousePos) {
+        meta.x = ((app.mousePos.x - app.state.x) / app.state.scale) - 36;
+        meta.y = ((app.mousePos.y - app.state.y) / app.state.scale) - 36;
+      } else {
+        meta.x += 36;
+        meta.y += 36;
+      }
       var newNode = graph.addNode(makeNewId(node.component), node.component, meta);
       map[node.id] = newNode.id;
       pasted.nodes.push(newNode);
