@@ -200,9 +200,6 @@
         highX = startX;
       }
 
-      lowX -= TheGraph.config.nodeWidth / 2;
-      highX += TheGraph.config.nodeWidth / 2;
-
       if (startY <= currentY) {
         lowY = startY;
         highY = currentY;
@@ -210,9 +207,6 @@
         lowY = currentY;
         highY = startY;
       }
-
-      lowY -= TheGraph.config.nodeWidth / 2;
-      highY += TheGraph.config.nodeWidth * 0.75;
 
       var filter = function (node) {
        return (
@@ -1370,7 +1364,8 @@
           scale: scale,
           color: 1,
           triggerMoveGroup: self.moveGroup,
-          showContext: self.props.showContext
+          showContext: self.props.showContext,
+          isMarqueeSelect: true
         };
         selectionGroupOptions = TheGraph.merge(TheGraph.config.graph.selectionGroup, selectionGroupOptions);
         var selectionGroup = TheGraph.factories.graph.createGraphGroup.call(this, selectionGroupOptions);

@@ -165,16 +165,26 @@
       );
     },
     render: function() {
-      var x = this.props.minX - TheGraph.config.nodeWidth / 2;
-      var y = this.props.minY - TheGraph.config.nodeHeight / 2;
+      if (!this.props.isMarqueeSelect) {
+        var x = this.props.minX - TheGraph.config.nodeWidth / 2;
+        var y = this.props.minY - TheGraph.config.nodeHeight / 2;
+        var width = this.props.maxX - x + TheGraph.config.nodeWidth*0.5;
+        var height = this.props.maxY - y + TheGraph.config.nodeHeight*0.75;
+      } else {
+        var x = this.props.minX;
+        var y = this.props.minY;
+        var width = this.props.maxX - x;
+        var height = this.props.maxY - y;
+      }
       var color = (this.props.color ? this.props.color : 0);
       var selection = (this.props.isSelectionGroup ? ' selection drag' : '');
+      var marquee = (this.props.isMarqueeSelect ? ' marquee': '');
       var boxRectOptions = {
         x: x,
         y: y,
-        width: this.props.maxX - x + TheGraph.config.nodeWidth*0.5,
-        height: this.props.maxY - y + TheGraph.config.nodeHeight*0.75,
-        className: "group-box color"+color + selection
+        width: width,
+        height: height,
+        className: "group-box color" + color + selection + marquee
       };
       boxRectOptions = TheGraph.merge(TheGraph.config.group.boxRect, boxRectOptions);
       var boxRect =  TheGraph.factories.group.createGroupBoxRect.call(this, boxRectOptions);
