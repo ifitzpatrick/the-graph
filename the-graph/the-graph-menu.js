@@ -175,6 +175,9 @@
           event.preventDefault();
         }
       }, false);
+      ReactDOM.findDOMNode(this).addEventListener("trackstart", function (event) {
+        event.stopPropagation();
+      });
     },
     getPosition: function () {
       return {
