@@ -74,8 +74,9 @@
       content = clipboardContent;
     }
 
-    for (i = 0, len = content.nodes.length; i < len; i++) {
-      var node = content.nodes[i];
+    var nodes = content.nodes || [];
+    for (i = 0, len = nodes.length; i < len; i++) {
+      var node = nodes[i];
       var meta = cloneObject(node.metadata);
       meta.x += 36;
       meta.y += 36;
@@ -83,8 +84,10 @@
       map[node.id] = newNode.id;
       pasted.nodes.push(newNode);
     }
-    for (i = 0, len = content.edges.length; i < len; i++) {
-      var edge = content.edges[i];
+
+    var edges = content.edges || [];
+    for (i = 0, len = edges.length; i < len; i++) {
+      var edge = edges[i];
       var newEdgeMeta = cloneObject(edge.metadata);
       var newEdge;
       if (edge.from.hasOwnProperty('index') || edge.to.hasOwnProperty('index')) {
@@ -97,8 +100,10 @@
       }
       pasted.edges.push(newEdge);
     }
-    for (i = 0, len = content.iips.length; i < len; i++) {
-      var iip = content.iips[i];
+
+    var iips = content.iips || [];
+    for (i = 0, len = iips.length; i < len; i++) {
+      var iip = iips[i];
       var iipMeta = cloneObject(iip.metadata);
       if (iip.to.index !== null && iip.to.index !== undefined) {
         var toIndex = edge.to.index;
