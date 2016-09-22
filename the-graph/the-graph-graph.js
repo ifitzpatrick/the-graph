@@ -509,7 +509,7 @@
     },
     triggerMoveNode: null,
     onChangeNode: function (node, before) {
-      delete this.portInfo[event.id];
+      delete this.portInfo[node.id];
 
       if (!this.triggerMoveNode) {
         this.triggerMoveNode = function () {
