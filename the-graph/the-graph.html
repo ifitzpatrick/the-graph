@@ -326,8 +326,94 @@
           this.graph.removeListener('removeEdge', this.triggerAutolayout);
         }
       },
-      triggerAutolayout: function (event) {
-        var graph = this.graph;
+      triggerSelectionAutolayout: function (center) {
+        var tmp = new noflo.graph.Graph(this.graph.name, {
+          caseSensitive: this.graph.caseSensitive});
+
+        var minX = Infinity, minY = Infinity;
+        this.selectedNodes.forEach(function (node) {
+          tmp.addNode(node.id, node.component, node.metadata);
+
+          if (node.metadata.x < minX) {
+            minX = node.metadata.x;
+          }
+          if (node.metadata.y < minY) {
+            minY = node.metadata.y;
+          }
+        });
+
+        this.selectedInports.forEach(function (port) {
+          tmp.addInport(
+            port.exportKey,
+            port.export.process,
+            port.export.port,
+            port.export.metadata
+          );
+
+          if (port.export.metadata.x < minX) {
+            minX = port.export.metadata.x;
+          }
+          if (port.export.metadata.y < minY) {
+            minY = port.export.metadata.y;
+          }
+        });
+
+        this.selectedOutports.forEach(function (port) {
+          tmp.addOutport(
+            port.exportKey,
+            port.export.process,
+            port.export.port,
+            port.export.metadata
+          );
+
+          if (port.export.metadata.x < minX) {
+            minX = port.export.metadata.x;
+          }
+          if (port.export.metadata.y < minY) {
+            minY = port.export.metadata.y;
+          }
+        });
+
+        if (center) {
+          this._autolayoutCenter = {
+            x: minX,
+            y: minY
+          };
+        }
+
+        this.graph.edges.filter(function (edge) {
+          return tmp.nodes.filter(function (node) {
+            return edge.from.node === node.id;
+          }).length > 0 && tmp.nodes.filter(function (node) {
+            return edge.to.node === node.id;
+          }).length > 0;
+        }).forEach(function (edge) {
+          tmp.addEdgeIndex(
+            edge.from.node, edge.from.port, edge.from.index,
+            edge.to.node, edge.to.port, edge.to.index
+          );
+        });
+
+        var groups = this.graph.groups,
+            i, len, nodes, group;
+
+        for (i = 0, len = groups.length; i < len; i++) {
+          group = groups[i];
+          nodes = this.selectedNodes.filter(function (node) {
+            return group.nodes.indexOf(node.id) >= 0;
+          }.bind(this)).map(function (node) {
+            return node.id;
+          });
+
+          if (nodes.length > 0) {
+            tmp.addGroup(group.name, nodes, group.metadata);
+          }
+        }
+
+        this.triggerAutolayout(null, tmp);
+      },
+      triggerAutolayout: function (event, tmp) {
+        var graph = tmp || this.graph;
         var portInfo = this.graphView ? this.graphView.portInfo : null;
         // Calls the autolayouter
         this.autolayouter.layout({
@@ -355,6 +441,26 @@
 
         // Update original graph nodes with the new coordinates from KIELER graph
         var children = layoutedKGraph.children.slice();
+        if (this._autolayoutCenter) {
+          var minX = Infinity, minY = Infinity;
+          children.forEach(function (node) {
+            if (node.children) {
+              node.children.forEach(function (childNode) {
+                if (node.x + childNode.x < minX) minX = node.x + childNode.x;
+                if (node.y + childNode.y < minY) minY = node.y + childNode.y;
+              });
+            } else {
+              if (node.x < minX) minX = node.x;
+              if (node.y < minY) minY = node.y;
+            }
+          });
+          var center = {
+            x: this._autolayoutCenter.x - minX,
+            y: this._autolayoutCenter.y - minY,
+          };
+        } else {
+          var center = {x: 0, y: 0};
+        }
 
         var i, len;
         for (i=0, len = children.length; i<len; i++) {
@@ -369,8 +475,8 @@
               var klayChild = klayChildren[idx];
               if (klayChild.id) {
                 this.graph.setNodeMetadata(klayChild.id, {
-                  x: Math.round((klayNode.x + klayChild.x)/this.snap)*this.snap,
-                  y: Math.round((klayNode.y + klayChild.y)/this.snap)*this.snap
+                  x: Math.round((klayNode.x + klayChild.x + center.x)/this.snap)*this.snap,
+                  y: Math.round((klayNode.y + klayChild.y + center.y)/this.snap)*this.snap
                 });
               }
             }
@@ -379,8 +485,8 @@
           // Encode nodes outside groups
           if (nofloNode) {
             this.graph.setNodeMetadata(klayNode.id, {
-              x: Math.round(klayNode.x/this.snap)*this.snap,
-              y: Math.round(klayNode.y/this.snap)*this.snap
+              x: Math.round((klayNode.x + center.x)/this.snap)*this.snap,
+              y: Math.round((klayNode.y + center.y)/this.snap)*this.snap
             });
           } else {
             // Find inport or outport
@@ -389,13 +495,13 @@
             var expKey = idSplit[1];
             if (expDirection==="inport" && this.graph.inports[expKey]) {
               this.graph.setInportMetadata(expKey, {
-                x: Math.round(klayNode.x/this.snap)*this.snap,
-                y: Math.round(klayNode.y/this.snap)*this.snap
+                x: Math.round((klayNode.x + center.x)/this.snap)*this.snap,
+                y: Math.round((klayNode.y + center.y)/this.snap)*this.snap
               });
             } else if (expDirection==="outport" && this.graph.outports[expKey]) {
               this.graph.setOutportMetadata(expKey, {
-                x: Math.round(klayNode.x/this.snap)*this.snap,
-                y: Math.round(klayNode.y/this.snap)*this.snap
+                x: Math.round((klayNode.x + center.x)/this.snap)*this.snap,
+                y: Math.round((klayNode.y + center.y)/this.snap)*this.snap
               });
             }
           }
@@ -403,9 +509,12 @@
 
         this.graph.endTransaction("autolayout");
 
-        // Fit to window
-        this.triggerFit();
-
+        if (this._autolayoutCenter) {
+          this._autolayoutCenter = null;
+        } else {
+          // Fit to window
+          this.triggerFit();
+        }
       },
       triggerFit: function () {
         if (this.appView) {
