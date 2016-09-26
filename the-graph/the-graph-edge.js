@@ -109,6 +109,7 @@
 
       // Dragging
       domNode.addEventListener("trackstart", this.onTrackStart);
+      domNode.addEventListener("trackend", this.onTrackEnd);
 
       if (this.props.onEdgeSelection) {
         // Needs to be click (not tap) to get event.shiftKey
@@ -181,6 +182,15 @@
         bubbles: true
       });
       ReactDOM.findDOMNode(this).dispatchEvent(edgeStartEvent);
+    },
+    onTrackEnd: function (event) {
+      // If dropped on a child element will bubble up to port
+      if (!event.relatedTarget) { return; }
+      var dropEvent = new CustomEvent('the-graph-edge-drop', {
+        detail: null,
+        bubbles: true
+      });
+      event.relatedTarget.dispatchEvent(dropEvent);
     },
     onEdgeSelection: function (event) {
       // Don't click app
