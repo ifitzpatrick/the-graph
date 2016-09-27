@@ -12,7 +12,8 @@
       className: "port-circle-bg"
     },
     arc: {
-      className: "port-arc"
+      className: "port-arc",
+      ref: "portArc"
     },
     innerCircle: {
       ref: "circleSmall"
@@ -48,10 +49,14 @@
     ],
     componentDidMount: function () {
       // Preview edge start
-      ReactDOM.findDOMNode(this).addEventListener("tap", this.edgeStart);
-      ReactDOM.findDOMNode(this).addEventListener("trackstart", this.edgeStart);
+      this.refs.circleSmall.addEventListener("tap", this.edgeStart);
+      this.refs.circleSmall.addEventListener("trackstart", this.edgeStart);
+      this.refs.portArc.addEventListener("tap", this.edgeStart);
+      this.refs.portArc.addEventListener("trackstart", this.edgeStart);
+
       // Make edge
-      ReactDOM.findDOMNode(this).addEventListener("trackend", this.triggerDropOnTarget);
+      this.refs.circleSmall.addEventListener("trackend", this.triggerDropOnTarget);
+      this.refs.portArc.addEventListener("trackend", this.triggerDropOnTarget);
       ReactDOM.findDOMNode(this).addEventListener("the-graph-edge-drop", this.edgeStart);
 
       // Show context menu
