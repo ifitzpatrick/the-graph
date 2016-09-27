@@ -121,6 +121,22 @@
         domNode.addEventListener("contextmenu", this.showContext);
         domNode.addEventListener("hold", this.showContext);
       }
+
+      if (this.props.previewPort) {
+        domNode.addEventListener('render-edge-preview', function (event) {
+          if (this.props.previewPort === 'out') {
+            this.setState({
+              sX: event.detail.x,
+              sY: event.detail.y
+            });
+          } else {
+            this.setState({
+              tX: event.detail.x,
+              tY: event.detail.y
+            });
+          }
+        }.bind(this));
+      }
     },
     onTrackStart: function (event) {
       event.stopPropagation();
@@ -232,13 +248,29 @@
         iconColor: this.props.route
       });
     },
+    getInitialState: function () {
+      return {
+        sX: this.props.sX,
+        sY: this.props.sY,
+        tX: this.props.tX,
+        tY: this.props.tY
+      };
+    },
+    componentWillReceiveProps: function (newProps) {
+      this.setState({
+        sX: newProps.sX,
+        sY: newProps.sY,
+        tX: newProps.tX,
+        tY: newProps.tY
+      });
+    },
     shouldComponentUpdate: function (nextProps, nextState) {
       // Only rerender if changed
       return (
-        nextProps.sX !== this.props.sX ||
-        nextProps.sY !== this.props.sY ||
-        nextProps.tX !== this.props.tX ||
-        nextProps.tY !== this.props.tY ||
+        nextState.sX !== this.state.sX ||
+        nextState.sY !== this.state.sY ||
+        nextState.tX !== this.state.tX ||
+        nextState.tY !== this.state.tY ||
         nextProps.selected !== this.props.selected ||
         nextProps.animated !== this.props.animated ||
         nextProps.route !== this.props.route ||
@@ -253,10 +285,10 @@
       return true;
     },
     render: function () {
-      var sourceX = this.props.sX;
-      var sourceY = this.props.sY;
-      var targetX = this.props.tX;
-      var targetY = this.props.tY;
+      var sourceX = this.state.sX;
+      var sourceY = this.state.sY;
+      var targetX = this.state.tX;
+      var targetY = this.state.tY;
 
       // Organic / curved edge
       var c1X, c1Y, c2X, c2Y;

@@ -209,7 +209,7 @@
       }
 
       var filter = function (node) {
-       return (
+        return (
           (node.metadata.x >= lowX &&
            node.metadata.x <= highX) ||
           (node.metadata.x + node.metadata.width >= lowX &&
@@ -370,7 +370,7 @@
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: edge});
       appDomNode.dispatchEvent(edgePreviewEvent);
 
-      this.setState({edgePreview: edge});
+      this.setState({edgePreview: edge}, this.markDirty);
     },
     cancelPreviewEdge: function (event) {
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
@@ -385,17 +385,32 @@
         this.markDirty();
       }
     },
+    triggerMoveEdge: null,
     renderPreviewEdge: function (event) {
       var x = event.x || event.clientX || 0;
       var y = event.y || event.clientY || 0;
       x -= this.props.app.state.offsetX || 0;
       y -= this.props.app.state.offsetY || 0;
       var scale = this.props.app.state.scale;
-      this.setState({
-        edgePreviewX: (x - this.props.app.state.x) / scale,
-        edgePreviewY: (y - this.props.app.state.y) / scale
-      });
-      this.markDirty();
+
+      this.state.edgePreviewX = (x - this.props.app.state.x) / scale;
+      this.state.edgePreviewY = (y - this.props.app.state.y) / scale;
+
+      if (!this.triggerMoveEdge) {
+        this.triggerMoveEdge = function () {
+          if (this.refs.edgePreview) {
+            ReactDOM.findDOMNode(this.refs.edgePreview).dispatchEvent(
+              new CustomEvent('render-edge-preview', {detail: {
+                x: this.state.edgePreviewX,
+                y: this.state.edgePreviewY
+              }})
+            );
+          }
+
+          delete this.triggerMoveEdge;
+        }.bind(this);
+        window.requestAnimationFrame(this.triggerMoveEdge);
+      }
     },
     addEdge: function (edge) {
       var graph = this.state.graph,
@@ -1426,7 +1441,9 @@
             sY: source.metadata.y + sourceY,
             tX: this.state.edgePreviewX,
             tY: this.state.edgePreviewY,
-            route: edgePreview.metadata.route
+            route: edgePreview.metadata.route,
+            ref: 'edgePreview',
+            previewPort: 'in'
           };
         } else {
           var target = graph.getNode(edgePreview.to.process);
@@ -1440,7 +1457,9 @@
             sY: this.state.edgePreviewY,
             tX: target.metadata.x,
             tY: target.metadata.y + targetY,
-            route: edgePreview.metadata.route
+            route: edgePreview.metadata.route,
+            ref: 'edgePreview',
+            previewPort: 'out'
           };
         }
         edgePreviewOptions = TheGraph.merge(TheGraph.config.graph.edgePreview, edgePreviewOptions);
