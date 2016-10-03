@@ -581,6 +581,8 @@
         inports: {},
         outports: {}
       };
+      var maxInportLength = 0;
+      var maxOutportLength = 0;
 
       if (!ports) {
         var inports = {};
@@ -599,6 +601,11 @@
           for (i=0, len=component.outports.length; i<len; i++) {
             port = component.outports[i];
             if (!port.name) { continue; }
+
+            if (port.name.length > maxOutportLength) {
+              maxOutportLength = port.name.length;
+            }
+
             outports[port.name] = {
               label: port.name,
               type: port.type,
@@ -617,6 +624,11 @@
           for (i=0, len=component.inports.length; i<len; i++) {
             port = component.inports[i];
             if (!port.name) { continue; }
+
+            if (port.name.length > maxInportLength) {
+              maxInportLength = port.name.length;
+            }
+
             inports[port.name] = {
               label: port.name,
               type: port.type,
@@ -650,6 +662,8 @@
           outports: outports,
           dirty: true,
           count: Math.max(inportCount, outportCount),
+          maxOutportLength: maxOutportLength,
+          maxInportLength: maxInportLength,
           inportCount: inportCount,
           outportCount: outportCount,
           height: null,//node.metadata.height
@@ -661,6 +675,7 @@
     updatePortPositions: function (graph, processName, component) {
       var node = graph.getNode(processName);
       var nodeHeight = node.metadata.height;
+      var nodeWidth = node.metadata.width;
       var ports = this.getPorts(graph, processName, component);
 
       if (ports.height === nodeHeight) {
@@ -695,6 +710,7 @@
         if (port.expand) {
           port.indexY = map(port.indexList, nextY);
         }
+        port.x = nodeWidth;
       });
 
       i = 0;
@@ -900,16 +916,16 @@
         if (!node.metadata) {
           node.metadata = {};
         }
-        if (node.metadata.x === undefined) { 
-          node.metadata.x = 0; 
+        if (node.metadata.x === undefined) {
+          node.metadata.x = 0;
         }
-        if (node.metadata.y === undefined) { 
-          node.metadata.y = 0; 
+        if (node.metadata.y === undefined) {
+          node.metadata.y = 0;
         }
-        if (node.metadata.width === undefined) { 
-          node.metadata.width = TheGraph.config.nodeWidth; 
+        if (node.metadata.width === undefined) {
+          node.metadata.width = TheGraph.config.nodeWidth;
         }
-        if (node.metadata.height === undefined) { 
+        if (node.metadata.height === undefined) {
           node.metadata.height = TheGraph.config.nodeHeight;
         }
 
@@ -920,6 +936,18 @@
           if (portCount > TheGraph.config.maxPortCount) {
             var diff = portCount - TheGraph.config.maxPortCount;
             node.metadata.height = TheGraph.config.nodeHeight + (diff * TheGraph.config.nodeHeightIncrement);
+          }
+
+          var inLength = ports.maxInportLength * 4;
+          inLength = inLength <  30 ? 30 : inLength;
+
+          var outLength = ports.maxOutportLength * 4;
+          outLength = outLength <  30 ? 30 : outLength;
+
+          var nodeWidth = inLength + outLength + 12;
+
+          if (nodeWidth > node.metadata.width) {
+            node.metadata.width = nodeWidth;
           }
         }
         self.updatePortPositions(graph, key, node.component);

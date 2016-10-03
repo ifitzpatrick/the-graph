@@ -698,97 +698,100 @@
       var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
       var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
 
-      var resizeWidth = 10;
-      var resizeOffset = 3;
       var translate = function (x, y) {
         return 'translate(' + x + ', ' + y + ')';
       };
-      var resizeCornerConfig = {
-        width: resizeWidth,
-        height: resizeWidth
-      };
-      var horizontalConfig = {
-        width: this.props.width - resizeWidth*2 + resizeOffset*2,
-        height: resizeWidth
-      };
-      var verticalConfig = {
-        width: resizeWidth,
-        height: this.props.height - resizeWidth*2 + resizeOffset*2
-      };
-      var cornerConfigs = [
-        {
-          className: 'topleft',
-          transform: translate(-1 * resizeOffset, -1 * resizeOffset)
-        },
-        {
-          className: 'topright',
-          transform: translate(
-            this.props.width - resizeWidth + resizeOffset,
-            -1 * resizeOffset
-          )
-        },
-        {
-          className: 'bottomleft',
-          transform: translate(
-            -1 * resizeOffset,
-            this.props.height - resizeWidth + resizeOffset
-          )
-        },
-        {
-          className: 'bottomright',
-          transform: translate(
-            this.props.width - resizeWidth + resizeOffset,
-            this.props.height - resizeWidth + resizeOffset
-          )
-        }
-      ];
-      var horizontalEdgeConfigs = [
-        {
-          className: 'top',
-          transform: translate(resizeWidth - resizeOffset, -1*resizeOffset)
-        },
-        {
-          className: 'bottom',
-          transform: translate(
-            resizeWidth - resizeOffset,
-            this.props.height - resizeWidth + resizeOffset
-          )
-        },
-      ];
-      var verticalEdgeConfigs = [
-        {
-          className: 'left',
-          transform: translate(-1*resizeOffset, resizeWidth - resizeOffset)
-        },
-        {
-          className: 'right',
-          transform: translate(
-            this.props.width - resizeWidth + resizeOffset,
-            resizeWidth - resizeOffset
-          )
-        },
-      ];
 
-      var resizeRectGroup = TheGraph.factories.node.createNodeResizeGroup.call(
-        this,
-        {className: 'resize'},
-        cornerConfigs.map(function (config) {
-          return TheGraph.factories.node.createNodeResizeRect.call(
-            this,
-            TheGraph.merge(resizeCornerConfig, config)
-          );
-        }.bind(this)).concat(verticalEdgeConfigs.map(function (config) {
-          return TheGraph.factories.node.createNodeResizeRect.call(
-            this,
-            TheGraph.merge(verticalConfig, config)
-          );
-        }.bind(this))).concat(horizontalEdgeConfigs.map(function (config) {
-          return TheGraph.factories.node.createNodeResizeRect.call(
-            this,
-            TheGraph.merge(horizontalConfig, config)
-          );
-        }.bind(this)))
-      );
+      if (this.props.resize) {
+        var resizeWidth = 10;
+        var resizeOffset = 3;
+        var resizeCornerConfig = {
+          width: resizeWidth,
+          height: resizeWidth
+        };
+        var horizontalConfig = {
+          width: this.props.width - resizeWidth*2 + resizeOffset*2,
+          height: resizeWidth
+        };
+        var verticalConfig = {
+          width: resizeWidth,
+          height: this.props.height - resizeWidth*2 + resizeOffset*2
+        };
+        var cornerConfigs = [
+          {
+            className: 'topleft',
+            transform: translate(-1 * resizeOffset, -1 * resizeOffset)
+          },
+          {
+            className: 'topright',
+            transform: translate(
+              this.props.width - resizeWidth + resizeOffset,
+              -1 * resizeOffset
+            )
+          },
+          {
+            className: 'bottomleft',
+            transform: translate(
+              -1 * resizeOffset,
+              this.props.height - resizeWidth + resizeOffset
+            )
+          },
+          {
+            className: 'bottomright',
+            transform: translate(
+              this.props.width - resizeWidth + resizeOffset,
+              this.props.height - resizeWidth + resizeOffset
+            )
+          }
+        ];
+        var horizontalEdgeConfigs = [
+          {
+            className: 'top',
+            transform: translate(resizeWidth - resizeOffset, -1*resizeOffset)
+          },
+          {
+            className: 'bottom',
+            transform: translate(
+              resizeWidth - resizeOffset,
+              this.props.height - resizeWidth + resizeOffset
+            )
+          },
+        ];
+        var verticalEdgeConfigs = [
+          {
+            className: 'left',
+            transform: translate(-1*resizeOffset, resizeWidth - resizeOffset)
+          },
+          {
+            className: 'right',
+            transform: translate(
+              this.props.width - resizeWidth + resizeOffset,
+              resizeWidth - resizeOffset
+            )
+          },
+        ];
+
+        var resizeRectGroup = TheGraph.factories.node.createNodeResizeGroup.call(
+          this,
+          {className: 'resize'},
+          cornerConfigs.map(function (config) {
+            return TheGraph.factories.node.createNodeResizeRect.call(
+              this,
+              TheGraph.merge(resizeCornerConfig, config)
+            );
+          }.bind(this)).concat(verticalEdgeConfigs.map(function (config) {
+            return TheGraph.factories.node.createNodeResizeRect.call(
+              this,
+              TheGraph.merge(verticalConfig, config)
+            );
+          }.bind(this))).concat(horizontalEdgeConfigs.map(function (config) {
+            return TheGraph.factories.node.createNodeResizeRect.call(
+              this,
+              TheGraph.merge(horizontalConfig, config)
+            );
+          }.bind(this)))
+        );
+      };
 
       var nodeContents = [
         backgroundRect,
@@ -797,7 +800,7 @@
         iconContent
       ];
 
-      if (!this.props.export) {
+      if (!this.props.export && this.props.resize) {
         nodeContents.push(resizeRectGroup);
       }
 
