@@ -161,26 +161,42 @@
         marqueeSelectCurrentY: startY
       });
       this.markDirty();
+
+      this._marqueeSelectCallback = null;
     },
+    _marqueeSelectCallback: null,
+    _marqueeSelectEvent: null,
     moveMarqueeSelect: function (event) {
-      if (!this.state.marqueeSelect) {
+      this._marqueeSelectEvent = event;
+
+      if (this._marqueeSelectCallback) {
         return;
       }
-      var result = this.calculateMarqueeSelect(event);
-      result.state.selectedNodes = result.nodes.reduce(function (map, node) {
-        map[node.id] = true;
-        return map;
-      }, {});
-      result.state.selectedInports = result.inports.reduce(function (map, node) {
-        map[node.exportKey] = true;
-        return map;
-      }, {});
-      result.state.selectedOutports = result.outports.reduce(function (map, node) {
-        map[node.exportKey] = true;
-        return map;
-      }, {});
-      this.setState(result.state);
-      this.markDirty();
+
+      this._marqueeSelectCallback = function () {
+        if (!this.state.marqueeSelect) {
+          return;
+        }
+        var result = this.calculateMarqueeSelect(event);
+        result.state.selectedNodes = result.nodes.reduce(function (map, node) {
+          map[node.id] = true;
+          return map;
+        }, {});
+        result.state.selectedInports = result.inports.reduce(function (map, node) {
+          map[node.exportKey] = true;
+          return map;
+        }, {});
+        result.state.selectedOutports = result.outports.reduce(function (map, node) {
+          map[node.exportKey] = true;
+          return map;
+        }, {});
+        this.setState(result.state);
+        this.markDirty();
+
+        this._marqueeSelectCallback = null;
+      }.bind(this);
+
+      window.requestAnimationFrame(this._marqueeSelectCallback);
     },
     calculateMarqueeSelect: function (event) {
       var appX = this.props.app.state.x;
