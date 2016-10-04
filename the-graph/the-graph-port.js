@@ -59,6 +59,10 @@
       this.refs.portArc.addEventListener("trackend", this.triggerDropOnTarget);
       ReactDOM.findDOMNode(this).addEventListener("the-graph-edge-drop", this.edgeStart);
 
+      if (this.refs.expand) {
+        this.refs.expand.addEventListener("tap", this.toggleExpand);
+      }
+
       // Show context menu
       if (this.props.showContext) {
         ReactDOM.findDOMNode(this).addEventListener("contextmenu", this.showContext);
