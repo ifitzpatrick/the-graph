@@ -354,17 +354,14 @@
 
       var edge;
       var typeRoutes = {
-        all: 0,
-        bang: 0,
-        object: 1,
-        buffer: 2,
-        array: 3,
-        string: 4,
-        "function": 5,
-        number: 6,
-        "int": 7,
-        color: 8,
-        date: 9
+        'any': 0,
+        'bang': 0,
+        'string': 1,
+        'boolean': 2,
+        'int': 3,
+        'number': 3,
+        'object': 4,
+        'array': 4,
       };
 
       if (event.detail.isIn) {
