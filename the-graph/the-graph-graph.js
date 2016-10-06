@@ -378,6 +378,7 @@
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
       appDomNode.addEventListener("mousemove", this.renderPreviewEdge);
       appDomNode.addEventListener("track", this.renderPreviewEdge);
+      window.addEventListener("mouseup", this.dropPreviewEdge);
       // TODO tap to add new node here
       appDomNode.addEventListener("tap", this.cancelPreviewEdge);
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: edge});
@@ -385,11 +386,20 @@
 
       this.setState({edgePreview: edge}, this.markDirty);
     },
+    dropPreviewEdge: function (event) {
+      var dropEvent = new CustomEvent('the-graph-edge-drop', {
+        detail: null,
+        bubbles: true
+      });
+      event.target.dispatchEvent(dropEvent);
+      this.cancelPreviewEdge();
+    },
     cancelPreviewEdge: function (event) {
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
       appDomNode.removeEventListener("mousemove", this.renderPreviewEdge);
       appDomNode.removeEventListener("track", this.renderPreviewEdge);
       appDomNode.removeEventListener("tap", this.cancelPreviewEdge);
+      window.removeEventListener("mouseup", this.dropPreviewEdge);
 
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: null});
       appDomNode.dispatchEvent(edgePreviewEvent);
@@ -1104,10 +1114,6 @@
 
         edgeOptions.length = length(edgeOptions);
         edgeOptions.opacity = opacity(edgeOptions.length);
-
-        if (!rendered) {
-          //console.log(length, (1 - ((length - 100) / 900)), edgeOptions.opacity)
-        }
 
         edgeOptions = TheGraph.merge(TheGraph.config.graph.edge, edgeOptions);
         return TheGraph.factories.graph.createGraphEdge.call(this, edgeOptions);
