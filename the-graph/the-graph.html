@@ -170,6 +170,9 @@
           }
         } else {
           this.selectedEdges = [item];
+          this.selectedNodes = [];
+          this.selectedInports = [];
+          this.selectedOutports = [];
         }
         this.fire('edges', this.selectedEdges);
       },
@@ -186,6 +189,7 @@
           }
         } else {
           this.selectedNodes = [item];
+          this.selectedEdges = [];
           this.selectedInports = [];
           this.selectedOutports = [];
           this.fire('inports', this.selectedInports);
