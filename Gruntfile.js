@@ -93,6 +93,31 @@
             livereload: true
           }
         }
+      },
+      concat: {
+        options: {
+          separator: ';',
+        },
+        graph: {
+          src: [
+            "the-graph/the-graph.js",
+            "the-graph/font-awesome-unicode-map.js",
+            "the-graph/the-graph-app.js",
+            "the-graph/the-graph-graph.js",
+            "the-graph/the-graph-node.js",
+            "the-graph/the-graph-node-menu.js",
+            "the-graph/the-graph-node-menu-port.js",
+            "the-graph/the-graph-node-menu-ports.js",
+            "the-graph/the-graph-port.js",
+            "the-graph/the-graph-edge.js",
+            "the-graph/the-graph-iip.js",
+            "the-graph/the-graph-group.js",
+            "the-graph/the-graph-tooltip.js",
+            "the-graph/the-graph-menu.js",
+            "the-graph/the-graph-clipboard.js"
+          ],
+          dest: 'the-graph/bundle.js',
+        }
       }
     });
 
@@ -101,6 +126,7 @@
     this.loadNpmTasks('grunt-contrib-watch');
     this.loadNpmTasks('grunt-contrib-jshint');
     this.loadNpmTasks('grunt-contrib-connect');
+    this.loadNpmTasks('grunt-contrib-concat');
     this.loadNpmTasks('grunt-browserify');
 
     this.registerTask('dev', ['test', 'connect:server', 'watch']);

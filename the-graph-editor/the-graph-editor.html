@@ -26,6 +26,12 @@
     </the-graph>
   </template>
   <script>
+  if (!window.bench) {
+    window.bench = {
+      mark: function () {}
+    };
+  }
+  window.bench.mark('Start graph editor');
   (function () {
     "use strict";
 
@@ -56,6 +62,7 @@
         this.$.graph.disabled = this.disabled;
       },
       created: function () {
+        window.bench.mark('Created graph editor polymer component');
         var dispatchDisabledEvent = function (action) {
           this.dispatchEvent(new CustomEvent('disabled-notification', {
               detail: {
@@ -290,6 +297,7 @@
       },
       ready: function () {},
       attached: function () {
+        window.bench.mark('Attached graph editor polymer component');
       },
       detached: function () {
         for (var name in this.plugins) {

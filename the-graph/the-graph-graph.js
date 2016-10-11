@@ -104,6 +104,7 @@
       };
     },
     componentDidMount: function () {
+      window.bench.mark('Mounted graph editor react component');
       // To change port colors
       this.props.graph.on("addEdge", this.onAddEdge);
       this.props.graph.on("removeEdge", this.onRemoveEdge);
@@ -884,13 +885,18 @@
     },
     dirty: false,
     libraryDirty: false,
+    pendingDirty: false,
     markDirty: function (event) {
       if (event && event.libraryDirty) {
         this.libraryDirty = true;
       }
-      window.requestAnimationFrame(this.triggerRender);
+      if (!this.pendingDirty) {
+        window.requestAnimationFrame(this.triggerRender);
+        this.pendingDirty = true;
+      }
     },
     triggerRender: function (time) {
+      this.pendingDirty = false;
       if (!this.isMounted()) {
         return;
       }
@@ -1549,12 +1555,14 @@
 
       var containerOptions = TheGraph.merge(TheGraph.config.graph.container, { className: 'graph' + selectedClass });
       this.rendered = true;
+      window.bench.mark('Rendering graph editor react component');
       return TheGraph.factories.graph.createGraphContainerGroup.call(this, containerOptions, containerContents);
 
     },
     componentDidUpdate: function () {
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
       var event = new CustomEvent('rendersuccess', {detail: this.props.graph});
+      window.bench.mark('Updated graph editor react component');
       appDomNode.dispatchEvent(event);
     }
   }));

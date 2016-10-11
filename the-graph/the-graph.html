@@ -16,6 +16,7 @@
     </svg>
   </template>
 
+  <!--
   <script type="text/javascript" src="./the-graph.js"></script>
   <script type="text/javascript" src="./font-awesome-unicode-map.js"></script>
   <script type="text/javascript" src="./the-graph-app.js"></script>
@@ -31,6 +32,8 @@
   <script type="text/javascript" src="./the-graph-tooltip.js"></script>
   <script type="text/javascript" src="./the-graph-menu.js"></script>
   <script type="text/javascript" src="./the-graph-clipboard.js"></script>
+  -->
+  <script type="text/javascript" src="./bundle.js"></script>
 
   <script>
   (function(){
@@ -110,6 +113,7 @@
 
         // Setup app
         this.$.svgcontainer.innerHTML = "";
+        window.bench.mark('Start graph editor react component');
         this.appView = ReactDOM.render(
           window.TheGraph.App({
             graph: this.graph,
