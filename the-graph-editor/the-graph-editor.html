@@ -1,6 +1,6 @@
 <link rel="import" href="../the-graph/the-graph.html">
 
-<polymer-element name="the-graph-editor" attributes="grid snap width height autolayout theme selectedNodes errorNodes selectedInports selectedOutports selectedEdges animatedEdges onContextMenu displaySelectionGroup forceSelection registerPanEvent eventConfig disabled" touch-action="none">
+<polymer-element name="the-graph-editor" attributes="grid snap width height autolayout theme selectedNodes errorNodes selectedInports selectedOutports selectedEdges animatedEdges onContextMenu displaySelectionGroup forceSelection registerPanEvent eventConfig disabled hotKeys" touch-action="none">
   <template>
     <the-graph id="graph"
       name="{{ graph.properties.name }}"
@@ -22,7 +22,8 @@
       forceSelection="{{forceSelection}}"
       getMenuDef="{{getMenuDef}}"
       eventConfig="{{eventConfig}}"
-      disabled="{{disabled}}">
+      disabled="{{disabled}}"
+      hotKeys="{{hotKeys}}">
     </the-graph>
   </template>
   <script>
@@ -473,6 +474,9 @@
       },
       triggerFit: function () {
         this.$.graph.triggerFit();
+      },
+      focusSelection: function () {
+        this.$.graph.focusSelection();
       },
       animateEdge: function (edge) {
         // Make sure unique

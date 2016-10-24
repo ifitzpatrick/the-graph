@@ -1,4 +1,4 @@
-<polymer-element name="the-graph" attributes="graph menus library snap grid width height autolayout theme selectedNodes errorNodes selectedInports selectedOutports selectedEdges animatedEdges objectClassNames getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX eventConfig disabled" touch-action="none">
+<polymer-element name="the-graph" attributes="graph menus library snap grid width height autolayout theme selectedNodes errorNodes selectedInports selectedOutports selectedEdges animatedEdges objectClassNames getMenuDef pan scale maxZoom minZoom displaySelectionGroup forceSelection offsetY offsetX eventConfig disabled hotKeys" touch-action="none">
 
   <template>
     <link rel="stylesheet" href="../themes/the-graph-dark.css">
@@ -139,7 +139,8 @@
             registerPanEvent: this.registerPanEvent,
             registerMarqueeSelectEvent: this.registerMarqueeSelectEvent,
             eventConfig: this.eventConfig,
-            disabled: this.disabled
+            disabled: this.disabled,
+            hotKeys: this.hotKeys
           }),
           this.$.svgcontainer
         );
@@ -527,6 +528,11 @@
       triggerFit: function () {
         if (this.appView) {
           this.appView.triggerFit();
+        }
+      },
+      focusSelection: function () {
+        if (this.appView) {
+          this.appView.focusSelection();
         }
       },
       widthChanged: function () {

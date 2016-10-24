@@ -314,6 +314,51 @@
         scale: fit.scale,
       }, duration, 'in-quint');
     },
+    focusSelection: function () {
+      var duration = TheGraph.config.focusAnimationDuration;
+      var point1 = {
+        x: Infinity,
+        y: Infinity
+      };
+      var point2 = {
+        x: -Infinity,
+        y: -Infinity
+      };
+      var graphState = this.refs.graph.state;
+      var graph = this.props.graph;
+
+      Object.keys(graphState.selectedNodes).map(function (node) {
+        return graph.getNode(node);
+      }).concat(
+        Object.keys(graphState.selectedInports),
+        Object.keys(graphState.selectedOutports)
+      ).forEach(function (node) {
+        if (node.metadata.x < point1.x) {
+          point1.x = node.metadata.x;
+        }
+        if (node.metadata.y < point1.y) {
+          point1.y = node.metadata.y;
+        }
+
+        var nodeX = node.metadata.x + node.metadata.width;
+        if (nodeX > point2.x) {
+          point2.x = nodeX;
+        }
+        var nodeY = node.metadata.y + node.metadata.height;
+        if (nodeY > point2.y) {
+          point2.y = nodeY;
+        }
+      });
+
+      var fit = TheGraph.findAreaFit(
+        point1, point2, this.state.width, this.state.height);
+
+      this.animate({
+        x: fit.x,
+        y: fit.y,
+        scale: fit.scale,
+      }, duration, 'in-quint');
+    },
     edgeStart: function (event) {
       // Listened from PortMenu.edgeStart() and Port.edgeStart()
       this.refs.graph.edgeStart(event);
@@ -498,7 +543,9 @@
             }.bind(this)
           };
 
-      if (hotKeys[key]) {
+      if (this.props.hotKeys && this.props.hotKeys[key]) {
+        this.props.hotKeys[key].bind(this)(event);
+      } else if (hotKeys[key]) {
         hotKeys[key]();
       }
     },
