@@ -388,12 +388,19 @@
       this.setState({edgePreview: edge}, this.markDirty);
     },
     dropPreviewEdge: function (event) {
-      var dropEvent = new CustomEvent('the-graph-edge-drop', {
+      var eventType = 'the-graph-edge-drop';
+      var dropEvent = new CustomEvent(eventType, {
         detail: null,
         bubbles: true
       });
       event.target.dispatchEvent(dropEvent);
-      this.cancelPreviewEdge();
+
+      var appDomNode = ReactDOM.findDOMNode(this.props.app);
+      var listener = function () {
+        this.cancelPreviewEdge();
+        appDomNode.removeEventListener(eventType, listener);
+      }.bind(this);
+      appDomNode.addEventListener(eventType, listener);
     },
     cancelPreviewEdge: function (event) {
       var appDomNode = ReactDOM.findDOMNode(this.props.app);

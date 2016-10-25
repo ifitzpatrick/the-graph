@@ -7,7 +7,7 @@
       "* Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>; Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n";
 
     var sources = {
-      scripts: ['Gruntfile.js', 'the-*/*.js', 'the-*/*.html'],
+      scripts: ['Gruntfile.js', 'the-*/*.js', 'the-*/*.html', '!(*/**/bundle.js)'],
       // elements: ['the-*/*.html'],
       stylus: ['themes/*/*.styl'],
       css: ['themes/*.css']
@@ -78,6 +78,13 @@
           tasks: ['jshint:force'],
           options: {
             livereload: true
+          }
+        },
+        concat: {
+          files: sources.scripts,
+          tasks: ['concat'],
+          options: {
+            interrupt: true
           }
         },
         stylus: {
