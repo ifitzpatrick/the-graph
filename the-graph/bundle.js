@@ -1637,7 +1637,7 @@ context.TheGraph.FONT_AWESOME = {
       var key = event.keyCode,
           hotKeys = {
             // Delete
-            46: this.deleteSelection(),
+            46: this.deleteSelection,
             // f for fit
             70: function () {
               this.triggerFitAnimated();
