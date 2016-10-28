@@ -492,6 +492,27 @@
         });
       }
     },
+    deleteSelection: function () {
+      var graph = this.refs.graph.state.graph,
+          selectedNodes = this.refs.graph.state.selectedNodes,
+          selectedEdges = this.refs.graph.state.selectedEdges,
+          menus = this.props.menus,
+          menuOption = null,
+          menuAction = null,
+          nodeKey = null,
+          node = null,
+          edge = null;
+
+      for (nodeKey in selectedNodes) {
+        if (selectedNodes.hasOwnProperty(nodeKey)) {
+          node = graph.getNode(nodeKey);
+          menus.node.actions.delete(graph, nodeKey, node);
+        }
+      }
+      selectedEdges.map(function (edge) {
+        menus.edge.actions.delete(graph, null, edge);
+      });
+    },
     keyDown: function (event) {
       // HACK metaKey global for taps https://github.com/Polymer/PointerGestures/issues/29
       if (event.metaKey || event.ctrlKey) {
@@ -501,27 +522,7 @@
       var key = event.keyCode,
           hotKeys = {
             // Delete
-            46: function () {
-              var graph = this.refs.graph.state.graph,
-                  selectedNodes = this.refs.graph.state.selectedNodes,
-                  selectedEdges = this.refs.graph.state.selectedEdges,
-                  menus = this.props.menus,
-                  menuOption = null,
-                  menuAction = null,
-                  nodeKey = null,
-                  node = null,
-                  edge = null;
-
-              for (nodeKey in selectedNodes) {
-                if (selectedNodes.hasOwnProperty(nodeKey)) {
-                  node = graph.getNode(nodeKey);
-                  menus.node.actions.delete(graph, nodeKey, node);
-                }
-              }
-              selectedEdges.map(function (edge) {
-                menus.edge.actions.delete(graph, null, edge);
-              });
-            }.bind(this),
+            46: this.deleteSelection(),
             // f for fit
             70: function () {
               this.triggerFitAnimated();
