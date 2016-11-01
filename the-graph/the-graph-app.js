@@ -361,6 +361,7 @@
     },
     edgeStart: function (event) {
       // Listened from PortMenu.edgeStart() and Port.edgeStart()
+      event.detail.mousePos = this.mousePos;
       this.refs.graph.edgeStart(event);
       this.hideContext();
     },

@@ -1476,6 +1476,7 @@ context.TheGraph.FONT_AWESOME = {
     },
     edgeStart: function (event) {
       // Listened from PortMenu.edgeStart() and Port.edgeStart()
+      event.detail.mousePos = this.mousePos;
       this.refs.graph.edgeStart(event);
       this.hideContext();
     },
@@ -2229,8 +2230,8 @@ context.TheGraph.FONT_AWESOME = {
       appDomNode.addEventListener("tap", this.cancelPreviewEdge);
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: edge});
       appDomNode.dispatchEvent(edgePreviewEvent);
-
       this.setState({edgePreview: edge}, this.markDirty);
+      this.renderPreviewEdge(event.detail.mousePos);
     },
     dropPreviewEdge: function (event) {
       var eventType = 'the-graph-edge-drop';
