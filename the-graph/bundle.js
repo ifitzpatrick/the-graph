@@ -1403,7 +1403,7 @@ context.TheGraph.FONT_AWESOME = {
       });
     },
     getFit: function () {
-      return TheGraph.findFit(this.props.graph, this.props.width, this.props.height);
+      return TheGraph.findFit(this.props.graph, this.state.width, this.state.height);
     },
     triggerFit: function (event) {
       var fit = this.getFit();
