@@ -1563,18 +1563,22 @@ context.TheGraph.FONT_AWESOME = {
       this.bgContext = unwrap(this.bgCanvas.getContext('2d'));
       this.componentDidUpdate();
 
-      window.addEventListener('mousemove', function (event) {
-        var boundingRect = this.getBoundingRect();
-        this.mousePos = {
-          x: event.clientX - boundingRect.left,
-          y: event.clientY - boundingRect.top
-        };
-      }.bind(this));
+      window.addEventListener('mousemove', this.mouseMove);
 
       // Rerender graph once to fix edges
       setTimeout(function () {
         this.renderGraph();
       }.bind(this), 500);
+    },
+    mouseMove: function (event) {
+      var boundingRect = this.getBoundingRect();
+      this.mousePos = {
+        x: event.clientX,
+        y: event.clientY
+      };
+    },
+    componentWillUnmount: function () {
+      window.removeEventListener('mousemove', this.mouseMove);
     },
     onShowContext: function (event) {
       event.preventDefault();
