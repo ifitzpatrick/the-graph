@@ -367,8 +367,10 @@
       if (event.preventTap) { event.preventTap(); }
 
       // Get mouse position
-      var x = event.x || event.clientX || 0;
-      var y = event.y || event.clientY || 0;
+      var boundingRect = this.props.app.getBoundingRect();
+
+      var x = (event.x || event.clientX || 0) - boundingRect.left;
+      var y = (event.y || event.clientY || 0) - boundingRect.top;
 
       // App.showContext
       this.props.showContext({

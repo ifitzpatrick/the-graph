@@ -97,6 +97,9 @@
     zoomFactor: 0,
     zoomX: 0,
     zoomY: 0,
+    getBoundingRect: function () {
+      return ReactDOM.findDOMNode(this).getBoundingClientRect();
+    },
     onWheel: function (event) {
       // Don't bounce
       event.preventDefault();
@@ -107,8 +110,10 @@
 
       // Safari is wheelDeltaY
       this.zoomFactor += event.deltaY ? event.deltaY : 0-event.wheelDeltaY;
-      this.zoomX = event.clientX;
-      this.zoomY = event.clientY;
+
+      var boundingRect = this.getBoundingRect();
+      this.zoomX = event.clientX - boundingRect.left;
+      this.zoomY = event.clientY - boundingRect.top;
       requestAnimationFrame(this.scheduleWheelZoom);
     },
     scheduleWheelZoom: function () {
@@ -270,7 +275,7 @@
       // Don't go over right edge
       var x = event.detail.x + 10;
       var width = tooltip.length*6;
-      if (x + width > this.props.width) {
+      if (x + width > this.state.width) {
         x = event.detail.x - width - 10;
       }
 
@@ -431,8 +436,8 @@
       }.bind(this));
 
       // Start zoom from middle if zoom before mouse move
-      this.mouseX = Math.floor( this.props.width/2 );
-      this.mouseY = Math.floor( this.props.height/2 );
+      this.mouseX = Math.floor( this.state.width/2 );
+      this.mouseY = Math.floor( this.state.height/2 );
 
       // HACK metaKey global for taps https://github.com/Polymer/PointerGestures/issues/29
       document.addEventListener('keydown', this.keyDown);
@@ -444,9 +449,10 @@
       this.componentDidUpdate();
 
       window.addEventListener('mousemove', function (event) {
+        var boundingRect = this.getBoundingRect();
         this.mousePos = {
-          x: event.clientX,
-          y: event.clientY
+          x: event.clientX - boundingRect.left,
+          y: event.clientY - boundingRect.top
         };
       }.bind(this));
 
@@ -461,8 +467,11 @@
       if (event.preventTap) { event.preventTap(); }
 
       // Get mouse position
-      var x = event.x || event.clientX || 0;
-      var y = event.y || event.clientY || 0;
+      //var x = (event.x || event.clientX || 0) - this.props.app.state.x;
+      //var y = (event.y || event.clientY || 0) - this.props.app.state.y;
+      var boundingRect = this.getBoundingRect();
+      var x = (event.x || event.clientX || 0) - boundingRect.left;
+      var y = (event.y || event.clientY || 0) - boundingRect.top;
 
       if (this.state.edgePreview) {
         var isIn = this.state.edgePreview.isIn;
@@ -627,8 +636,8 @@
             processKey: null,
             x: options.x,
             y: options.y,
-            nodeWidth: this.props.width,
-            nodeHeight: this.props.height,
+            nodeWidth: this.state.width,
+            nodeHeight: this.state.height,
             deltaX: 0,
             deltaY: 0,
             highlightPort: false
