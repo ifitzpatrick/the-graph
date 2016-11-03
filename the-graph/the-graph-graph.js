@@ -152,8 +152,9 @@
 
       this.props.onNodeSelection();
 
-      var startX = (event.clientX - appX)/scale;
-      var startY = (event.clientY - appY)/scale;
+      var boundingRect = this.props.app.getBoundingRect();
+      var startX = (event.clientX - boundingRect.left - appX)/scale;
+      var startY = (event.clientY - boundingRect.top - appY)/scale;
       this.setState({
         marqueeSelect: true,
         marqueeSelectStartX: startX,
@@ -206,8 +207,9 @@
 
       var startX = this.state.marqueeSelectStartX;
       var startY = this.state.marqueeSelectStartY;
-      var currentX = (event.clientX - appX)/scale;
-      var currentY = (event.clientY - appY)/scale;
+      var boundingRect = this.props.app.getBoundingRect();
+      var currentX = (event.clientX - boundingRect.left - appX)/scale;
+      var currentY = (event.clientY - boundingRect.top - appY)/scale;
       var lowX, lowY, highX, highY;
       if (startX <= currentX) {
         lowX = startX;
