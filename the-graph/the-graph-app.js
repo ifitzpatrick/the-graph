@@ -100,6 +100,20 @@
     getBoundingRect: function () {
       return ReactDOM.findDOMNode(this).getBoundingClientRect();
     },
+    getMousePos: function (event) {
+      if (!event) {
+        event = this.mousePos || {
+          x: 0,
+          y: 0
+        }
+      }
+
+      var boundingRect = this.getBoundingRect();
+      return {
+        x: (event.x || event.clientX) - boundingRect.left,
+        y: (event.y || event.clientY) - boundingRect.top
+      };
+    },
     onWheel: function (event) {
       // Don't bounce
       event.preventDefault();

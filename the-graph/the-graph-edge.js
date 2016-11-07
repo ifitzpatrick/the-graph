@@ -150,8 +150,9 @@
       var targetX = this.props.tX;
       var targetY = this.props.tY;
       var scale = this.props.app.state.scale;
-      var clientX = (event.clientX - this.props.app.state.x) / scale;
-      var clientY = (event.clientY - this.props.app.state.y) / scale;
+      var mousePos = this.props.app.getMousePos();
+      var clientX = (mousePos.x - this.props.app.state.x) / scale;
+      var clientY = (mousePos.y - this.props.app.state.y) / scale;
 
       var graph = this.props.graph;
       var edge = this.props.edge;
@@ -224,8 +225,9 @@
       if (event.preventTap) { event.preventTap(); }
 
       // Get mouse position
-      var x = event.x || event.clientX || 0;
-      var y = event.y || event.clientY || 0;
+      var mousePos = this.props.app.getMousePos();
+      var x = mousePos.x;
+      var y = mousePos.y;
 
       // App.showContext
       this.props.showContext({

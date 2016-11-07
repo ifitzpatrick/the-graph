@@ -1215,6 +1215,20 @@ context.TheGraph.FONT_AWESOME = {
     getBoundingRect: function () {
       return ReactDOM.findDOMNode(this).getBoundingClientRect();
     },
+    getMousePos: function (event) {
+      if (!event) {
+        event = this.mousePos || {
+          x: 0,
+          y: 0
+        }
+      }
+
+      var boundingRect = this.getBoundingRect();
+      return {
+        x: (event.x || event.clientX) - boundingRect.left,
+        y: (event.y || event.clientY) - boundingRect.top
+      };
+    },
     onWheel: function (event) {
       // Don't bounce
       event.preventDefault();
@@ -2011,9 +2025,9 @@ context.TheGraph.FONT_AWESOME = {
 
       this.props.onNodeSelection();
 
-      var boundingRect = this.props.app.getBoundingRect();
-      var startX = (event.clientX - boundingRect.left - appX)/scale;
-      var startY = (event.clientY - boundingRect.top - appY)/scale;
+      var mousePos = this.props.app.getMousePos();
+      var startX = (mousePos.x - appX)/scale;
+      var startY = (mousePos.y - appY)/scale;
       this.setState({
         marqueeSelect: true,
         marqueeSelectStartX: startX,
@@ -5128,8 +5142,9 @@ context.TheGraph.FONT_AWESOME = {
       var targetX = this.props.tX;
       var targetY = this.props.tY;
       var scale = this.props.app.state.scale;
-      var clientX = (event.clientX - this.props.app.state.x) / scale;
-      var clientY = (event.clientY - this.props.app.state.y) / scale;
+      var mousePos = this.props.app.getMousePos();
+      var clientX = (mousePos.x - this.props.app.state.x) / scale;
+      var clientY = (mousePos.y - this.props.app.state.y) / scale;
 
       var graph = this.props.graph;
       var edge = this.props.edge;
@@ -5202,8 +5217,9 @@ context.TheGraph.FONT_AWESOME = {
       if (event.preventTap) { event.preventTap(); }
 
       // Get mouse position
-      var x = event.x || event.clientX || 0;
-      var y = event.y || event.clientY || 0;
+      var mousePos = this.props.app.getMousePos();
+      var x = mousePos.x;
+      var y = mousePos.y;
 
       // App.showContext
       this.props.showContext({
@@ -5532,8 +5548,9 @@ context.TheGraph.FONT_AWESOME = {
       if (event.preventTap) { event.preventTap(); }
 
       // Get mouse position
-      var x = event.x || event.clientX || 0;
-      var y = event.y || event.clientY || 0;
+      var mousePos = this.props.app.getMousePos(event);
+      var x = mousePos.x;
+      var y = mousePos.y;
 
       // App.showContext
       this.props.showContext({

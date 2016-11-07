@@ -152,9 +152,9 @@
 
       this.props.onNodeSelection();
 
-      var boundingRect = this.props.app.getBoundingRect();
-      var startX = (event.clientX - boundingRect.left - appX)/scale;
-      var startY = (event.clientY - boundingRect.top - appY)/scale;
+      var mousePos = this.props.app.getMousePos();
+      var startX = (mousePos.x - appX)/scale;
+      var startY = (mousePos.y - appY)/scale;
       this.setState({
         marqueeSelect: true,
         marqueeSelectStartX: startX,
