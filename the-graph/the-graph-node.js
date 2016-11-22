@@ -17,10 +17,10 @@
     },
     innerRect: {
       className: "node-rect drag",
-      x: 3,
+      x: 0,
       y: 3,
-      rx: TheGraph.config.nodeRadius - 2,
-      ry: TheGraph.config.nodeRadius - 2
+      rx: TheGraph.config.nodeRadius,
+      ry: TheGraph.config.nodeRadius
     },
     icon: {
       ref: "icon",
@@ -205,7 +205,7 @@
           var width = this.props.width;
           var height = this.props.height;
 
-          var min = 72;
+          var min = 15;
 
           var x = this.props.x,
               y = this.props.y;
@@ -573,6 +573,7 @@
             processKey: processKey,
             isIn: isIn,
             isExport: isExport,
+            isConnected: info.isConnected,
             nodeX: x,
             nodeY: y,
             nodeWidth: width,
@@ -611,6 +612,7 @@
                 processKey: processKey,
                 isIn: isIn,
                 isExport: isExport,
+                isConnected: info.isConnected,
                 nodeX: x,
                 nodeY: y,
                 nodeWidth: width,
@@ -671,7 +673,7 @@
       var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
       var borderRect = TheGraph.factories.node.createNodeBorderRect.call(this, borderRectOptions);
 
-      var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { width: this.props.width - 6, height: this.props.height - 6 });
+      var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { y: -15, width: this.props.width, height: this.props.height + 15 });
       var innerRect = TheGraph.factories.node.createNodeInnerRect.call(this, innerRectOptions);
 
       var inportsOptions = TheGraph.merge(TheGraph.config.node.inports, { children: inportViews });
@@ -680,7 +682,7 @@
       var outportsOptions = TheGraph.merge(TheGraph.config.node.outports, { children: outportViews });
       var outportsGroup = TheGraph.factories.node.createNodeOutportsGroup.call(this, outportsOptions);
 
-      var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: this.props.height + 15, children: label });
+      var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: -4, children: label });
       var labelText = TheGraph.factories.node.createNodeLabelText.call(this, labelTextOptions);
 
       var labelRectX = this.props.width / 2;

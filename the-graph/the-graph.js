@@ -1,7 +1,7 @@
 (function (context) {
   "use strict";
 
-  var defaultNodeSize = 72;
+  var defaultNodeSize = 15;
   var defaultNodeRadius = 8;
 
   // Dumb module setup

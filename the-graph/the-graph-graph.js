@@ -108,8 +108,8 @@
       // To change port colors
       this.props.graph.on("addEdge", this.onAddEdge);
       this.props.graph.on("removeEdge", this.onRemoveEdge);
-      this.props.graph.on("changeEdge", this.resetPortRoute);
-      this.props.graph.on("removeInitial", this.resetPortRoute);
+      // this.props.graph.on("changeEdge", this.resetPortRoute);
+      // this.props.graph.on("removeInitial", this.resetPortRoute);
 
       // Listen to noflo graph object's events
       this.props.graph.on("changeNode", this.onChangeNode);
@@ -314,12 +314,12 @@
     onAddEdge: function (edge) {
       this.arrayPortInfo = null;
       this.portInfo = {};
-      this.resetPortRoute(edge);
+      // this.resetPortRoute(edge);
     },
     onRemoveEdge: function (edge) {
       this.arrayPortInfo = null;
       this.portInfo = {};
-      this.resetPortRoute(edge);
+      // this.resetPortRoute(edge);
     },
     edgePreview: null,
     edgeStart: function (event) {
@@ -609,8 +609,21 @@
     },
     portInfo: {},
     getPorts: function (graph, processName, componentName) {
+
+      var typeMap = {
+          'any': 0,
+          'bang': 0,
+          'string': 1,
+          'boolean': 2,
+          'int': 3,
+          'number': 3,
+          'object': 4,
+          'array': 4,
+      };
+
       var node = graph.getNode(processName);
       var ports = this.portInfo[processName];
+
       var expanded = node.metadata.expandedPorts || {
         inports: {},
         outports: {}
@@ -621,6 +634,51 @@
       if (!ports) {
         var inports = {};
         var outports = {};
+
+        // get the port connections
+        var connections = {
+            inports: {},
+            outports: {}
+        };
+        // get edge & iip connections
+        graph.edges.concat(graph.initializers).forEach(function (conn) {
+          var total;
+
+          if (conn.from && conn.from.node === processName) {
+              total = connections.outports[conn.from.port];
+              // if there already is a connection for the port then add 1
+              connections.outports[conn.from.port] = total ? total + 1 : 1;
+          }
+          else if (conn.to.node === processName) {
+              total = connections.inports[conn.to.port];
+              // if there already is a connection for the port then add 1
+              connections.inports[conn.to.port] = total ? total + 1 : 1;
+          }
+        });
+
+        // get exported ports
+        Object.keys(graph.inports).forEach(function (key) {
+          var value = graph.inports[key];
+          var total;
+
+          if (value.process === processName) {
+              total = connections.inports[value.port];
+              // if there already is a connection for the port then add 1
+              connections.inports[value.port] = total ? total + 1 : 1;
+          }
+        });
+        // get exported ports
+        Object.keys(graph.outports).forEach(function (key) {
+            var value = graph.outports[key];
+            var total;
+
+            if (value.process === processName) {
+                total = connections.outports[value.port];
+                // if there already is a connection for the port then add 1
+                connections.outports[value.port] = total ? total + 1 : 1;
+            }
+        });
+
         if (componentName && this.props.library) {
           // Copy ports from library object
           var component = this.getComponentInfo(componentName);
@@ -632,6 +690,7 @@
           }
 
           var i, port, len;
+
           for (i=0, len=component.outports.length; i<len; i++) {
             port = component.outports[i];
             if (!port.name) { continue; }
@@ -641,6 +700,8 @@
             }
 
             outports[port.name] = {
+              isConnected: connections.outports[port.name] > 0,
+              route: typeMap[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -664,6 +725,8 @@
             }
 
             inports[port.name] = {
+              isConnected: connections.inports[port.name] > 0,
+              route: typeMap[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -721,7 +784,7 @@
 
       var i, len;
       i = 0;
-      len = ports.outportCount;
+      var max_len = Math.max(ports.inportCount, ports.outportCount);
 
       var map = function (indexList, callback) {
         var i, len, newList = [], item;
@@ -733,7 +796,7 @@
         return newList;
       };
       var nextY = function () {
-        var portHeight = nodeHeight / (len+1) * (i+1)
+        var portHeight = nodeHeight / (max_len+1) * (i+1);
         i++;
         return portHeight;
       };
@@ -748,13 +811,13 @@
       });
 
       i = 0;
-      len = ports.inportCount;
       Object.keys(ports.inports).forEach(function (key) {
         var port = ports.inports[key];
         port.y = nextY();
         if (port.expand) {
           port.indexY = map(port.indexList, nextY);
         }
+        port.x = 0;
       });
     },
     getNodeOutport: function (graph, processName, portName, route, componentName) {
@@ -790,6 +853,29 @@
         port.route = route;
       }
       return port;
+    },
+    setPortConnections: function (event) {
+        // Trigger nodes with changed ports to rerender
+        if (event.from && event.from.node) {
+            var fromNode = this.portInfo[event.from.node];
+            if (fromNode) {
+                fromNode.dirty = true;
+                var outport = fromNode.outports[event.from.port];
+                if (outport) {
+                    outport.connections.push(event);
+                }
+            }
+        }
+        if (event.to && event.to.node) {
+            var toNode = this.portInfo[event.to.node];
+            if (toNode) {
+                toNode.dirty = true;
+                var inport = toNode.inports[event.to.port];
+                if (inport) {
+                    inport.route = null;
+                }
+            }
+        }
     },
     resetPortRoute: function (event) {
       // Trigger nodes with changed ports to rerender
@@ -972,10 +1058,7 @@
         if (TheGraph.config.autoSizeNode && componentInfo) {
           // Adjust node height based on number of ports.
           var portCount = ports.count;
-          if (portCount > TheGraph.config.maxPortCount) {
-            var diff = portCount - TheGraph.config.maxPortCount;
-            node.metadata.height = TheGraph.config.nodeHeight + (diff * TheGraph.config.nodeHeightIncrement);
-          }
+          node.metadata.height = TheGraph.config.nodeHeight + (portCount * TheGraph.config.nodeHeightIncrement);
 
           var inLength = ports.maxInportLength * 4;
           inLength = inLength <  30 ? 30 : inLength;

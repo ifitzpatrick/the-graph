@@ -1,7 +1,7 @@
 (function (context) {
   "use strict";
 
-  var defaultNodeSize = 72;
+  var defaultNodeSize = 15;
   var defaultNodeRadius = 8;
 
   // Dumb module setup
@@ -1981,8 +1981,8 @@ context.TheGraph.FONT_AWESOME = {
       // To change port colors
       this.props.graph.on("addEdge", this.onAddEdge);
       this.props.graph.on("removeEdge", this.onRemoveEdge);
-      this.props.graph.on("changeEdge", this.resetPortRoute);
-      this.props.graph.on("removeInitial", this.resetPortRoute);
+      // this.props.graph.on("changeEdge", this.resetPortRoute);
+      // this.props.graph.on("removeInitial", this.resetPortRoute);
 
       // Listen to noflo graph object's events
       this.props.graph.on("changeNode", this.onChangeNode);
@@ -2187,12 +2187,12 @@ context.TheGraph.FONT_AWESOME = {
     onAddEdge: function (edge) {
       this.arrayPortInfo = null;
       this.portInfo = {};
-      this.resetPortRoute(edge);
+      // this.resetPortRoute(edge);
     },
     onRemoveEdge: function (edge) {
       this.arrayPortInfo = null;
       this.portInfo = {};
-      this.resetPortRoute(edge);
+      // this.resetPortRoute(edge);
     },
     edgePreview: null,
     edgeStart: function (event) {
@@ -2482,8 +2482,21 @@ context.TheGraph.FONT_AWESOME = {
     },
     portInfo: {},
     getPorts: function (graph, processName, componentName) {
+
+      var typeMap = {
+          'any': 0,
+          'bang': 0,
+          'string': 1,
+          'boolean': 2,
+          'int': 3,
+          'number': 3,
+          'object': 4,
+          'array': 4,
+      };
+
       var node = graph.getNode(processName);
       var ports = this.portInfo[processName];
+
       var expanded = node.metadata.expandedPorts || {
         inports: {},
         outports: {}
@@ -2494,6 +2507,51 @@ context.TheGraph.FONT_AWESOME = {
       if (!ports) {
         var inports = {};
         var outports = {};
+
+        // get the port connections
+        var connections = {
+            inports: {},
+            outports: {}
+        };
+        // get edge & iip connections
+        graph.edges.concat(graph.initializers).forEach(function (conn) {
+          var total;
+
+          if (conn.from && conn.from.node === processName) {
+              total = connections.outports[conn.from.port];
+              // if there already is a connection for the port then add 1
+              connections.outports[conn.from.port] = total ? total + 1 : 1;
+          }
+          else if (conn.to.node === processName) {
+              total = connections.inports[conn.to.port];
+              // if there already is a connection for the port then add 1
+              connections.inports[conn.to.port] = total ? total + 1 : 1;
+          }
+        });
+
+        // get exported ports
+        Object.keys(graph.inports).forEach(function (key) {
+          var value = graph.inports[key];
+          var total;
+
+          if (value.process === processName) {
+              total = connections.inports[value.port];
+              // if there already is a connection for the port then add 1
+              connections.inports[value.port] = total ? total + 1 : 1;
+          }
+        });
+        // get exported ports
+        Object.keys(graph.outports).forEach(function (key) {
+            var value = graph.outports[key];
+            var total;
+
+            if (value.process === processName) {
+                total = connections.outports[value.port];
+                // if there already is a connection for the port then add 1
+                connections.outports[value.port] = total ? total + 1 : 1;
+            }
+        });
+
         if (componentName && this.props.library) {
           // Copy ports from library object
           var component = this.getComponentInfo(componentName);
@@ -2505,6 +2563,7 @@ context.TheGraph.FONT_AWESOME = {
           }
 
           var i, port, len;
+
           for (i=0, len=component.outports.length; i<len; i++) {
             port = component.outports[i];
             if (!port.name) { continue; }
@@ -2514,6 +2573,8 @@ context.TheGraph.FONT_AWESOME = {
             }
 
             outports[port.name] = {
+              isConnected: connections.outports[port.name] > 0,
+              route: typeMap[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -2537,6 +2598,8 @@ context.TheGraph.FONT_AWESOME = {
             }
 
             inports[port.name] = {
+              isConnected: connections.inports[port.name] > 0,
+              route: typeMap[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -2594,7 +2657,7 @@ context.TheGraph.FONT_AWESOME = {
 
       var i, len;
       i = 0;
-      len = ports.outportCount;
+      var max_len = Math.max(ports.inportCount, ports.outportCount);
 
       var map = function (indexList, callback) {
         var i, len, newList = [], item;
@@ -2606,7 +2669,7 @@ context.TheGraph.FONT_AWESOME = {
         return newList;
       };
       var nextY = function () {
-        var portHeight = nodeHeight / (len+1) * (i+1)
+        var portHeight = nodeHeight / (max_len+1) * (i+1);
         i++;
         return portHeight;
       };
@@ -2621,13 +2684,13 @@ context.TheGraph.FONT_AWESOME = {
       });
 
       i = 0;
-      len = ports.inportCount;
       Object.keys(ports.inports).forEach(function (key) {
         var port = ports.inports[key];
         port.y = nextY();
         if (port.expand) {
           port.indexY = map(port.indexList, nextY);
         }
+        port.x = 0;
       });
     },
     getNodeOutport: function (graph, processName, portName, route, componentName) {
@@ -2663,6 +2726,29 @@ context.TheGraph.FONT_AWESOME = {
         port.route = route;
       }
       return port;
+    },
+    setPortConnections: function (event) {
+        // Trigger nodes with changed ports to rerender
+        if (event.from && event.from.node) {
+            var fromNode = this.portInfo[event.from.node];
+            if (fromNode) {
+                fromNode.dirty = true;
+                var outport = fromNode.outports[event.from.port];
+                if (outport) {
+                    outport.connections.push(event);
+                }
+            }
+        }
+        if (event.to && event.to.node) {
+            var toNode = this.portInfo[event.to.node];
+            if (toNode) {
+                toNode.dirty = true;
+                var inport = toNode.inports[event.to.port];
+                if (inport) {
+                    inport.route = null;
+                }
+            }
+        }
     },
     resetPortRoute: function (event) {
       // Trigger nodes with changed ports to rerender
@@ -2845,10 +2931,7 @@ context.TheGraph.FONT_AWESOME = {
         if (TheGraph.config.autoSizeNode && componentInfo) {
           // Adjust node height based on number of ports.
           var portCount = ports.count;
-          if (portCount > TheGraph.config.maxPortCount) {
-            var diff = portCount - TheGraph.config.maxPortCount;
-            node.metadata.height = TheGraph.config.nodeHeight + (diff * TheGraph.config.nodeHeightIncrement);
-          }
+          node.metadata.height = TheGraph.config.nodeHeight + (portCount * TheGraph.config.nodeHeightIncrement);
 
           var inLength = ports.maxInportLength * 4;
           inLength = inLength <  30 ? 30 : inLength;
@@ -3470,10 +3553,10 @@ context.TheGraph.FONT_AWESOME = {
     },
     innerRect: {
       className: "node-rect drag",
-      x: 3,
+      x: 0,
       y: 3,
-      rx: TheGraph.config.nodeRadius - 2,
-      ry: TheGraph.config.nodeRadius - 2
+      rx: TheGraph.config.nodeRadius,
+      ry: TheGraph.config.nodeRadius
     },
     icon: {
       ref: "icon",
@@ -3658,7 +3741,7 @@ context.TheGraph.FONT_AWESOME = {
           var width = this.props.width;
           var height = this.props.height;
 
-          var min = 72;
+          var min = 15;
 
           var x = this.props.x,
               y = this.props.y;
@@ -4026,6 +4109,7 @@ context.TheGraph.FONT_AWESOME = {
             processKey: processKey,
             isIn: isIn,
             isExport: isExport,
+            isConnected: info.isConnected,
             nodeX: x,
             nodeY: y,
             nodeWidth: width,
@@ -4064,6 +4148,7 @@ context.TheGraph.FONT_AWESOME = {
                 processKey: processKey,
                 isIn: isIn,
                 isExport: isExport,
+                isConnected: info.isConnected,
                 nodeX: x,
                 nodeY: y,
                 nodeWidth: width,
@@ -4124,7 +4209,7 @@ context.TheGraph.FONT_AWESOME = {
       var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
       var borderRect = TheGraph.factories.node.createNodeBorderRect.call(this, borderRectOptions);
 
-      var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { width: this.props.width - 6, height: this.props.height - 6 });
+      var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { y: -15, width: this.props.width, height: this.props.height + 15 });
       var innerRect = TheGraph.factories.node.createNodeInnerRect.call(this, innerRectOptions);
 
       var inportsOptions = TheGraph.merge(TheGraph.config.node.inports, { children: inportViews });
@@ -4133,7 +4218,7 @@ context.TheGraph.FONT_AWESOME = {
       var outportsOptions = TheGraph.merge(TheGraph.config.node.outports, { children: outportViews });
       var outportsGroup = TheGraph.factories.node.createNodeOutportsGroup.call(this, outportsOptions);
 
-      var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: this.props.height + 15, children: label });
+      var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: -4, children: label });
       var labelText = TheGraph.factories.node.createNodeLabelText.call(this, labelTextOptions);
 
       var labelRectX = this.props.width / 2;
@@ -4893,7 +4978,7 @@ context.TheGraph.FONT_AWESOME = {
       var inArc = TheGraph.arcs.inport;
       var outArc = TheGraph.arcs.outport;
       if (highlightPort && highlightPort.isIn === this.props.isIn && (highlightPort.type === this.props.port.type || this.props.port.type === 'any')) {
-        r = 6;
+        r = 5;
         inArc = TheGraph.arcs.inportBig;
         outArc = TheGraph.arcs.outportBig;
       }
@@ -4904,8 +4989,9 @@ context.TheGraph.FONT_AWESOME = {
       var arcOptions = TheGraph.merge(TheGraph.config.port.arc, { d: (this.props.isIn ? inArc : outArc) });
       var arc = TheGraph.factories.port.createPortArc.call(this, arcOptions);
 
+
       var innerCircleOptions = {
-        className: "port-circle-small fill route"+this.props.route,
+        className: "port-circle-small stroke route"+this.props.route + (this.props.isConnected ? ' fill' : ' empty-fill'),
         r: r - 1.5
       };
 
@@ -5362,27 +5448,30 @@ context.TheGraph.FONT_AWESOME = {
         return [x1, y1];
       };
 
-      var arrowLength = 12;
+      var arrowLength = 3;
       // Which direction should arrow point
       if (plus[0] > minus[0]) {
         arrowLength *= -1;
       }
-      center = findLinePoint(center[0], center[1], m, b, -1*arrowLength/2);
 
-      // find points of perpendicular line length l centered at x,y
-      var perpendicular = function (x, y, oldM, l) {
-        var m = -1/oldM;
-        var b = y - m*x;
-        var point1 = findLinePoint(x, y, m, b, l/2);
-        var point2 = findLinePoint(x, y, m, b, l/-2);
-        return [point1, point2];
+      var getArrowPoints = function (x, y, m, l, flip) {
+        // Get the arrow points for an edge.
+        center = findLinePoint(x, y, m, b, -1*l/2);
+        var x = center[0];
+        var y = center[1];
+        var perp_m = -1/m;
+        var perp_b = y - perp_m * x;
+        var point1 = findLinePoint(x, y, perp_m, perp_b, (l * 0.9 / 2));
+        var point2 = findLinePoint(x, y, m, b, l - 2.5, flip);
+        var point3 = findLinePoint(x, y, perp_m, perp_b, (l * 0.9 / -2));
+        var point4 = findLinePoint(x, y, m, b, l, flip);
+
+        return [point1, point2, point3, point4]
       };
 
-      var points = perpendicular(center[0], center[1], m, arrowLength * 0.9);
       // For m === 0, figure out if arrow should be straight up or down
       var flip = plus[1] > minus[1] ? -1 : 1;
-      var arrowTip = findLinePoint(center[0], center[1], m, b, arrowLength, flip);
-      points.push(arrowTip);
+      var points = getArrowPoints(center[0], center[1], m, arrowLength, flip);
 
       var pointsArray = points.map(
         function (point) {return point.join(',');}).join(' ');
@@ -5390,7 +5479,7 @@ context.TheGraph.FONT_AWESOME = {
         points: pointsArray,
         className: 'arrow-bg'
       });
-
+      
       var arrow = TheGraph.factories.edge.createArrow({
         points: pointsArray,
         className: 'arrow fill stroke route' + this.props.route
@@ -5468,7 +5557,7 @@ context.TheGraph.FONT_AWESOME = {
       var pathOptions = TheGraph.merge(TheGraph.config.iip.path, {d: path});
       var iipPath = TheGraph.factories.iip.createIIPPath.call(this, pathOptions);
 
-      var textOptions = TheGraph.merge(TheGraph.config.iip.text, {x: x - 10, y: y, text: label});
+      var textOptions = TheGraph.merge(TheGraph.config.iip.text, {x: x - 13, y: y, text: label});
       var text = TheGraph.factories.iip.createIIPText.call(this, textOptions);
 
       var containerContents = [iipPath, text];
