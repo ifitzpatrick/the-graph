@@ -286,18 +286,20 @@
     changeTooltip: function (event) {
       var tooltip = event.detail.tooltip;
 
+      var mousePos = this.getMousePos(event.detail);
+
       // Don't go over right edge
-      var x = event.detail.x + 10;
+      var x = mousePos.x + 10;
       var width = tooltip.length*6;
       if (x + width > this.state.width) {
-        x = event.detail.x - width - 10;
+        x = mousePos.x - width - 10;
       }
 
       this.setState({
         tooltip: tooltip,
         tooltipVisible: true,
         tooltipX: x,
-        tooltipY: event.detail.y + 20
+        tooltipY: mousePos.y + 20
       });
     },
     hideTooltip: function (event) {
