@@ -18,7 +18,7 @@
     innerRect: {
       className: "node-rect drag",
       x: 0,
-      y: 3,
+      y: 0,
       rx: TheGraph.config.nodeRadius,
       ry: TheGraph.config.nodeRadius
     },
@@ -667,7 +667,7 @@
           iconContent = TheGraph.factories.node.createNodeIconText.call(this, iconOptions);
       }
 
-      var backgroundRectOptions = TheGraph.merge(TheGraph.config.node.background, { width: this.props.width, height: this.props.height + 25 });
+      var backgroundRectOptions = TheGraph.merge(TheGraph.config.node.background, { width: this.props.width, height: this.props.height });
       var backgroundRect = TheGraph.factories.node.createNodeBackgroundRect.call(this, backgroundRectOptions);
 
       var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
