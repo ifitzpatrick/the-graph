@@ -854,29 +854,6 @@
       }
       return port;
     },
-    setPortConnections: function (event) {
-        // Trigger nodes with changed ports to rerender
-        if (event.from && event.from.node) {
-            var fromNode = this.portInfo[event.from.node];
-            if (fromNode) {
-                fromNode.dirty = true;
-                var outport = fromNode.outports[event.from.port];
-                if (outport) {
-                    outport.connections.push(event);
-                }
-            }
-        }
-        if (event.to && event.to.node) {
-            var toNode = this.portInfo[event.to.node];
-            if (toNode) {
-                toNode.dirty = true;
-                var inport = toNode.inports[event.to.port];
-                if (inport) {
-                    inport.route = null;
-                }
-            }
-        }
-    },
     resetPortRoute: function (event) {
       // Trigger nodes with changed ports to rerender
       if (event.from && event.from.node) {
