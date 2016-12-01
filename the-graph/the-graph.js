@@ -2,7 +2,7 @@
   "use strict";
 
   var defaultNodeSize = 15;
-  var defaultNodeRadius = 8;
+  var defaultNodeRadius = 5;
 
   // Dumb module setup
   var TheGraph = context.TheGraph = {
