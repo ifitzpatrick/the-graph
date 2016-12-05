@@ -361,7 +361,7 @@
         'bang': 0,
         'string': 1,
         'boolean': 2,
-        'int': 3,
+        'integer': 3,
         'number': 3,
         'object': 4,
         'array': 4,
@@ -610,12 +610,12 @@
     portInfo: {},
     getPorts: function (graph, processName, componentName) {
 
-      var typeMap = {
+      var typeRoutes = {
           'any': 0,
           'bang': 0,
           'string': 1,
           'boolean': 2,
-          'int': 3,
+          'integer': 3,
           'number': 3,
           'object': 4,
           'array': 4,
@@ -701,7 +701,7 @@
 
             outports[port.name] = {
               isConnected: connections.outports[port.name] > 0,
-              route: typeMap[port.type],
+              route: typeRoutes[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -726,7 +726,7 @@
 
             inports[port.name] = {
               isConnected: connections.inports[port.name] > 0,
-              route: typeMap[port.type],
+              route: typeRoutes[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
