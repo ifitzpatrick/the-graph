@@ -72,9 +72,9 @@
     createNodeLabelGroup: TheGraph.factories.createGroup,
     createNodeLabelRect: TheGraph.factories.createRect,
     createNodeLabelText: TheGraph.factories.createText,
-    createNodeSublabelGroup: TheGraph.factories.createGroup,
-    createNodeSublabelRect: TheGraph.factories.createRect,
-    createNodeSublabelText: TheGraph.factories.createText,
+    // createNodeSublabelGroup: TheGraph.factories.createGroup,
+    // createNodeSublabelRect: TheGraph.factories.createRect,
+    // createNodeSublabelText: TheGraph.factories.createText,
     createNodePort: createNodePort
   };
 
@@ -673,6 +673,8 @@
       var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
       var borderRect = TheGraph.factories.node.createNodeBorderRect.call(this, borderRectOptions);
 
+      // NOTE: The y (and height adjustment) is shifted down a few pixels to
+      // make room for the labelText.
       var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { y: -15, width: this.props.width, height: this.props.height + 15 });
       var innerRect = TheGraph.factories.node.createNodeInnerRect.call(this, innerRectOptions);
 
@@ -685,22 +687,22 @@
       var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: -4, children: label });
       var labelText = TheGraph.factories.node.createNodeLabelText.call(this, labelTextOptions);
 
-      var labelRectX = this.props.width / 2;
-      var labelRectY = this.props.height + 15;
-      var labelRectOptions = buildLabelRectOptions(14, labelRectX, labelRectY, label.length, TheGraph.config.node.labelRect.className);
-      labelRectOptions = TheGraph.merge(TheGraph.config.node.labelRect, labelRectOptions);
-      var labelRect = TheGraph.factories.node.createNodeLabelRect.call(this, labelRectOptions);
-      var labelGroup = TheGraph.factories.node.createNodeLabelGroup.call(this, TheGraph.config.node.labelBackground, [labelRect, labelText]);
+      // var labelRectX = this.props.width / 2;
+      // var labelRectY = this.props.height + 15;
+      // var labelRectOptions = buildLabelRectOptions(14, labelRectX, labelRectY, label.length, TheGraph.config.node.labelRect.className);
+      // labelRectOptions = TheGraph.merge(TheGraph.config.node.labelRect, labelRectOptions);
+      // var labelRect = TheGraph.factories.node.createNodeLabelRect.call(this, labelRectOptions);
+      var labelGroup = TheGraph.factories.node.createNodeLabelGroup.call(this, TheGraph.config.node.labelBackground, [labelText]);
 
-      var sublabelTextOptions = TheGraph.merge(TheGraph.config.node.sublabelText, { x: this.props.width / 2, y: this.props.height + 30, children: sublabel });
-      var sublabelText = TheGraph.factories.node.createNodeSublabelText.call(this, sublabelTextOptions);
-
-      var sublabelRectX = this.props.width / 2;
-      var sublabelRectY = this.props.height + 30;
-      var sublabelRectOptions = buildLabelRectOptions(9, sublabelRectX, sublabelRectY, sublabel.length, TheGraph.config.node.sublabelRect.className);
-      sublabelRectOptions = TheGraph.merge(TheGraph.config.node.sublabelRect, sublabelRectOptions);
-      var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
-      var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
+      // var sublabelTextOptions = TheGraph.merge(TheGraph.config.node.sublabelText, { x: this.props.width / 2, y: this.props.height + 30, children: sublabel });
+      // var sublabelText = TheGraph.factories.node.createNodeSublabelText.call(this, sublabelTextOptions);
+      //
+      // var sublabelRectX = this.props.width / 2;
+      // var sublabelRectY = this.props.height + 30;
+      // var sublabelRectOptions = buildLabelRectOptions(9, sublabelRectX, sublabelRectY, sublabel.length, TheGraph.config.node.sublabelRect.className);
+      // sublabelRectOptions = TheGraph.merge(TheGraph.config.node.sublabelRect, sublabelRectOptions);
+      // var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
+      // var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
 
       var translate = function (x, y) {
         return 'translate(' + x + ', ' + y + ')';
@@ -812,7 +814,7 @@
         inportsGroup,
         outportsGroup,
         labelGroup,
-        sublabelGroup
+        // sublabelGroup
       ]);
 
       var nodeOptions = {
