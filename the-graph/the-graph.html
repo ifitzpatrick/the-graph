@@ -695,6 +695,18 @@
       toJSON: function () {
         if (!this.graph) { return {}; }
         return this.graph.toJSON();
+      },
+      registerTheme: function (url) {
+        var req = new XMLHttpRequest();
+
+        req.addEventListener('load', function () {
+          const style = document.createElement('style');
+          style.innerHTML = req.responseText;
+          this.shadowRoot.appendChild(style);
+        }.bind(this));
+
+        req.open('GET', url);
+        req.send();
       }
     });
 
