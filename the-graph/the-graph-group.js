@@ -9,8 +9,8 @@
     },
     boxRect: {
       ref: "box",
-      rx: TheGraph.config.nodeRadius,
-      ry: TheGraph.config.nodeRadius
+      rx: 0,
+      ry: 0
     },
     labelText: {
       ref: "label",
@@ -168,12 +168,16 @@
     render: function() {
       if (!this.props.isMarqueeSelect) {
         var x = this.props.minX - TheGraph.config.nodeWidth / 2;
-        var y = this.props.minY - TheGraph.config.nodeHeight / 2;
+        var y = (this.props.minY - TheGraph.config.nodeHeight / 2) - 30;
+        var rx = TheGraph.config.nodeRadius;
+        var ry = TheGraph.config.nodeRadius;
         var width = this.props.maxX - x + TheGraph.config.nodeWidth*0.5;
-        var height = this.props.maxY - y + TheGraph.config.nodeHeight*0.75;
+        var height = (this.props.maxY - y + TheGraph.config.nodeHeight*0.75);
       } else {
         var x = this.props.minX;
         var y = this.props.minY;
+        var rx = 0;
+        var ry = 0;
         var width = this.props.maxX - x;
         var height = this.props.maxY - y;
       }
@@ -183,6 +187,8 @@
       var boxRectOptions = {
         x: x,
         y: y,
+        rx: rx,
+        yx: ry,
         width: width,
         height: height,
         className: "group-box color" + color + selection + marquee
