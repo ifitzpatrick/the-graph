@@ -2674,7 +2674,7 @@ context.TheGraph.FONT_AWESOME = {
           fromNode.dirty = true;
           var outport = fromNode.outports[event.from.port];
           if (outport) {
-            outport.route = null;
+            delete outport.route;
           }
         }
       }
@@ -2684,7 +2684,7 @@ context.TheGraph.FONT_AWESOME = {
           toNode.dirty = true;
           var inport = toNode.inports[event.to.port];
           if (inport) {
-            inport.route = null;
+            delete inport.route;
           }
         }
       }
@@ -4874,6 +4874,7 @@ context.TheGraph.FONT_AWESOME = {
         nextProps.y !== this.props.y ||
         nextProps.nodeWidth !== this.props.nodeWidth ||
         nextProps.classNames !== this.props.classNames ||
+        nextProps.route !== this.props.route ||
         nextProps.highlightPort !== this.props.highlightPort
       );
     },

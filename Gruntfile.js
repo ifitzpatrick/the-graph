@@ -7,7 +7,7 @@
       "* Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>; Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n";
 
     var sources = {
-      scripts: ['Gruntfile.js', 'the-*/*.js', 'the-*/*.html', '!(*/**/bundle.js)'],
+      scripts: ['Gruntfile.js', 'the-*/*.js', 'the-*/*.html', '!the-graph/bundle.js'],
       // elements: ['the-*/*.html'],
       stylus: ['themes/*/*.styl'],
       css: ['themes/*.css']
