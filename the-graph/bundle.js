@@ -94,6 +94,7 @@
     var maxX = -Infinity;
     var maxY = -Infinity;
 
+    var allNodes = [];
     // Loop through nodes
     var len = nodes.length;
     for (var i=0; i<len; i++) {
@@ -102,12 +103,7 @@
       if (!node || !node.metadata) {
         continue;
       }
-      if (node.metadata.x < minX) { minX = node.metadata.x; }
-      if (node.metadata.y < minY) { minY = node.metadata.y; }
-      var x = node.metadata.x + node.metadata.width;
-      var y = node.metadata.y + node.metadata.height;
-      if (x > maxX) { maxX = x; }
-      if (y > maxY) { maxY = y; }
+      allNodes.push(node);
     }
     // Loop through exports
     var keys, exp;
@@ -116,10 +112,7 @@
       for (i=0; i<len; i++) {
         exp = graph.inports[inports[i]];
         if (!exp.metadata) { continue; }
-        if (exp.metadata.x < minX) { minX = exp.metadata.x; }
-        if (exp.metadata.y < minY) { minY = exp.metadata.y; }
-        if (exp.metadata.x > maxX) { maxX = exp.metadata.x; }
-        if (exp.metadata.y > maxY) { maxY = exp.metadata.y; }
+        allNodes.push(exp);
       }
     }
     if (outports) {
@@ -127,11 +120,18 @@
       for (i=0; i<len; i++) {
         exp = graph.outports[outports[i]];
         if (!exp.metadata) { continue; }
-        if (exp.metadata.x < minX) { minX = exp.metadata.x; }
-        if (exp.metadata.y < minY) { minY = exp.metadata.y; }
-        if (exp.metadata.x > maxX) { maxX = exp.metadata.x; }
-        if (exp.metadata.y > maxY) { maxY = exp.metadata.y; }
+        allNodes.push(exp);
       }
+    }
+
+    for (i=0, len=allNodes.length; i<len; i++) {
+      var node = allNodes[i];
+      if (node.metadata.x < minX) { minX = node.metadata.x; }
+      if (node.metadata.y < minY) { minY = node.metadata.y; }
+      var x = node.metadata.x + node.metadata.width;
+      var y = node.metadata.y + node.metadata.height;
+      if (x > maxX) { maxX = x; }
+      if (y > maxY) { maxY = y; }
     }
 
     if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
