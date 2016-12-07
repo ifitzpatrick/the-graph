@@ -521,6 +521,9 @@
       },
       toJSON: function () {
         return this.nofloGraph.toJSON();
+      },
+      registerTheme: function (url) {
+        this.$.graph.registerTheme(url);
       }
     });
 

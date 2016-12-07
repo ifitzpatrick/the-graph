@@ -94,6 +94,7 @@
     var maxX = -Infinity;
     var maxY = -Infinity;
 
+    var allNodes = [];
     // Loop through nodes
     var len = nodes.length;
     for (var i=0; i<len; i++) {
@@ -102,12 +103,7 @@
       if (!node || !node.metadata) {
         continue;
       }
-      if (node.metadata.x < minX) { minX = node.metadata.x; }
-      if (node.metadata.y < minY) { minY = node.metadata.y; }
-      var x = node.metadata.x + node.metadata.width;
-      var y = node.metadata.y + node.metadata.height;
-      if (x > maxX) { maxX = x; }
-      if (y > maxY) { maxY = y; }
+      allNodes.push(node);
     }
     // Loop through exports
     var keys, exp;
@@ -116,10 +112,7 @@
       for (i=0; i<len; i++) {
         exp = graph.inports[inports[i]];
         if (!exp.metadata) { continue; }
-        if (exp.metadata.x < minX) { minX = exp.metadata.x; }
-        if (exp.metadata.y < minY) { minY = exp.metadata.y; }
-        if (exp.metadata.x > maxX) { maxX = exp.metadata.x; }
-        if (exp.metadata.y > maxY) { maxY = exp.metadata.y; }
+        allNodes.push(exp);
       }
     }
     if (outports) {
@@ -127,11 +120,18 @@
       for (i=0; i<len; i++) {
         exp = graph.outports[outports[i]];
         if (!exp.metadata) { continue; }
-        if (exp.metadata.x < minX) { minX = exp.metadata.x; }
-        if (exp.metadata.y < minY) { minY = exp.metadata.y; }
-        if (exp.metadata.x > maxX) { maxX = exp.metadata.x; }
-        if (exp.metadata.y > maxY) { maxY = exp.metadata.y; }
+        allNodes.push(exp);
       }
+    }
+
+    for (i=0, len=allNodes.length; i<len; i++) {
+      var node = allNodes[i];
+      if (node.metadata.x < minX) { minX = node.metadata.x; }
+      if (node.metadata.y < minY) { minY = node.metadata.y; }
+      var x = node.metadata.x + node.metadata.width;
+      var y = node.metadata.y + node.metadata.height;
+      if (x > maxX) { maxX = x; }
+      if (y > maxY) { maxY = y; }
     }
 
     if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
@@ -1401,18 +1401,20 @@ context.TheGraph.FONT_AWESOME = {
     changeTooltip: function (event) {
       var tooltip = event.detail.tooltip;
 
+      var mousePos = this.getMousePos(event.detail);
+
       // Don't go over right edge
-      var x = event.detail.x + 10;
+      var x = mousePos.x + 10;
       var width = tooltip.length*6;
       if (x + width > this.state.width) {
-        x = event.detail.x - width - 10;
+        x = mousePos.x - width - 10;
       }
 
       this.setState({
         tooltip: tooltip,
         tooltipVisible: true,
         tooltipX: x,
-        tooltipY: event.detail.y + 20
+        tooltipY: mousePos.y + 20
       });
     },
     hideTooltip: function (event) {
@@ -2758,7 +2760,7 @@ context.TheGraph.FONT_AWESOME = {
           fromNode.dirty = true;
           var outport = fromNode.outports[event.from.port];
           if (outport) {
-            outport.route = null;
+            delete outport.route;
           }
         }
       }
@@ -2768,7 +2770,7 @@ context.TheGraph.FONT_AWESOME = {
           toNode.dirty = true;
           var inport = toNode.inports[event.to.port];
           if (inport) {
-            inport.route = null;
+            delete inport.route;
           }
         }
       }
@@ -4957,6 +4959,7 @@ context.TheGraph.FONT_AWESOME = {
         nextProps.y !== this.props.y ||
         nextProps.nodeWidth !== this.props.nodeWidth ||
         nextProps.classNames !== this.props.classNames ||
+        nextProps.route !== this.props.route ||
         nextProps.highlightPort !== this.props.highlightPort
       );
     },

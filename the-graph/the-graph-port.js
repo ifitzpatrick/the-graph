@@ -174,6 +174,7 @@
         nextProps.y !== this.props.y ||
         nextProps.nodeWidth !== this.props.nodeWidth ||
         nextProps.classNames !== this.props.classNames ||
+        nextProps.route !== this.props.route ||
         nextProps.highlightPort !== this.props.highlightPort
       );
     },

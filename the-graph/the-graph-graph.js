@@ -862,7 +862,7 @@
           fromNode.dirty = true;
           var outport = fromNode.outports[event.from.port];
           if (outport) {
-            outport.route = null;
+            delete outport.route;
           }
         }
       }
@@ -872,7 +872,7 @@
           toNode.dirty = true;
           var inport = toNode.inports[event.to.port];
           if (inport) {
-            inport.route = null;
+            delete inport.route;
           }
         }
       }
