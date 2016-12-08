@@ -490,7 +490,8 @@
         nextProps.highlightPort !== this.props.highlightPort ||
         nextProps.ports.dirty ||
         nextProps.classNames !== this.props.classNames ||
-        nextProps.portClassNames !== this.props.portClassNames
+        nextProps.portClassNames !== this.props.portClassNames ||
+        nextProps.route !== this.props.route
       );
     },
     render: function() {
@@ -664,6 +665,7 @@
               x: this.props.width / 2,
               y: this.props.height / 2,
               children: icon });
+          iconOptions.className += (this.props.export && this.props.route !== undefined) ? " fill route" + this.props.route : "";
           iconContent = TheGraph.factories.node.createNodeIconText.call(this, iconOptions);
       }
 

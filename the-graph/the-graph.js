@@ -21,6 +21,8 @@
       nodeWidth: defaultNodeSize,
       nodeRadius: defaultNodeRadius,
       nodeHeight: defaultNodeSize,
+      exportHeight: 50,
+      exportWidth: 0,
       autoSizeNode: true,
       maxPortCount: 9,
       nodeHeightIncrement: 12,

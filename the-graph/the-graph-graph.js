@@ -877,6 +877,11 @@
         }
       }
     },
+    getGraphExportRoute: function (port, isIn) {
+      var ports = this.getPorts(this.props.graph, port.process, this.props.graph.getNode(port.process).component);
+      var route = ports[isIn ? 'inports' : 'outports'][port.port].route;
+      return route;
+    },
     graphOutports: {},
     getGraphOutport: function (key) {
       var exp = this.graphOutports[key];
@@ -885,9 +890,9 @@
         exp.inports[key] = {
           label: key,
           type: "all",
-          route: 5,
+          route: this.getGraphExportRoute(this.props.graph.outports[key], false),
           x: 0,
-          y: TheGraph.config.nodeHeight / 2
+          y: TheGraph.config.exportHeight / 2
         };
         this.graphOutports[key] = exp;
       }
@@ -901,9 +906,9 @@
         exp.outports[key] = {
           label: key,
           type: "all",
-          route: 2,
-          x: TheGraph.config.nodeWidth,
-          y: TheGraph.config.nodeHeight / 2
+          route: this.getGraphExportRoute(this.props.graph.inports[key], true),
+          x: TheGraph.config.exportWidth,
+          y: TheGraph.config.exportHeight / 2
         };
         this.graphInports[key] = exp;
       }
@@ -1239,14 +1244,14 @@
         var label = key;
         var nodeKey = inport.process;
         var portKey = inport.port;
-        if (!inport.metadata) { 
-          inport.metadata = {x:0, y:0}; 
+        if (!inport.metadata) {
+          inport.metadata = {x:0, y:0};
         }
         var metadata = inport.metadata;
         if (!metadata.x) { metadata.x = 0; }
         if (!metadata.y) { metadata.y = 0; }
-        if (!metadata.width) { metadata.width = TheGraph.config.nodeWidth; }
-        if (!metadata.height) { metadata.height = TheGraph.config.nodeHeight; }
+        if (!metadata.width) { metadata.width = TheGraph.config.exportWidth; }
+        if (!metadata.height) { metadata.height = TheGraph.config.exportHeight; }
         // Private port info
         var portInfo = self.portInfo[nodeKey];
         if (!portInfo) {
@@ -1275,6 +1280,7 @@
           selectedInports.push(key);
         }
 
+        var route = self.getGraphExportRoute(inport, true);
         // Node view
         var expNode = {
           key: "inport.node."+key,
@@ -1289,6 +1295,7 @@
           graphView: self,
           graph: graph,
           node: {},
+          route: route,
           ports: self.getGraphInport(key),
           isIn: true,
           icon: (metadata.icon ? metadata.icon : "sign-in"),
@@ -1307,11 +1314,11 @@
           graph: graph,
           app: self.props.app,
           edge: {},
-          route: (metadata.route ? metadata.route : 2),
+          route: route,
           isIn: true,
           label: "export in " + label.toUpperCase() + " -> " + portKey.toUpperCase() + " " + privateNode.metadata.label,
-          sX: expNode.x + TheGraph.config.nodeWidth,
-          sY: expNode.y + TheGraph.config.nodeHeight / 2,
+          sX: expNode.x + TheGraph.config.exportWidth,
+          sY: expNode.y + TheGraph.config.exportHeight / 2,
           tX: privateNode.metadata.x + privatePort.x,
           tY: privateNode.metadata.y + privatePort.y,
           showContext: self.props.showContext,
@@ -1343,8 +1350,8 @@
         var metadata = outport.metadata;
         if (!metadata.x) { metadata.x = 0; }
         if (!metadata.y) { metadata.y = 0; }
-        if (!metadata.width) { metadata.width = TheGraph.config.nodeWidth; }
-        if (!metadata.height) { metadata.height = TheGraph.config.nodeHeight; }
+        if (!metadata.width) { metadata.width = TheGraph.config.exportWidth; }
+        if (!metadata.height) { metadata.height = TheGraph.config.exportHeight; }
         // Private port info
         var portInfo = self.portInfo[nodeKey];
         if (!portInfo) {
@@ -1373,6 +1380,8 @@
           selectedOutports.push(key);
         }
 
+        var route = self.getGraphExportRoute(outport, false);
+
         // Node view
         var expNode = {
           key: "outport.node."+key,
@@ -1387,6 +1396,7 @@
           graphView: self,
           graph: graph,
           node: {},
+          route: route,
           ports: self.getGraphOutport(key),
           isIn: false,
           icon: (metadata.icon ? metadata.icon : "sign-out"),
@@ -1405,13 +1415,13 @@
           graph: graph,
           app: self.props.app,
           edge: {},
-          route: (metadata.route ? metadata.route : 4),
+          route: route,
           isIn: false,
           label: privateNode.metadata.label + " " + portKey.toUpperCase() + " -> " + label.toUpperCase() + " export out",
           sX: privateNode.metadata.x + privatePort.x,
           sY: privateNode.metadata.y + privatePort.y,
           tX: expNode.x,
-          tY: expNode.y + TheGraph.config.nodeHeight / 2,
+          tY: expNode.y + TheGraph.config.exportHeight / 2,
           showContext: self.props.showContext,
           nodeSelected: self.state.selectedNodes[privateNode.id] === true,
           classNames: classNames,

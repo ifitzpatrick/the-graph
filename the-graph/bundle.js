@@ -2,7 +2,7 @@
   "use strict";
 
   var defaultNodeSize = 15;
-  var defaultNodeRadius = 8;
+  var defaultNodeRadius = 5;
 
   // Dumb module setup
   var TheGraph = context.TheGraph = {
@@ -21,6 +21,8 @@
       nodeWidth: defaultNodeSize,
       nodeRadius: defaultNodeRadius,
       nodeHeight: defaultNodeSize,
+      exportHeight: 50,
+      exportWidth: 0,
       autoSizeNode: true,
       maxPortCount: 9,
       nodeHeightIncrement: 12,
@@ -446,6 +448,7 @@ context.TheGraph.FONT_AWESOME = {
   "align-right": "",
   "amazon": "",
   "ambulance": "",
+  "american-sign-language-interpreting": "",
   "anchor": "",
   "android": "",
   "angellist": "",
@@ -476,8 +479,11 @@ context.TheGraph.FONT_AWESOME = {
   "arrows-alt": "",
   "arrows-h": "",
   "arrows-v": "",
+  "asl-interpreting": "",
+  "assistive-listening-systems": "",
   "asterisk": "",
   "at": "",
+  "audio-description": "",
   "automobile": "",
   "backward": "",
   "balance-scale": "",
@@ -512,12 +518,16 @@ context.TheGraph.FONT_AWESOME = {
   "bitbucket-square": "",
   "bitcoin": "",
   "black-tie": "",
+  "blind": "",
+  "bluetooth": "",
+  "bluetooth-b": "",
   "bold": "",
   "bolt": "",
   "bomb": "",
   "book": "",
   "bookmark": "",
   "bookmark-o": "",
+  "braille": "",
   "briefcase": "",
   "btc": "",
   "bug": "",
@@ -590,6 +600,7 @@ context.TheGraph.FONT_AWESOME = {
   "code": "",
   "code-fork": "",
   "codepen": "",
+  "codiepie": "",
   "coffee": "",
   "cog": "",
   "cogs": "",
@@ -608,6 +619,7 @@ context.TheGraph.FONT_AWESOME = {
   "copyright": "",
   "creative-commons": "",
   "credit-card": "",
+  "credit-card-alt": "",
   "crop": "",
   "crosshairs": "",
   "css3": "",
@@ -618,6 +630,8 @@ context.TheGraph.FONT_AWESOME = {
   "dashboard": "",
   "dashcube": "",
   "database": "",
+  "deaf": "",
+  "deafness": "",
   "dedent": "",
   "delicious": "",
   "desktop": "",
@@ -630,6 +644,7 @@ context.TheGraph.FONT_AWESOME = {
   "dribbble": "",
   "dropbox": "",
   "drupal": "",
+  "edge": "",
   "edit": "",
   "eject": "",
   "ellipsis-h": "",
@@ -638,6 +653,7 @@ context.TheGraph.FONT_AWESOME = {
   "envelope": "",
   "envelope-o": "",
   "envelope-square": "",
+  "envira": "",
   "eraser": "",
   "eur": "",
   "euro": "",
@@ -652,6 +668,7 @@ context.TheGraph.FONT_AWESOME = {
   "eye": "",
   "eye-slash": "",
   "eyedropper": "",
+  "fa": "",
   "facebook": "",
   "facebook-f": "",
   "facebook-official": "",
@@ -686,6 +703,7 @@ context.TheGraph.FONT_AWESOME = {
   "fire": "",
   "fire-extinguisher": "",
   "firefox": "",
+  "first-order": "",
   "flag": "",
   "flag-checkered": "",
   "flag-o": "",
@@ -698,7 +716,9 @@ context.TheGraph.FONT_AWESOME = {
   "folder-open": "",
   "folder-open-o": "",
   "font": "",
+  "font-awesome": "",
   "fonticons": "",
+  "fort-awesome": "",
   "forumbee": "",
   "forward": "",
   "foursquare": "",
@@ -720,11 +740,16 @@ context.TheGraph.FONT_AWESOME = {
   "github": "",
   "github-alt": "",
   "github-square": "",
+  "gitlab": "",
   "gittip": "",
   "glass": "",
+  "glide": "",
+  "glide-g": "",
   "globe": "",
   "google": "",
   "google-plus": "",
+  "google-plus-circle": "",
+  "google-plus-official": "",
   "google-plus-square": "",
   "google-wallet": "",
   "graduation-cap": "",
@@ -745,6 +770,8 @@ context.TheGraph.FONT_AWESOME = {
   "hand-scissors-o": "",
   "hand-spock-o": "",
   "hand-stop-o": "",
+  "hard-of-hearing": "",
+  "hashtag": "",
   "hdd-o": "",
   "header": "",
   "headphones": "",
@@ -816,6 +843,7 @@ context.TheGraph.FONT_AWESOME = {
   "long-arrow-left": "",
   "long-arrow-right": "",
   "long-arrow-up": "",
+  "low-vision": "",
   "magic": "",
   "magnet": "",
   "mail-forward": "",
@@ -844,8 +872,10 @@ context.TheGraph.FONT_AWESOME = {
   "minus-circle": "",
   "minus-square": "",
   "minus-square-o": "",
+  "mixcloud": "",
   "mobile": "",
   "mobile-phone": "",
+  "modx": "",
   "money": "",
   "moon-o": "",
   "mortar-board": "",
@@ -872,18 +902,22 @@ context.TheGraph.FONT_AWESOME = {
   "paragraph": "",
   "paste": "",
   "pause": "",
+  "pause-circle": "",
+  "pause-circle-o": "",
   "paw": "",
   "paypal": "",
   "pencil": "",
   "pencil-square": "",
   "pencil-square-o": "",
+  "percent": "",
   "phone": "",
   "phone-square": "",
   "photo": "",
   "picture-o": "",
   "pie-chart": "",
-  "pied-piper": "",
+  "pied-piper": "",
   "pied-piper-alt": "",
+  "pied-piper-pp": "",
   "pinterest": "",
   "pinterest-p": "",
   "pinterest-square": "",
@@ -898,11 +932,13 @@ context.TheGraph.FONT_AWESOME = {
   "plus-square-o": "",
   "power-off": "",
   "print": "",
+  "product-hunt": "",
   "puzzle-piece": "",
   "qq": "",
   "qrcode": "",
   "question": "",
   "question-circle": "",
+  "question-circle-o": "",
   "quote-left": "",
   "quote-right": "",
   "ra": "",
@@ -910,6 +946,7 @@ context.TheGraph.FONT_AWESOME = {
   "rebel": "",
   "recycle": "",
   "reddit": "",
+  "reddit-alien": "",
   "reddit-square": "",
   "refresh": "",
   "registered": "",
@@ -919,6 +956,7 @@ context.TheGraph.FONT_AWESOME = {
   "repeat": "",
   "reply": "",
   "reply-all": "",
+  "resistance": "",
   "retweet": "",
   "rmb": "",
   "road": "",
@@ -934,6 +972,7 @@ context.TheGraph.FONT_AWESOME = {
   "safari": "",
   "save": "",
   "scissors": "",
+  "scribd": "",
   "search": "",
   "search-minus": "",
   "search-plus": "",
@@ -951,10 +990,14 @@ context.TheGraph.FONT_AWESOME = {
   "shield": "",
   "ship": "",
   "shirtsinbulk": "",
+  "shopping-bag": "",
+  "shopping-basket": "",
   "shopping-cart": "",
   "sign-in": "",
+  "sign-language": "",
   "sign-out": "",
   "signal": "",
+  "signing": "",
   "simplybuilt": "",
   "sitemap": "",
   "skyatlas": "",
@@ -963,6 +1006,9 @@ context.TheGraph.FONT_AWESOME = {
   "sliders": "",
   "slideshare": "",
   "smile-o": "",
+  "snapchat": "",
+  "snapchat-ghost": "",
+  "snapchat-square": "",
   "soccer-ball-o": "",
   "sort": "",
   "sort-alpha-asc": "",
@@ -998,6 +1044,8 @@ context.TheGraph.FONT_AWESOME = {
   "sticky-note": "",
   "sticky-note-o": "",
   "stop": "",
+  "stop-circle": "",
+  "stop-circle-o": "",
   "street-view": "",
   "strikethrough": "",
   "stumbleupon": "",
@@ -1023,6 +1071,7 @@ context.TheGraph.FONT_AWESOME = {
   "th": "",
   "th-large": "",
   "th-list": "",
+  "themeisle": "",
   "thumb-tack": "",
   "thumbs-down": "",
   "thumbs-o-down": "",
@@ -1062,12 +1111,14 @@ context.TheGraph.FONT_AWESOME = {
   "umbrella": "",
   "underline": "",
   "undo": "",
+  "universal-access": "",
   "university": "",
   "unlink": "",
   "unlock": "",
   "unlock-alt": "",
   "unsorted": "",
   "upload": "",
+  "usb": "",
   "usd": "",
   "user": "",
   "user-md": "",
@@ -1079,11 +1130,14 @@ context.TheGraph.FONT_AWESOME = {
   "venus-double": "",
   "venus-mars": "",
   "viacoin": "",
+  "viadeo": "",
+  "viadeo-square": "",
   "video-camera": "",
   "vimeo": "",
   "vimeo-square": "",
   "vine": "",
   "vk": "",
+  "volume-control-phone": "",
   "volume-down": "",
   "volume-off": "",
   "volume-up": "",
@@ -1093,11 +1147,14 @@ context.TheGraph.FONT_AWESOME = {
   "weixin": "",
   "whatsapp": "",
   "wheelchair": "",
+  "wheelchair-alt": "",
   "wifi": "",
   "wikipedia-w": "",
   "windows": "",
   "won": "",
   "wordpress": "",
+  "wpbeginner": "",
+  "wpforms": "",
   "wrench": "",
   "xing": "",
   "xing-square": "",
@@ -1108,6 +1165,7 @@ context.TheGraph.FONT_AWESOME = {
   "yc-square": "",
   "yelp": "",
   "yen": "",
+  "yoast": "",
   "youtube": "",
   "youtube-play": "",
   "youtube-square": ""
@@ -2236,7 +2294,7 @@ context.TheGraph.FONT_AWESOME = {
         'bang': 0,
         'string': 1,
         'boolean': 2,
-        'int': 3,
+        'integer': 3,
         'number': 3,
         'object': 4,
         'array': 4,
@@ -2485,12 +2543,12 @@ context.TheGraph.FONT_AWESOME = {
     portInfo: {},
     getPorts: function (graph, processName, componentName) {
 
-      var typeMap = {
+      var typeRoutes = {
           'any': 0,
           'bang': 0,
           'string': 1,
           'boolean': 2,
-          'int': 3,
+          'integer': 3,
           'number': 3,
           'object': 4,
           'array': 4,
@@ -2576,7 +2634,7 @@ context.TheGraph.FONT_AWESOME = {
 
             outports[port.name] = {
               isConnected: connections.outports[port.name] > 0,
-              route: typeMap[port.type],
+              route: typeRoutes[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -2601,7 +2659,7 @@ context.TheGraph.FONT_AWESOME = {
 
             inports[port.name] = {
               isConnected: connections.inports[port.name] > 0,
-              route: typeMap[port.type],
+              route: typeRoutes[port.type],
               label: port.name,
               type: port.type,
               addressable: port.addressable,
@@ -2729,29 +2787,6 @@ context.TheGraph.FONT_AWESOME = {
       }
       return port;
     },
-    setPortConnections: function (event) {
-        // Trigger nodes with changed ports to rerender
-        if (event.from && event.from.node) {
-            var fromNode = this.portInfo[event.from.node];
-            if (fromNode) {
-                fromNode.dirty = true;
-                var outport = fromNode.outports[event.from.port];
-                if (outport) {
-                    outport.connections.push(event);
-                }
-            }
-        }
-        if (event.to && event.to.node) {
-            var toNode = this.portInfo[event.to.node];
-            if (toNode) {
-                toNode.dirty = true;
-                var inport = toNode.inports[event.to.port];
-                if (inport) {
-                    inport.route = null;
-                }
-            }
-        }
-    },
     resetPortRoute: function (event) {
       // Trigger nodes with changed ports to rerender
       if (event.from && event.from.node) {
@@ -2775,6 +2810,11 @@ context.TheGraph.FONT_AWESOME = {
         }
       }
     },
+    getGraphExportRoute: function (port, isIn) {
+      var ports = this.getPorts(this.props.graph, port.process, this.props.graph.getNode(port.process).component);
+      var route = ports[isIn ? 'inports' : 'outports'][port.port].route;
+      return route;
+    },
     graphOutports: {},
     getGraphOutport: function (key) {
       var exp = this.graphOutports[key];
@@ -2783,9 +2823,9 @@ context.TheGraph.FONT_AWESOME = {
         exp.inports[key] = {
           label: key,
           type: "all",
-          route: 5,
+          route: this.getGraphExportRoute(this.props.graph.outports[key], false),
           x: 0,
-          y: TheGraph.config.nodeHeight / 2
+          y: TheGraph.config.exportHeight / 2
         };
         this.graphOutports[key] = exp;
       }
@@ -2799,9 +2839,9 @@ context.TheGraph.FONT_AWESOME = {
         exp.outports[key] = {
           label: key,
           type: "all",
-          route: 2,
-          x: TheGraph.config.nodeWidth,
-          y: TheGraph.config.nodeHeight / 2
+          route: this.getGraphExportRoute(this.props.graph.inports[key], true),
+          x: TheGraph.config.exportWidth,
+          y: TheGraph.config.exportHeight / 2
         };
         this.graphInports[key] = exp;
       }
@@ -3137,14 +3177,14 @@ context.TheGraph.FONT_AWESOME = {
         var label = key;
         var nodeKey = inport.process;
         var portKey = inport.port;
-        if (!inport.metadata) { 
-          inport.metadata = {x:0, y:0}; 
+        if (!inport.metadata) {
+          inport.metadata = {x:0, y:0};
         }
         var metadata = inport.metadata;
         if (!metadata.x) { metadata.x = 0; }
         if (!metadata.y) { metadata.y = 0; }
-        if (!metadata.width) { metadata.width = TheGraph.config.nodeWidth; }
-        if (!metadata.height) { metadata.height = TheGraph.config.nodeHeight; }
+        if (!metadata.width) { metadata.width = TheGraph.config.exportWidth; }
+        if (!metadata.height) { metadata.height = TheGraph.config.exportHeight; }
         // Private port info
         var portInfo = self.portInfo[nodeKey];
         if (!portInfo) {
@@ -3173,6 +3213,7 @@ context.TheGraph.FONT_AWESOME = {
           selectedInports.push(key);
         }
 
+        var route = self.getGraphExportRoute(inport, true);
         // Node view
         var expNode = {
           key: "inport.node."+key,
@@ -3187,6 +3228,7 @@ context.TheGraph.FONT_AWESOME = {
           graphView: self,
           graph: graph,
           node: {},
+          route: route,
           ports: self.getGraphInport(key),
           isIn: true,
           icon: (metadata.icon ? metadata.icon : "sign-in"),
@@ -3205,11 +3247,11 @@ context.TheGraph.FONT_AWESOME = {
           graph: graph,
           app: self.props.app,
           edge: {},
-          route: (metadata.route ? metadata.route : 2),
+          route: route,
           isIn: true,
           label: "export in " + label.toUpperCase() + " -> " + portKey.toUpperCase() + " " + privateNode.metadata.label,
-          sX: expNode.x + TheGraph.config.nodeWidth,
-          sY: expNode.y + TheGraph.config.nodeHeight / 2,
+          sX: expNode.x + TheGraph.config.exportWidth,
+          sY: expNode.y + TheGraph.config.exportHeight / 2,
           tX: privateNode.metadata.x + privatePort.x,
           tY: privateNode.metadata.y + privatePort.y,
           showContext: self.props.showContext,
@@ -3241,8 +3283,8 @@ context.TheGraph.FONT_AWESOME = {
         var metadata = outport.metadata;
         if (!metadata.x) { metadata.x = 0; }
         if (!metadata.y) { metadata.y = 0; }
-        if (!metadata.width) { metadata.width = TheGraph.config.nodeWidth; }
-        if (!metadata.height) { metadata.height = TheGraph.config.nodeHeight; }
+        if (!metadata.width) { metadata.width = TheGraph.config.exportWidth; }
+        if (!metadata.height) { metadata.height = TheGraph.config.exportHeight; }
         // Private port info
         var portInfo = self.portInfo[nodeKey];
         if (!portInfo) {
@@ -3271,6 +3313,8 @@ context.TheGraph.FONT_AWESOME = {
           selectedOutports.push(key);
         }
 
+        var route = self.getGraphExportRoute(outport, false);
+
         // Node view
         var expNode = {
           key: "outport.node."+key,
@@ -3285,6 +3329,7 @@ context.TheGraph.FONT_AWESOME = {
           graphView: self,
           graph: graph,
           node: {},
+          route: route,
           ports: self.getGraphOutport(key),
           isIn: false,
           icon: (metadata.icon ? metadata.icon : "sign-out"),
@@ -3303,13 +3348,13 @@ context.TheGraph.FONT_AWESOME = {
           graph: graph,
           app: self.props.app,
           edge: {},
-          route: (metadata.route ? metadata.route : 4),
+          route: route,
           isIn: false,
           label: privateNode.metadata.label + " " + portKey.toUpperCase() + " -> " + label.toUpperCase() + " export out",
           sX: privateNode.metadata.x + privatePort.x,
           sY: privateNode.metadata.y + privatePort.y,
           tX: expNode.x,
-          tY: expNode.y + TheGraph.config.nodeHeight / 2,
+          tY: expNode.y + TheGraph.config.exportHeight / 2,
           showContext: self.props.showContext,
           nodeSelected: self.state.selectedNodes[privateNode.id] === true,
           classNames: classNames,
@@ -3556,7 +3601,7 @@ context.TheGraph.FONT_AWESOME = {
     innerRect: {
       className: "node-rect drag",
       x: 0,
-      y: 3,
+      y: 0,
       rx: TheGraph.config.nodeRadius,
       ry: TheGraph.config.nodeRadius
     },
@@ -3610,9 +3655,9 @@ context.TheGraph.FONT_AWESOME = {
     createNodeLabelGroup: TheGraph.factories.createGroup,
     createNodeLabelRect: TheGraph.factories.createRect,
     createNodeLabelText: TheGraph.factories.createText,
-    createNodeSublabelGroup: TheGraph.factories.createGroup,
-    createNodeSublabelRect: TheGraph.factories.createRect,
-    createNodeSublabelText: TheGraph.factories.createText,
+    // createNodeSublabelGroup: TheGraph.factories.createGroup,
+    // createNodeSublabelRect: TheGraph.factories.createRect,
+    // createNodeSublabelText: TheGraph.factories.createText,
     createNodePort: createNodePort
   };
 
@@ -4028,7 +4073,8 @@ context.TheGraph.FONT_AWESOME = {
         nextProps.highlightPort !== this.props.highlightPort ||
         nextProps.ports.dirty ||
         nextProps.classNames !== this.props.classNames ||
-        nextProps.portClassNames !== this.props.portClassNames
+        nextProps.portClassNames !== this.props.portClassNames ||
+        nextProps.route !== this.props.route
       );
     },
     render: function() {
@@ -4202,15 +4248,18 @@ context.TheGraph.FONT_AWESOME = {
               x: this.props.width / 2,
               y: this.props.height / 2,
               children: icon });
+          iconOptions.className += (this.props.export && this.props.route !== undefined) ? " fill route" + this.props.route : "";
           iconContent = TheGraph.factories.node.createNodeIconText.call(this, iconOptions);
       }
 
-      var backgroundRectOptions = TheGraph.merge(TheGraph.config.node.background, { width: this.props.width, height: this.props.height + 25 });
+      var backgroundRectOptions = TheGraph.merge(TheGraph.config.node.background, { width: this.props.width, height: this.props.height });
       var backgroundRect = TheGraph.factories.node.createNodeBackgroundRect.call(this, backgroundRectOptions);
 
       var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
       var borderRect = TheGraph.factories.node.createNodeBorderRect.call(this, borderRectOptions);
 
+      // NOTE: The y (and height adjustment) is shifted down a few pixels to
+      // make room for the labelText.
       var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { y: -15, width: this.props.width, height: this.props.height + 15 });
       var innerRect = TheGraph.factories.node.createNodeInnerRect.call(this, innerRectOptions);
 
@@ -4223,22 +4272,22 @@ context.TheGraph.FONT_AWESOME = {
       var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: -4, children: label });
       var labelText = TheGraph.factories.node.createNodeLabelText.call(this, labelTextOptions);
 
-      var labelRectX = this.props.width / 2;
-      var labelRectY = this.props.height + 15;
-      var labelRectOptions = buildLabelRectOptions(14, labelRectX, labelRectY, label.length, TheGraph.config.node.labelRect.className);
-      labelRectOptions = TheGraph.merge(TheGraph.config.node.labelRect, labelRectOptions);
-      var labelRect = TheGraph.factories.node.createNodeLabelRect.call(this, labelRectOptions);
-      var labelGroup = TheGraph.factories.node.createNodeLabelGroup.call(this, TheGraph.config.node.labelBackground, [labelRect, labelText]);
+      // var labelRectX = this.props.width / 2;
+      // var labelRectY = this.props.height + 15;
+      // var labelRectOptions = buildLabelRectOptions(14, labelRectX, labelRectY, label.length, TheGraph.config.node.labelRect.className);
+      // labelRectOptions = TheGraph.merge(TheGraph.config.node.labelRect, labelRectOptions);
+      // var labelRect = TheGraph.factories.node.createNodeLabelRect.call(this, labelRectOptions);
+      var labelGroup = TheGraph.factories.node.createNodeLabelGroup.call(this, TheGraph.config.node.labelBackground, [labelText]);
 
-      var sublabelTextOptions = TheGraph.merge(TheGraph.config.node.sublabelText, { x: this.props.width / 2, y: this.props.height + 30, children: sublabel });
-      var sublabelText = TheGraph.factories.node.createNodeSublabelText.call(this, sublabelTextOptions);
-
-      var sublabelRectX = this.props.width / 2;
-      var sublabelRectY = this.props.height + 30;
-      var sublabelRectOptions = buildLabelRectOptions(9, sublabelRectX, sublabelRectY, sublabel.length, TheGraph.config.node.sublabelRect.className);
-      sublabelRectOptions = TheGraph.merge(TheGraph.config.node.sublabelRect, sublabelRectOptions);
-      var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
-      var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
+      // var sublabelTextOptions = TheGraph.merge(TheGraph.config.node.sublabelText, { x: this.props.width / 2, y: this.props.height + 30, children: sublabel });
+      // var sublabelText = TheGraph.factories.node.createNodeSublabelText.call(this, sublabelTextOptions);
+      //
+      // var sublabelRectX = this.props.width / 2;
+      // var sublabelRectY = this.props.height + 30;
+      // var sublabelRectOptions = buildLabelRectOptions(9, sublabelRectX, sublabelRectY, sublabel.length, TheGraph.config.node.sublabelRect.className);
+      // sublabelRectOptions = TheGraph.merge(TheGraph.config.node.sublabelRect, sublabelRectOptions);
+      // var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
+      // var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
 
       var translate = function (x, y) {
         return 'translate(' + x + ', ' + y + ')';
@@ -4350,7 +4399,7 @@ context.TheGraph.FONT_AWESOME = {
         inportsGroup,
         outportsGroup,
         labelGroup,
-        sublabelGroup
+        // sublabelGroup
       ]);
 
       var nodeOptions = {
@@ -5585,8 +5634,8 @@ context.TheGraph.FONT_AWESOME = {
     },
     boxRect: {
       ref: "box",
-      rx: TheGraph.config.nodeRadius,
-      ry: TheGraph.config.nodeRadius
+      rx: 0,
+      ry: 0
     },
     labelText: {
       ref: "label",
@@ -5744,12 +5793,16 @@ context.TheGraph.FONT_AWESOME = {
     render: function() {
       if (!this.props.isMarqueeSelect) {
         var x = this.props.minX - TheGraph.config.nodeWidth / 2;
-        var y = this.props.minY - TheGraph.config.nodeHeight / 2;
+        var y = (this.props.minY - TheGraph.config.nodeHeight / 2) - 30;
+        var rx = TheGraph.config.nodeRadius;
+        var ry = TheGraph.config.nodeRadius;
         var width = this.props.maxX - x + TheGraph.config.nodeWidth*0.5;
-        var height = this.props.maxY - y + TheGraph.config.nodeHeight*0.75;
+        var height = (this.props.maxY - y + TheGraph.config.nodeHeight*0.75);
       } else {
         var x = this.props.minX;
         var y = this.props.minY;
+        var rx = 0;
+        var ry = 0;
         var width = this.props.maxX - x;
         var height = this.props.maxY - y;
       }
@@ -5759,6 +5812,8 @@ context.TheGraph.FONT_AWESOME = {
       var boxRectOptions = {
         x: x,
         y: y,
+        rx: rx,
+        yx: ry,
         width: width,
         height: height,
         className: "group-box color" + color + selection + marquee
