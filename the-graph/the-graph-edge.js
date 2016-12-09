@@ -4,7 +4,6 @@
   var TheGraph = context.TheGraph;
 
   TheGraph.config.edge = {
-    curve: TheGraph.config.nodeSize,
     container: {
       className: "edge"
     },
@@ -19,6 +18,17 @@
       className: "edge-touch",
       ref: "touch"
     }
+  };
+
+  var getDefaultConfig = function () {
+    // Props configured by TheGraph.config
+    return {
+      curve: TheGraph.config.nodeSize,
+    };
+  };
+
+  var getEdgeConfig = function () {
+    return TheGraph.mergeDeep(TheGraph.config.edge, getDefaultConfig());
   };
 
   TheGraph.factories.edge = {
@@ -40,9 +50,6 @@
         targetX, targetY
       ];
   }
-
-  // Const
-  var CURVE = TheGraph.config.edge.curve;
 
   // Point along cubic bezier curve
   // See http://en.wikipedia.org/wiki/File:Bezier_3_big.gif
@@ -287,6 +294,9 @@
       return true;
     },
     render: function () {
+      var config = getEdgeConfig();
+      var curve = config.curve;
+
       var sourceX = this.state.sX;
       var sourceY = this.state.sY;
       var targetX = this.state.tX;
@@ -295,7 +305,7 @@
       // Organic / curved edge
       var c1X, c1Y, c2X, c2Y;
       if (targetX-5 < sourceX) {
-        var curveFactor = (sourceX - targetX) * CURVE / 200;
+        var curveFactor = (sourceX - targetX) * curve / 200;
         if (Math.abs(targetY-sourceY) < TheGraph.config.nodeSize/2) {
           // Loopback
           c1X = sourceX + curveFactor;
@@ -322,14 +332,14 @@
       var path = TheGraph.factories.edge.createEdgePathArray(sourceX, sourceY, c1X, c1Y, c2X, c2Y, targetX, targetY);
       path = path.join(" ");
 
-      var backgroundPathOptions = TheGraph.merge(TheGraph.config.edge.backgroundPath, { d: path });
+      var backgroundPathOptions = TheGraph.merge(config.backgroundPath, { d: path });
       var backgroundPath = TheGraph.factories.edge.createEdgeBackgroundPath(backgroundPathOptions);
 
-      var foregroundPathClassName = TheGraph.config.edge.foregroundPath.className + this.props.route;
-      var foregroundPathOptions = TheGraph.merge(TheGraph.config.edge.foregroundPath, { d: path, className: foregroundPathClassName });
+      var foregroundPathClassName = config.foregroundPath.className + this.props.route;
+      var foregroundPathOptions = TheGraph.merge(config.foregroundPath, { d: path, className: foregroundPathClassName });
       var foregroundPath = TheGraph.factories.edge.createEdgeForegroundPath(foregroundPathOptions);
 
-      var touchPathOptions = TheGraph.merge(TheGraph.config.edge.touchPath, { d: path });
+      var touchPathOptions = TheGraph.merge(config.touchPath, { d: path });
       var touchPath = TheGraph.factories.edge.createEdgeTouchPath(touchPathOptions);
 
       var containerOptions = {
@@ -343,7 +353,7 @@
           {opacity: this.props.opacity || 1}
       };
 
-      containerOptions = TheGraph.merge(TheGraph.config.edge.container, containerOptions);
+      containerOptions = TheGraph.merge(config.container, containerOptions);
 
       var epsilon = 0.01;
       var center = findPointOnCubicBezier(0.5, sourceX, sourceY, c1X, c1Y, c2X, c2Y, targetX, targetY);
@@ -401,7 +411,7 @@
         points: pointsArray,
         className: 'arrow-bg'
       });
-      
+
       var arrow = TheGraph.factories.edge.createArrow({
         points: pointsArray,
         className: 'arrow fill stroke route' + this.props.route

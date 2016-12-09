@@ -13,7 +13,8 @@
     },
     arc: {
       className: "port-arc",
-      ref: "portArc"
+      ref: "portArc",
+      bigArcRadius: 6
     },
     innerCircle: {
       ref: "circleSmall"
@@ -196,7 +197,7 @@
       var inArc = TheGraph.arcs.inport;
       var outArc = TheGraph.arcs.outport;
       if (highlightPort && highlightPort.isIn === this.props.isIn && (highlightPort.type === this.props.port.type || this.props.port.type === 'any')) {
-        r = 5;
+        r = TheGraph.config.port.arc.bigArcRadius;
         inArc = TheGraph.arcs.inportBig;
         outArc = TheGraph.arcs.outportBig;
       }
@@ -206,7 +207,6 @@
 
       var arcOptions = TheGraph.merge(TheGraph.config.port.arc, { d: (this.props.isIn ? inArc : outArc) });
       var arc = TheGraph.factories.port.createPortArc.call(this, arcOptions);
-
 
       var innerCircleOptions = {
         className: "port-circle-small stroke route"+this.props.route + (this.props.isConnected ? ' fill' : ' empty-fill'),

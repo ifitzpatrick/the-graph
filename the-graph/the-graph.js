@@ -1,8 +1,8 @@
 (function (context) {
   "use strict";
 
-  var defaultNodeSize = 15;
-  var defaultNodeRadius = 5;
+  var defaultNodeSize = 72;
+  var defaultNodeRadius = 8;
 
   // Dumb module setup
   var TheGraph = context.TheGraph = {
@@ -20,13 +20,31 @@
       nodeSize: defaultNodeSize,
       nodeWidth: defaultNodeSize,
       nodeRadius: defaultNodeRadius,
+      groupRadius: 0,
       nodeHeight: defaultNodeSize,
       exportHeight: 50,
       exportWidth: 0,
+      nodePaddingTop: 0,
       autoSizeNode: true,
       maxPortCount: 9,
       nodeHeightIncrement: 12,
-      focusAnimationDuration: 300
+      focusAnimationDuration: 300,
+      // Port routes determined by component spec port type instead of edge type
+      constantPortRoute: false,
+      typeRoutes: {
+        'any': 0,
+        'bang': 0,
+        'string': 1,
+        'boolean': 2,
+        'integer': 3,
+        'number': 3,
+        'object': 4,
+        'array': 4,
+      },
+      groupOffsetX: defaultNodeSize/2,
+      groupOffsetY: defaultNodeSize/2,
+      groupPaddingX: defaultNodeSize*0.5,
+      groupPaddingY: defaultNodeSize*0.5
     },
     factories: {}
   };
@@ -342,11 +360,17 @@
     }
   }));
 
+  TheGraph.isObject = function (value) {
+    return !(
+      Array.isArray(value) ||
+      typeof value !== 'object'
+    );
+  };
+
   // The `merge` function provides simple property merging.
   TheGraph.merge = function(src, dest, overwrite) {
     // Do nothing if neither are true objects.
-    if (Array.isArray(src) || Array.isArray(dest) || typeof src !== 'object' || typeof dest !== 'object')
-      return dest;
+    if (!TheGraph.isObject(src) || !TheGraph.isObject(dest)) return dest;
 
     // Default overwriting of existing properties to false.
     overwrite = overwrite || false;
@@ -357,6 +381,18 @@
         dest[key] = src[key];
     }
 
+    return dest;
+  };
+
+  TheGraph.mergeDeep = function (src, dest) {
+    Object.keys(src).forEach(function (key) {
+      var value = src[key];
+      if (TheGraph.isObject(value)) {
+        dest[key] = TheGraph.mergeDeep(value, dest[key] || {});
+      } else {
+        dest[key] = value;
+      }
+    });
     return dest;
   };
 

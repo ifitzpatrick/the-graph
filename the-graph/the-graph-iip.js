@@ -13,7 +13,8 @@
     text: {
       className: "iip-info",
       height: 5,
-      halign: "right"
+      halign: "right",
+      offset: 10
     }
   };
 
@@ -64,7 +65,7 @@
       var pathOptions = TheGraph.merge(TheGraph.config.iip.path, {d: path});
       var iipPath = TheGraph.factories.iip.createIIPPath.call(this, pathOptions);
 
-      var textOptions = TheGraph.merge(TheGraph.config.iip.text, {x: x - 13, y: y, text: label});
+      var textOptions = TheGraph.merge(TheGraph.config.iip.text, {x: x - TheGraph.config.iip.text.offset, y: y, text: label});
       var text = TheGraph.factories.iip.createIIPText.call(this, textOptions);
 
       var containerContents = [iipPath, text];
