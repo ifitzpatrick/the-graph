@@ -5074,7 +5074,8 @@ context.TheGraph.FONT_AWESOME = {
         nextProps.nodeWidth !== this.props.nodeWidth ||
         nextProps.classNames !== this.props.classNames ||
         nextProps.route !== this.props.route ||
-        nextProps.highlightPort !== this.props.highlightPort
+        nextProps.highlightPort !== this.props.highlightPort ||
+        nextProps.isConnected !== this.props.isConnected
       );
     },
     render: function() {
