@@ -9,8 +9,6 @@
     },
     boxRect: {
       ref: "box",
-      rx: TheGraph.config.nodeRadius,
-      ry: TheGraph.config.nodeRadius
     },
     labelText: {
       ref: "label",
@@ -19,6 +17,20 @@
     descriptionText: {
       className: "group-description"
     }
+  };
+
+  var getDefaultConfig = function () {
+    // Props configured by TheGraph.config
+    return {
+      boxRect: {
+        rx: TheGraph.config.groupRadius,
+        ry: TheGraph.config.groupRadius
+      }
+    };
+  };
+
+  var getGroupConfig = function () {
+    return TheGraph.mergeDeep(TheGraph.config.group, getDefaultConfig());
   };
 
   TheGraph.factories.group = {
@@ -166,14 +178,19 @@
       );
     },
     render: function() {
+      var groupConfig = getGroupConfig();
       if (!this.props.isMarqueeSelect) {
-        var x = this.props.minX - TheGraph.config.nodeWidth / 2;
-        var y = this.props.minY - TheGraph.config.nodeHeight / 2;
-        var width = this.props.maxX - x + TheGraph.config.nodeWidth*0.5;
-        var height = this.props.maxY - y + TheGraph.config.nodeHeight*0.75;
+        var x = this.props.minX - TheGraph.config.groupOffsetX;
+        var y = this.props.minY - TheGraph.config.groupOffsetY;
+        var rx = TheGraph.config.nodeRadius;
+        var ry = TheGraph.config.nodeRadius;
+        var width = this.props.maxX - x + TheGraph.config.groupPaddingX;
+        var height = this.props.maxY - y + TheGraph.config.groupPaddingY;
       } else {
         var x = this.props.minX;
         var y = this.props.minY;
+        var rx = 0;
+        var ry = 0;
         var width = this.props.maxX - x;
         var height = this.props.maxY - y;
       }
@@ -183,11 +200,13 @@
       var boxRectOptions = {
         x: x,
         y: y,
+        rx: rx,
+        ry: ry,
         width: width,
         height: height,
         className: "group-box color" + color + selection + marquee
       };
-      boxRectOptions = TheGraph.merge(TheGraph.config.group.boxRect, boxRectOptions);
+      boxRectOptions = TheGraph.merge(groupConfig.boxRect, boxRectOptions);
       var boxRect =  TheGraph.factories.group.createGroupBoxRect.call(this, boxRectOptions);
 
       var labelTextOptions = {
@@ -195,7 +214,7 @@
         y: y + 9,
         children: this.props.label
       };
-      labelTextOptions = TheGraph.merge(TheGraph.config.group.labelText, labelTextOptions);
+      labelTextOptions = TheGraph.merge(groupConfig.labelText, labelTextOptions);
       var labelText = TheGraph.factories.group.createGroupLabelText.call(this, labelTextOptions);
 
       var descriptionTextOptions = {

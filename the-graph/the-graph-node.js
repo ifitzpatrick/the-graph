@@ -8,19 +8,16 @@
     snap: TheGraph.config.nodeSize,
     container: {},
     background: {
-      className: "node-bg"
+      className: "node-bg",
+      heightPadding: 25
     },
     border: {
       className: "node-border drag",
-      rx: TheGraph.config.nodeRadius,
-      ry: TheGraph.config.nodeRadius
     },
     innerRect: {
       className: "node-rect drag",
       x: 3,
       y: 3,
-      rx: TheGraph.config.nodeRadius - 2,
-      ry: TheGraph.config.nodeRadius - 2
     },
     icon: {
       ref: "icon",
@@ -38,6 +35,7 @@
     labelBackground: {
       className: "node-label-bg"
     },
+    showLabelRect: true,
     labelRect: {
       className: "text-bg-rect"
     },
@@ -52,7 +50,29 @@
     },
     sublabelText: {
       className: "node-sublabel"
+    },
+    showSublabelGroup: true
+  };
+
+  var getDefaultConfig = function () {
+    // Props configured by TheGraph.config
+    return {
+      snap: TheGraph.config.nodeSize,
+      border: {
+        rx: TheGraph.config.nodeRadius,
+        ry: TheGraph.config.nodeRadius
+      },
+      innerRect: {
+        rx: TheGraph.config.nodeRadius - 2,
+        ry: TheGraph.config.nodeRadius - 2
+      }
     }
+  };
+
+  var getNodeConfig = function () {
+    var res = TheGraph.mergeDeep(TheGraph.config.node, getDefaultConfig());
+    //debugger;
+    return res;
   };
 
   // These factories use generic factories from the core, but
@@ -205,7 +225,7 @@
           var width = this.props.width;
           var height = this.props.height;
 
-          var min = 72;
+          var min = TheGraph.config.nodeSize;
 
           var x = this.props.x,
               y = this.props.y;
@@ -302,6 +322,7 @@
     },
     getOnTrackEnd: function (resize, onTrack) {
       var onTrackEnd = function (event) {
+        var config = getNodeConfig();
         // Don't fire on graph
         event.stopPropagation();
 
@@ -311,7 +332,7 @@
 
         // Snap to grid
         var snapToGrid = true;
-        var snap = this.props.snap || TheGraph.config.node.snap / 2;
+        var snap = this.props.snap || config.snap / 2;
         if (snapToGrid && !resize) {
           var x, y;
           if (this.props.export) {
@@ -490,7 +511,8 @@
         nextProps.highlightPort !== this.props.highlightPort ||
         nextProps.ports.dirty ||
         nextProps.classNames !== this.props.classNames ||
-        nextProps.portClassNames !== this.props.portClassNames
+        nextProps.portClassNames !== this.props.portClassNames ||
+        nextProps.route !== this.props.route
       );
     },
     render: function() {
@@ -573,6 +595,7 @@
             processKey: processKey,
             isIn: isIn,
             isExport: isExport,
+            isConnected: info.isConnected,
             nodeX: x,
             nodeY: y,
             nodeWidth: width,
@@ -611,6 +634,7 @@
                 processKey: processKey,
                 isIn: isIn,
                 isExport: isExport,
+                isConnected: info.isConnected,
                 nodeX: x,
                 nodeY: y,
                 nodeWidth: width,
@@ -647,9 +671,10 @@
         icon = TheGraph.FONT_AWESOME.cog;
       }
 
+      var nodeConfig = getNodeConfig();
       var iconContent;
       if (this.props.iconsvg && this.props.iconsvg !== "") {
-          var iconSVGOptions = TheGraph.merge(TheGraph.config.node.iconsvg, {
+          var iconSVGOptions = TheGraph.merge(nodeConfig.iconsvg, {
               src: this.props.iconsvg,
               x: TheGraph.config.nodeRadius - 4,
               y: TheGraph.config.nodeRadius - 4,
@@ -658,47 +683,64 @@
           });
           iconContent = TheGraph.factories.node.createNodeIconSVG.call(this, iconSVGOptions);
       } else {
-          var iconOptions = TheGraph.merge(TheGraph.config.node.icon, {
+          var iconOptions = TheGraph.merge(nodeConfig.icon, {
               x: this.props.width / 2,
               y: this.props.height / 2,
               children: icon });
+          iconOptions.className += (this.props.export && this.props.route !== undefined) ? " fill route" + this.props.route : "";
           iconContent = TheGraph.factories.node.createNodeIconText.call(this, iconOptions);
       }
 
-      var backgroundRectOptions = TheGraph.merge(TheGraph.config.node.background, { width: this.props.width, height: this.props.height + 25 });
+      var backgroundRectOptions = TheGraph.merge(nodeConfig.background, { width: this.props.width, height: this.props.height + nodeConfig.background.heightPadding});
       var backgroundRect = TheGraph.factories.node.createNodeBackgroundRect.call(this, backgroundRectOptions);
 
-      var borderRectOptions = TheGraph.merge(TheGraph.config.node.border, { width: this.props.width, height: this.props.height });
+      var borderRectOptions = TheGraph.merge(nodeConfig.border, { width: this.props.width, height: this.props.height });
       var borderRect = TheGraph.factories.node.createNodeBorderRect.call(this, borderRectOptions);
 
-      var innerRectOptions = TheGraph.merge(TheGraph.config.node.innerRect, { width: this.props.width - 6, height: this.props.height - 6 });
+      // NOTE: The y (and height adjustment) is shifted down a few pixels to
+      // make room for the labelText.
+      var innerRectOptions = TheGraph.merge(nodeConfig.innerRect, { width: this.props.width, height: this.props.height });
       var innerRect = TheGraph.factories.node.createNodeInnerRect.call(this, innerRectOptions);
 
-      var inportsOptions = TheGraph.merge(TheGraph.config.node.inports, { children: inportViews });
+      var inportsOptions = TheGraph.merge(nodeConfig.inports, { children: inportViews });
       var inportsGroup = TheGraph.factories.node.createNodeInportsGroup.call(this, inportsOptions);
 
-      var outportsOptions = TheGraph.merge(TheGraph.config.node.outports, { children: outportViews });
+      var outportsOptions = TheGraph.merge(nodeConfig.outports, { children: outportViews });
       var outportsGroup = TheGraph.factories.node.createNodeOutportsGroup.call(this, outportsOptions);
 
-      var labelTextOptions = TheGraph.merge(TheGraph.config.node.labelText, { x: this.props.width / 2, y: this.props.height + 15, children: label });
+      var labelTextOptions = TheGraph.merge(nodeConfig.labelText, {
+        x: this.props.width / 2,
+        y: (nodeConfig.labelText.y !== undefined) ? nodeConfig.labelText.y : this.props.height + 15,
+        children: label
+      });
       var labelText = TheGraph.factories.node.createNodeLabelText.call(this, labelTextOptions);
 
-      var labelRectX = this.props.width / 2;
-      var labelRectY = this.props.height + 15;
-      var labelRectOptions = buildLabelRectOptions(14, labelRectX, labelRectY, label.length, TheGraph.config.node.labelRect.className);
-      labelRectOptions = TheGraph.merge(TheGraph.config.node.labelRect, labelRectOptions);
-      var labelRect = TheGraph.factories.node.createNodeLabelRect.call(this, labelRectOptions);
-      var labelGroup = TheGraph.factories.node.createNodeLabelGroup.call(this, TheGraph.config.node.labelBackground, [labelRect, labelText]);
+      if (nodeConfig.showLabelRect) {
+        var labelRectX = this.props.width / 2;
+        var labelRectY = this.props.height + 15;
+        var labelRectOptions = buildLabelRectOptions(14, labelRectX, labelRectY, label.length, TheGraph.config.node.labelRect.className);
+        labelRectOptions = TheGraph.merge(TheGraph.config.node.labelRect, labelRectOptions);
+        var labelRect = TheGraph.factories.node.createNodeLabelRect.call(this, labelRectOptions);
+        var labelGroupContents = [labelRect, labelText];
+      } else {
+        var labelGroupContents = [labelText];
+      }
 
-      var sublabelTextOptions = TheGraph.merge(TheGraph.config.node.sublabelText, { x: this.props.width / 2, y: this.props.height + 30, children: sublabel });
-      var sublabelText = TheGraph.factories.node.createNodeSublabelText.call(this, sublabelTextOptions);
+      var labelGroup = TheGraph.factories.node.createNodeLabelGroup.call(this, nodeConfig.labelBackground, [labelText]);
 
-      var sublabelRectX = this.props.width / 2;
-      var sublabelRectY = this.props.height + 30;
-      var sublabelRectOptions = buildLabelRectOptions(9, sublabelRectX, sublabelRectY, sublabel.length, TheGraph.config.node.sublabelRect.className);
-      sublabelRectOptions = TheGraph.merge(TheGraph.config.node.sublabelRect, sublabelRectOptions);
-      var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
-      var sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
+      var sublabelGroup;
+      if (nodeConfig.showSublabelGroup) {
+         var sublabelTextOptions = TheGraph.merge(TheGraph.config.node.sublabelText, { x: this.props.width / 2, y: this.props.height + 30, children: sublabel });
+         var sublabelText = TheGraph.factories.node.createNodeSublabelText.call(this, sublabelTextOptions);
+
+         var sublabelRectX = this.props.width / 2;
+         var sublabelRectY = this.props.height + 30;
+         var sublabelRectOptions = buildLabelRectOptions(9, sublabelRectX, sublabelRectY, sublabel.length, TheGraph.config.node.sublabelRect.className);
+         sublabelRectOptions = TheGraph.merge(TheGraph.config.node.sublabelRect, sublabelRectOptions);
+         var sublabelRect = TheGraph.factories.node.createNodeSublabelRect.call(this, sublabelRectOptions);
+
+         sublabelGroup = TheGraph.factories.node.createNodeSublabelGroup.call(this, TheGraph.config.node.sublabelBackground, [sublabelRect, sublabelText]);
+      }
 
       var translate = function (x, y) {
         return 'translate(' + x + ', ' + y + ')';
@@ -809,9 +851,12 @@
       var nodeContents = nodeContents.concat([
         inportsGroup,
         outportsGroup,
-        labelGroup,
-        sublabelGroup
+        labelGroup
       ]);
+
+      if (sublabelGroup) {
+        nodeContent.push(sublabelGroup);
+      }
 
       var nodeOptions = {
         className: "node drag"+
@@ -823,7 +868,7 @@
         title: label,
         transform: translate(x, y)
       };
-      nodeOptions = TheGraph.merge(TheGraph.config.node.container, nodeOptions);
+      nodeOptions = TheGraph.merge(nodeConfig.container, nodeOptions);
 
       return TheGraph.factories.node.createNodeGroup.call(this, nodeOptions, nodeContents);
     }

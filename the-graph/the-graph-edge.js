@@ -4,7 +4,6 @@
   var TheGraph = context.TheGraph;
 
   TheGraph.config.edge = {
-    curve: TheGraph.config.nodeSize,
     container: {
       className: "edge"
     },
@@ -19,6 +18,17 @@
       className: "edge-touch",
       ref: "touch"
     }
+  };
+
+  var getDefaultConfig = function () {
+    // Props configured by TheGraph.config
+    return {
+      curve: TheGraph.config.nodeSize,
+    };
+  };
+
+  var getEdgeConfig = function () {
+    return TheGraph.mergeDeep(TheGraph.config.edge, getDefaultConfig());
   };
 
   TheGraph.factories.edge = {
@@ -40,9 +50,6 @@
         targetX, targetY
       ];
   }
-
-  // Const
-  var CURVE = TheGraph.config.edge.curve;
 
   // Point along cubic bezier curve
   // See http://en.wikipedia.org/wiki/File:Bezier_3_big.gif
@@ -287,6 +294,9 @@
       return true;
     },
     render: function () {
+      var config = getEdgeConfig();
+      var curve = config.curve;
+
       var sourceX = this.state.sX;
       var sourceY = this.state.sY;
       var targetX = this.state.tX;
@@ -295,7 +305,7 @@
       // Organic / curved edge
       var c1X, c1Y, c2X, c2Y;
       if (targetX-5 < sourceX) {
-        var curveFactor = (sourceX - targetX) * CURVE / 200;
+        var curveFactor = (sourceX - targetX) * curve / 200;
         if (Math.abs(targetY-sourceY) < TheGraph.config.nodeSize/2) {
           // Loopback
           c1X = sourceX + curveFactor;
@@ -322,14 +332,14 @@
       var path = TheGraph.factories.edge.createEdgePathArray(sourceX, sourceY, c1X, c1Y, c2X, c2Y, targetX, targetY);
       path = path.join(" ");
 
-      var backgroundPathOptions = TheGraph.merge(TheGraph.config.edge.backgroundPath, { d: path });
+      var backgroundPathOptions = TheGraph.merge(config.backgroundPath, { d: path });
       var backgroundPath = TheGraph.factories.edge.createEdgeBackgroundPath(backgroundPathOptions);
 
-      var foregroundPathClassName = TheGraph.config.edge.foregroundPath.className + this.props.route;
-      var foregroundPathOptions = TheGraph.merge(TheGraph.config.edge.foregroundPath, { d: path, className: foregroundPathClassName });
+      var foregroundPathClassName = config.foregroundPath.className + this.props.route;
+      var foregroundPathOptions = TheGraph.merge(config.foregroundPath, { d: path, className: foregroundPathClassName });
       var foregroundPath = TheGraph.factories.edge.createEdgeForegroundPath(foregroundPathOptions);
 
-      var touchPathOptions = TheGraph.merge(TheGraph.config.edge.touchPath, { d: path });
+      var touchPathOptions = TheGraph.merge(config.touchPath, { d: path });
       var touchPath = TheGraph.factories.edge.createEdgeTouchPath(touchPathOptions);
 
       var containerOptions = {
@@ -343,7 +353,7 @@
           {opacity: this.props.opacity || 1}
       };
 
-      containerOptions = TheGraph.merge(TheGraph.config.edge.container, containerOptions);
+      containerOptions = TheGraph.merge(config.container, containerOptions);
 
       var epsilon = 0.01;
       var center = findPointOnCubicBezier(0.5, sourceX, sourceY, c1X, c1Y, c2X, c2Y, targetX, targetY);
@@ -370,27 +380,30 @@
         return [x1, y1];
       };
 
-      var arrowLength = 12;
+      var arrowLength = 3;
       // Which direction should arrow point
       if (plus[0] > minus[0]) {
         arrowLength *= -1;
       }
-      center = findLinePoint(center[0], center[1], m, b, -1*arrowLength/2);
 
-      // find points of perpendicular line length l centered at x,y
-      var perpendicular = function (x, y, oldM, l) {
-        var m = -1/oldM;
-        var b = y - m*x;
-        var point1 = findLinePoint(x, y, m, b, l/2);
-        var point2 = findLinePoint(x, y, m, b, l/-2);
-        return [point1, point2];
+      var getArrowPoints = function (x, y, m, l, flip) {
+        // Get the arrow points for an edge.
+        center = findLinePoint(x, y, m, b, -1*l/2);
+        var x = center[0];
+        var y = center[1];
+        var perp_m = -1/m;
+        var perp_b = y - perp_m * x;
+        var point1 = findLinePoint(x, y, perp_m, perp_b, (l * 0.9 / 2));
+        var point2 = findLinePoint(x, y, m, b, l - 2.5, flip);
+        var point3 = findLinePoint(x, y, perp_m, perp_b, (l * 0.9 / -2));
+        var point4 = findLinePoint(x, y, m, b, l, flip);
+
+        return [point1, point2, point3, point4]
       };
 
-      var points = perpendicular(center[0], center[1], m, arrowLength * 0.9);
       // For m === 0, figure out if arrow should be straight up or down
       var flip = plus[1] > minus[1] ? -1 : 1;
-      var arrowTip = findLinePoint(center[0], center[1], m, b, arrowLength, flip);
-      points.push(arrowTip);
+      var points = getArrowPoints(center[0], center[1], m, arrowLength, flip);
 
       var pointsArray = points.map(
         function (point) {return point.join(',');}).join(' ');
