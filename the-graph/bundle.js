@@ -3825,8 +3825,8 @@ context.TheGraph.FONT_AWESOME = {
         event.stopPropagation();
 
         var scale = this.props.app.state.scale;
-        var deltaX = Math.round( event.ddx / scale );
-        var deltaY = Math.round( event.ddy / scale );
+        var deltaX = event.ddx / scale;
+        var deltaY = event.ddy / scale;
 
         // Fires a change event on noflo graph, which triggers redraw
         if (resize) {
