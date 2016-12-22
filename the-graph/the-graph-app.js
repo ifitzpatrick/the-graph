@@ -66,7 +66,7 @@
   TheGraph.App = React.createFactory( React.createClass({
     displayName: "TheGraphApp",
     mixins: [React.Animate],
-    getInitialState: function() {
+    getInitialState: function () {
       // Autofit
       var fit = TheGraph.findFit(this.props.graph, this.props.width, this.props.height);
 
@@ -272,6 +272,51 @@
         this.props.onPanScale(this.state.x, this.state.y, this.state.scale);
       }
     },
+    autoPan: false,
+    autoPanOffset: 20,
+    autoPanDirection: null,
+    autoPanCallback: null,
+    startAutoPan: function (direction, callback) {
+      var isRunning = this.autoPan;
+      this.autoPan = true;
+      this.autoPanDirection = direction;
+      this.autoPanCallback = callback;
+
+      var autoPanFn = function () {
+        if (!this.autoPan) {
+          return;
+        }
+
+        var offset = this.autoPanOffset;
+        var scale = 1;
+        this.autoPanCallback(this.autoPanOffset/scale, this.autoPanDirection, function () {
+          var x = this.state.x + offset/scale * this.autoPanDirection.x * -1;
+          var y = this.state.y + offset/scale * this.autoPanDirection.y * -1;
+          this.setState({
+            x: x,
+            y: y
+          }, function () {
+            this.autoPanFrame = window.requestAnimationFrame(autoPanFn);
+          }.bind(this));
+        }.bind(this));
+      }.bind(this);
+
+      if (!isRunning) {
+        autoPanFn();
+      }
+    },
+    resetAutoPan: function () {
+      // Clears animation frame loop so startAutoPan can be called more than once
+      window.cancelAnimationFrame(this.autoPanFrame);
+      this.autoPanFrame = null;
+    },
+    stopAutoPan: function () {
+      this.autoPan = false;
+      this.autoPanDirection = null;
+      this.autoPanCallback = null;
+
+      this.resetAutoPan();
+    },
     showContext: function (options) {
       this.setState({
         contextMenu: options,
@@ -323,7 +368,7 @@
       var duration = TheGraph.config.focusAnimationDuration;
       var fit = this.getFit();
 
-      this.animate(fit, duration, 'out-quint', function() {});
+      this.animate(fit, duration, 'out-quint', function () {});
     },
     focusNode: function (node) {
       var duration = TheGraph.config.focusAnimationDuration;
@@ -399,7 +444,7 @@
       var domNode = ReactDOM.findDOMNode(this);
 
       // Set up PolymerGestures for app and all children
-      var noop = function(){};
+      var noop = function () {};
       PolymerGestures.addEventListener(domNode, "up", noop);
       PolymerGestures.addEventListener(domNode, "down", noop);
       PolymerGestures.addEventListener(domNode, "tap", noop);
@@ -640,9 +685,7 @@
           }
         }
       }
-
     },
-
     getContext: function (menu, options, hide) {
         return TheGraph.Menu({
             menu: menu,
@@ -663,7 +706,7 @@
             highlightPort: false
         });
     },
-    render: function() {
+    render: function () {
       // console.timeEnd("App.render");
       // console.time("App.render");
 

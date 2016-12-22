@@ -147,7 +147,10 @@
       this.props.triggerMoveGroup(
         this.props.item.nodes,
         this.props.item.inports,
-        this.props.item.outports
+        this.props.item.outports,
+        null,
+        null,
+        true
       );
 
       if (this.props.isSelectionGroup) {
@@ -161,6 +164,7 @@
       }
 
       this.props.graph.endTransaction('movegroup');
+      this.props.app.stopAutoPan();
     },
     shouldComponentUpdate: function (nextProps, nextState) {
       return (

@@ -313,6 +313,52 @@
             this.props.graph.setOutportMetadata(this.props.exportKey, newPos);
           }
         } else {
+          var app = this.props.app;
+          var rect = app.getBoundingRect();
+          var nodeRect = ReactDOM
+            .findDOMNode(this)
+            .querySelector('.node-rect')
+            .getBoundingClientRect();
+
+          var direction = {x: 0, y: 0};
+
+          if (nodeRect.right > rect.width + rect.left) {
+            direction.x = 1;
+          } else if (nodeRect.left < rect.left) {
+            direction.x = -1;
+          }
+
+          if (nodeRect.bottom > rect.height + rect.top) {
+            direction.y = 1;
+          } else if (nodeRect.top < rect.top) {
+            direction.y = -1;
+          }
+
+          if (direction.x || direction.y) {
+            // Order of events:
+            // 1. Adjust node for mouse move
+            // 2. Adjust node for pan
+            // 3. Actually pan the screen
+            // 4. Repeat 2-3
+            this.props.graph.once('changeNode', app.startAutoPan.bind(
+              app,
+              direction,
+              function (offset, direction, autoPanFn) {
+                var node = this.props.graph.getNode(this.props.nodeID);
+                var x = node.metadata.x + (offset/scale * direction.x);
+                var y = node.metadata.y + (offset/scale * direction.y);
+
+                this.props.graph.once('changeNode', autoPanFn);
+                this.props.graph.setNodeMetadata(this.props.nodeID, {
+                  x: x,
+                  y: y
+                });
+              }.bind(this)
+            ));
+          } else {
+            app.stopAutoPan();
+          }
+
           this.props.graph.setNodeMetadata(this.props.nodeID, {
             x: this.props.node.metadata.x + deltaX,
             y: this.props.node.metadata.y + deltaY
@@ -325,6 +371,7 @@
         var config = getNodeConfig();
         // Don't fire on graph
         event.stopPropagation();
+        this.props.app.stopAutoPan();
 
         var domNode = ReactDOM.findDOMNode(this);
         domNode.removeEventListener("track", onTrack);

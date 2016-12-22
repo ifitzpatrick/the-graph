@@ -83,7 +83,7 @@
   TheGraph.Graph = React.createFactory( React.createClass({
     displayName: "TheGraphGraph",
     mixins: [TheGraph.mixins.FakeMouse],
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         graph: this.props.graph,
         displaySelectionGroup: true,
@@ -143,6 +143,7 @@
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
       window.addEventListener(
         this.getEvent('marqueeSelectEndEvent'), this.stopMarqueeSelect);
+
       appDomNode.addEventListener(
         this.getEvent('marqueeSelectEvent'), this.moveMarqueeSelect);
 
@@ -192,7 +193,36 @@
           map[node.exportKey] = true;
           return map;
         }, {});
-        this.setState(result.state);
+
+        this.setState(result.state, function () {
+          var app = this.props.app;
+          var rect = app.getBoundingRect();
+          var direction = {x: 0, y: 0};
+
+          if (event.clientX > rect.right) {
+            direction.x = 1;
+          } else if (event.clientX < rect.left) {
+            direction.x = -1;
+          }
+
+          if (event.clientY > rect.bottom) {
+            direction.y = 1;
+          } else if (event.clientY < rect.top) {
+            direction.y = -1;
+          }
+
+          app.startAutoPan(direction, function (offset, direction, autoPanFn) {
+            var scale = this.props.app.state.scale;
+            var x = this.state.marqueeSelectCurrentX + (offset/scale * direction.x);
+            var y = this.state.marqueeSelectCurrentY + (offset/scale * direction.y);
+
+            this.state.marqueeSelectCurrentX = x;
+            this.state.marqueeSelectCurrentY = y;
+            this.markDirty();
+            autoPanFn();
+          }.bind(this));
+        }.bind(this));
+
         this.markDirty();
 
         this._marqueeSelectCallback = null;
@@ -283,6 +313,8 @@
       };
     },
     stopMarqueeSelect: function (event) {
+      this.props.app.stopAutoPan();
+
       if (!this.getEvent('marqueeSelectFilter')(event)) {
         return;
       }
@@ -370,9 +402,10 @@
       };
 
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
-      appDomNode.addEventListener("mousemove", this.renderPreviewEdge);
-      appDomNode.addEventListener("track", this.renderPreviewEdge);
+      document.addEventListener("mousemove", this.renderPreviewEdge);
+      window.addEventListener("track", this.renderPreviewEdge);
       window.addEventListener("mouseup", this.dropPreviewEdge);
+
       // TODO tap to add new node here
       appDomNode.addEventListener("tap", this.cancelPreviewEdge);
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: edge});
@@ -396,11 +429,13 @@
       appDomNode.addEventListener(eventType, listener);
     },
     cancelPreviewEdge: function (event) {
+      this.props.app.stopAutoPan();
+
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
-      appDomNode.removeEventListener("mousemove", this.renderPreviewEdge);
-      appDomNode.removeEventListener("track", this.renderPreviewEdge);
-      appDomNode.removeEventListener("tap", this.cancelPreviewEdge);
+      document.removeEventListener("mousemove", this.renderPreviewEdge);
+      window.removeEventListener("track", this.renderPreviewEdge);
       window.removeEventListener("mouseup", this.dropPreviewEdge);
+      appDomNode.removeEventListener("tap", this.cancelPreviewEdge);
 
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: null});
       appDomNode.dispatchEvent(edgePreviewEvent);
@@ -412,14 +447,37 @@
     triggerMoveEdge: null,
     renderPreviewEdge: function (event) {
       var boundingRect = this.props.app.getBoundingRect();
-      var x = (event.x || event.clientX || 0) - boundingRect.left;
-      var y = (event.y || event.clientY || 0) - boundingRect.top;
+      var x = (event.clientX || event.x || 0) - boundingRect.left;
+      var y = (event.clientY || event.y || 0) - boundingRect.top;
       x -= this.props.app.state.offsetX || 0;
       y -= this.props.app.state.offsetY || 0;
       var scale = this.props.app.state.scale;
 
       this.state.edgePreviewX = (x - this.props.app.state.x) / scale;
       this.state.edgePreviewY = (y - this.props.app.state.y) / scale;
+
+      var app = this.props.app;
+      var rect = app.getBoundingRect();
+      var direction = {x: 0, y: 0};
+
+      if (event.clientX > rect.right) {
+        direction.x = 1;
+      } else if (event.clientX < rect.left) {
+        direction.x = -1;
+      }
+
+      if (event.clientY > rect.bottom) {
+        direction.y = 1;
+      } else if (event.clientY < rect.top) {
+        direction.y = -1;
+      }
+
+      app.startAutoPan(direction, function (offset, direction, autoPanFn) {
+        this.setState({
+          edgePreviewX: this.state.edgePreviewX + (offset/scale * direction.x),
+          edgePreviewY: this.state.edgePreviewY + (offset/scale * direction.y)
+        }, autoPanFn);
+      }.bind(this));
 
       if (!this.triggerMoveEdge) {
         this.triggerMoveEdge = function () {
@@ -493,7 +551,41 @@
         callback(newName, port, isIn, true);
       }
     },
-    moveGroup: function (nodes, inports, outports, dx, dy) {
+    moveGroup: function (nodes, inports, outports, dx, dy, skipAutoPan) {
+      var group = this._moveGroup(nodes, inports, outports, dx, dy);
+      var app = this.props.app;
+      var x = app.state.x;
+      var y = app.state.y;
+      var scale = app.state.scale;
+      var limits  = TheGraph.findMinMax(this.props.graph, nodes, inports, outports);
+      var direction = {x: 0, y: 0};
+
+      if (-1*limits.minX*scale > x) {
+        direction.x = -1;
+      } else if ( -1* limits.maxX * scale < x - app.state.width) {
+        direction.x = 1;
+      }
+
+      if (-1*limits.minY*scale > y) {
+        direction.y = -1;
+      } else if ( -1* limits.maxY * scale < y - app.state.height) {
+        direction.y = 1;
+      }
+
+      if (skipAutoPan) {
+        return;
+      }
+
+      this.props.app.startAutoPan(direction, function (offset, direction, autoPanFn) {
+        this._moveGroup(
+          nodes, inports, outports,
+          (offset/scale * direction.x),
+          (offset/scale * direction.y)
+        );
+        autoPanFn();
+      }.bind(this));
+    },
+    _moveGroup: function (nodes, inports, outports, dx, dy) {
       var graph = this.state.graph;
 
       var updateNode = function (id, metadata, method) {
@@ -977,7 +1069,7 @@
       // If ports change or nodes move, then edges need to rerender, so we do the whole graph
       return this.dirty;
     },
-    render: function() {
+    render: function () {
       this.dirty = false;
       var rendered = this.rendered;
 

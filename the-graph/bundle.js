@@ -64,7 +64,7 @@
     showTooltip: function (event) {
       if ( !this.shouldShowTooltip() ) { return; }
 
-      var tooltipEvent = new CustomEvent('the-graph-tooltip', { 
+      var tooltipEvent = new CustomEvent('the-graph-tooltip', {
         detail: {
           tooltip: this.props.label,
           x: event.clientX || event.x,
@@ -77,7 +77,7 @@
     hideTooltip: function (event) {
       if ( !this.shouldShowTooltip() ) { return; }
 
-      var tooltipEvent = new CustomEvent('the-graph-tooltip-hide', { 
+      var tooltipEvent = new CustomEvent('the-graph-tooltip-hide', {
         bubbles: true
       });
       if (this.isMounted()) {
@@ -98,7 +98,7 @@
 
   TheGraph.findMinMax = function (graph, nodes, inports, outports) {
     if (nodes === undefined && inports === undefined && outports == undefined) {
-      nodes = graph.nodes.map( function (node) {
+      nodes = graph.nodes.map(function (node) {
         return node.id;
       });
       // Only look at exports when calculating the whole graph
@@ -296,7 +296,7 @@
   // Reusable React classes
   TheGraph.SVGImage = React.createFactory( React.createClass({
     displayName: "TheGraphSVGImage",
-    render: function() {
+    render: function () {
         var html = '<image ';
         html = html +'xlink:href="'+ this.props.src + '"';
         html = html +'x="' + this.props.x + '"';
@@ -314,7 +314,7 @@
 
   TheGraph.TextBG = React.createFactory( React.createClass({
     displayName: "TheGraphTextBG",
-    render: function() {
+    render: function () {
       var text = this.props.text;
       if (!text) {
         text = "";
@@ -368,7 +368,7 @@
   };
 
   // The `merge` function provides simple property merging.
-  TheGraph.merge = function(src, dest, overwrite) {
+  TheGraph.merge = function (src, dest, overwrite) {
     // Do nothing if neither are true objects.
     if (!TheGraph.isObject(src) || !TheGraph.isObject(dest)) return dest;
 
@@ -396,7 +396,7 @@
     return dest;
   };
 
-  TheGraph.factories.createGroup = function(options, content) {
+  TheGraph.factories.createGroup = function (options, content) {
     var args = [options];
 
     if (Array.isArray(content)) {
@@ -406,35 +406,35 @@
     return React.DOM.g.apply(React.DOM.g, args);
   };
 
-  TheGraph.factories.createRect = function(options) {
+  TheGraph.factories.createRect = function (options) {
     return React.DOM.rect(options);
   };
 
-  TheGraph.factories.createText = function(options) {
+  TheGraph.factories.createText = function (options) {
     return React.DOM.text(options);
   };
 
-  TheGraph.factories.createCircle = function(options) {
+  TheGraph.factories.createCircle = function (options) {
     return React.DOM.circle(options);
   };
 
-  TheGraph.factories.createPath = function(options) {
+  TheGraph.factories.createPath = function (options) {
     return React.DOM.path(options);
   };
 
-  TheGraph.factories.createPolygon = function(options) {
+  TheGraph.factories.createPolygon = function (options) {
     return React.DOM.polygon(options);
   };
 
-  TheGraph.factories.createImg = function(options) {
+  TheGraph.factories.createImg = function (options) {
     return TheGraph.SVGImage(options);
   };
 
-  TheGraph.factories.createCanvas = function(options) {
+  TheGraph.factories.createCanvas = function (options) {
     return React.DOM.canvas(options);
   };
 
-  TheGraph.factories.createSvg = function(options, content) {
+  TheGraph.factories.createSvg = function (options, content) {
 
     var args = [options];
 
@@ -444,9 +444,9 @@
 
     return React.DOM.svg.apply(React.DOM.svg, args);
   };
-  
-  TheGraph.getOffset = function(domNode){
-    var getElementOffset = function(element){
+
+  TheGraph.getOffset = function (domNode) {
+    var getElementOffset = function (element) {
       var offset = { top: 0, left: 0},
           parentOffset;
       if(!element){
@@ -1275,7 +1275,7 @@ context.TheGraph.FONT_AWESOME = {
   TheGraph.App = React.createFactory( React.createClass({
     displayName: "TheGraphApp",
     mixins: [React.Animate],
-    getInitialState: function() {
+    getInitialState: function () {
       // Autofit
       var fit = TheGraph.findFit(this.props.graph, this.props.width, this.props.height);
 
@@ -1481,6 +1481,51 @@ context.TheGraph.FONT_AWESOME = {
         this.props.onPanScale(this.state.x, this.state.y, this.state.scale);
       }
     },
+    autoPan: false,
+    autoPanOffset: 20,
+    autoPanDirection: null,
+    autoPanCallback: null,
+    startAutoPan: function (direction, callback) {
+      var isRunning = this.autoPan;
+      this.autoPan = true;
+      this.autoPanDirection = direction;
+      this.autoPanCallback = callback;
+
+      var autoPanFn = function () {
+        if (!this.autoPan) {
+          return;
+        }
+
+        var offset = this.autoPanOffset;
+        var scale = 1;
+        this.autoPanCallback(this.autoPanOffset/scale, this.autoPanDirection, function () {
+          var x = this.state.x + offset/scale * this.autoPanDirection.x * -1;
+          var y = this.state.y + offset/scale * this.autoPanDirection.y * -1;
+          this.setState({
+            x: x,
+            y: y
+          }, function () {
+            this.autoPanFrame = window.requestAnimationFrame(autoPanFn);
+          }.bind(this));
+        }.bind(this));
+      }.bind(this);
+
+      if (!isRunning) {
+        autoPanFn();
+      }
+    },
+    resetAutoPan: function () {
+      // Clears animation frame loop so startAutoPan can be called more than once
+      window.cancelAnimationFrame(this.autoPanFrame);
+      this.autoPanFrame = null;
+    },
+    stopAutoPan: function () {
+      this.autoPan = false;
+      this.autoPanDirection = null;
+      this.autoPanCallback = null;
+
+      this.resetAutoPan();
+    },
     showContext: function (options) {
       this.setState({
         contextMenu: options,
@@ -1532,7 +1577,7 @@ context.TheGraph.FONT_AWESOME = {
       var duration = TheGraph.config.focusAnimationDuration;
       var fit = this.getFit();
 
-      this.animate(fit, duration, 'out-quint', function() {});
+      this.animate(fit, duration, 'out-quint', function () {});
     },
     focusNode: function (node) {
       var duration = TheGraph.config.focusAnimationDuration;
@@ -1608,7 +1653,7 @@ context.TheGraph.FONT_AWESOME = {
       var domNode = ReactDOM.findDOMNode(this);
 
       // Set up PolymerGestures for app and all children
-      var noop = function(){};
+      var noop = function () {};
       PolymerGestures.addEventListener(domNode, "up", noop);
       PolymerGestures.addEventListener(domNode, "down", noop);
       PolymerGestures.addEventListener(domNode, "tap", noop);
@@ -1849,9 +1894,7 @@ context.TheGraph.FONT_AWESOME = {
           }
         }
       }
-
     },
-
     getContext: function (menu, options, hide) {
         return TheGraph.Menu({
             menu: menu,
@@ -1872,7 +1915,7 @@ context.TheGraph.FONT_AWESOME = {
             highlightPort: false
         });
     },
-    render: function() {
+    render: function () {
       // console.timeEnd("App.render");
       // console.time("App.render");
 
@@ -2052,7 +2095,7 @@ context.TheGraph.FONT_AWESOME = {
   TheGraph.Graph = React.createFactory( React.createClass({
     displayName: "TheGraphGraph",
     mixins: [TheGraph.mixins.FakeMouse],
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         graph: this.props.graph,
         displaySelectionGroup: true,
@@ -2112,6 +2155,7 @@ context.TheGraph.FONT_AWESOME = {
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
       window.addEventListener(
         this.getEvent('marqueeSelectEndEvent'), this.stopMarqueeSelect);
+
       appDomNode.addEventListener(
         this.getEvent('marqueeSelectEvent'), this.moveMarqueeSelect);
 
@@ -2161,7 +2205,36 @@ context.TheGraph.FONT_AWESOME = {
           map[node.exportKey] = true;
           return map;
         }, {});
-        this.setState(result.state);
+
+        this.setState(result.state, function () {
+          var app = this.props.app;
+          var rect = app.getBoundingRect();
+          var direction = {x: 0, y: 0};
+
+          if (event.clientX > rect.right) {
+            direction.x = 1;
+          } else if (event.clientX < rect.left) {
+            direction.x = -1;
+          }
+
+          if (event.clientY > rect.bottom) {
+            direction.y = 1;
+          } else if (event.clientY < rect.top) {
+            direction.y = -1;
+          }
+
+          app.startAutoPan(direction, function (offset, direction, autoPanFn) {
+            var scale = this.props.app.state.scale;
+            var x = this.state.marqueeSelectCurrentX + (offset/scale * direction.x);
+            var y = this.state.marqueeSelectCurrentY + (offset/scale * direction.y);
+
+            this.state.marqueeSelectCurrentX = x;
+            this.state.marqueeSelectCurrentY = y;
+            this.markDirty();
+            autoPanFn();
+          }.bind(this));
+        }.bind(this));
+
         this.markDirty();
 
         this._marqueeSelectCallback = null;
@@ -2252,6 +2325,8 @@ context.TheGraph.FONT_AWESOME = {
       };
     },
     stopMarqueeSelect: function (event) {
+      this.props.app.stopAutoPan();
+
       if (!this.getEvent('marqueeSelectFilter')(event)) {
         return;
       }
@@ -2339,9 +2414,10 @@ context.TheGraph.FONT_AWESOME = {
       };
 
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
-      appDomNode.addEventListener("mousemove", this.renderPreviewEdge);
-      appDomNode.addEventListener("track", this.renderPreviewEdge);
+      document.addEventListener("mousemove", this.renderPreviewEdge);
+      window.addEventListener("track", this.renderPreviewEdge);
       window.addEventListener("mouseup", this.dropPreviewEdge);
+
       // TODO tap to add new node here
       appDomNode.addEventListener("tap", this.cancelPreviewEdge);
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: edge});
@@ -2365,11 +2441,13 @@ context.TheGraph.FONT_AWESOME = {
       appDomNode.addEventListener(eventType, listener);
     },
     cancelPreviewEdge: function (event) {
+      this.props.app.stopAutoPan();
+
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
-      appDomNode.removeEventListener("mousemove", this.renderPreviewEdge);
-      appDomNode.removeEventListener("track", this.renderPreviewEdge);
-      appDomNode.removeEventListener("tap", this.cancelPreviewEdge);
+      document.removeEventListener("mousemove", this.renderPreviewEdge);
+      window.removeEventListener("track", this.renderPreviewEdge);
       window.removeEventListener("mouseup", this.dropPreviewEdge);
+      appDomNode.removeEventListener("tap", this.cancelPreviewEdge);
 
       var edgePreviewEvent = new CustomEvent('edge-preview', {detail: null});
       appDomNode.dispatchEvent(edgePreviewEvent);
@@ -2381,14 +2459,37 @@ context.TheGraph.FONT_AWESOME = {
     triggerMoveEdge: null,
     renderPreviewEdge: function (event) {
       var boundingRect = this.props.app.getBoundingRect();
-      var x = (event.x || event.clientX || 0) - boundingRect.left;
-      var y = (event.y || event.clientY || 0) - boundingRect.top;
+      var x = (event.clientX || event.x || 0) - boundingRect.left;
+      var y = (event.clientY || event.y || 0) - boundingRect.top;
       x -= this.props.app.state.offsetX || 0;
       y -= this.props.app.state.offsetY || 0;
       var scale = this.props.app.state.scale;
 
       this.state.edgePreviewX = (x - this.props.app.state.x) / scale;
       this.state.edgePreviewY = (y - this.props.app.state.y) / scale;
+
+      var app = this.props.app;
+      var rect = app.getBoundingRect();
+      var direction = {x: 0, y: 0};
+
+      if (event.clientX > rect.right) {
+        direction.x = 1;
+      } else if (event.clientX < rect.left) {
+        direction.x = -1;
+      }
+
+      if (event.clientY > rect.bottom) {
+        direction.y = 1;
+      } else if (event.clientY < rect.top) {
+        direction.y = -1;
+      }
+
+      app.startAutoPan(direction, function (offset, direction, autoPanFn) {
+        this.setState({
+          edgePreviewX: this.state.edgePreviewX + (offset/scale * direction.x),
+          edgePreviewY: this.state.edgePreviewY + (offset/scale * direction.y)
+        }, autoPanFn);
+      }.bind(this));
 
       if (!this.triggerMoveEdge) {
         this.triggerMoveEdge = function () {
@@ -2462,7 +2563,41 @@ context.TheGraph.FONT_AWESOME = {
         callback(newName, port, isIn, true);
       }
     },
-    moveGroup: function (nodes, inports, outports, dx, dy) {
+    moveGroup: function (nodes, inports, outports, dx, dy, skipAutoPan) {
+      var group = this._moveGroup(nodes, inports, outports, dx, dy);
+      var app = this.props.app;
+      var x = app.state.x;
+      var y = app.state.y;
+      var scale = app.state.scale;
+      var limits  = TheGraph.findMinMax(this.props.graph, nodes, inports, outports);
+      var direction = {x: 0, y: 0};
+
+      if (-1*limits.minX*scale > x) {
+        direction.x = -1;
+      } else if ( -1* limits.maxX * scale < x - app.state.width) {
+        direction.x = 1;
+      }
+
+      if (-1*limits.minY*scale > y) {
+        direction.y = -1;
+      } else if ( -1* limits.maxY * scale < y - app.state.height) {
+        direction.y = 1;
+      }
+
+      if (skipAutoPan) {
+        return;
+      }
+
+      this.props.app.startAutoPan(direction, function (offset, direction, autoPanFn) {
+        this._moveGroup(
+          nodes, inports, outports,
+          (offset/scale * direction.x),
+          (offset/scale * direction.y)
+        );
+        autoPanFn();
+      }.bind(this));
+    },
+    _moveGroup: function (nodes, inports, outports, dx, dy) {
       var graph = this.state.graph;
 
       var updateNode = function (id, metadata, method) {
@@ -2946,7 +3081,7 @@ context.TheGraph.FONT_AWESOME = {
       // If ports change or nodes move, then edges need to rerender, so we do the whole graph
       return this.dirty;
     },
-    render: function() {
+    render: function () {
       this.dirty = false;
       var rendered = this.rendered;
 
@@ -3921,6 +4056,52 @@ context.TheGraph.FONT_AWESOME = {
             this.props.graph.setOutportMetadata(this.props.exportKey, newPos);
           }
         } else {
+          var app = this.props.app;
+          var rect = app.getBoundingRect();
+          var nodeRect = ReactDOM
+            .findDOMNode(this)
+            .querySelector('.node-rect')
+            .getBoundingClientRect();
+
+          var direction = {x: 0, y: 0};
+
+          if (nodeRect.right > rect.width + rect.left) {
+            direction.x = 1;
+          } else if (nodeRect.left < rect.left) {
+            direction.x = -1;
+          }
+
+          if (nodeRect.bottom > rect.height + rect.top) {
+            direction.y = 1;
+          } else if (nodeRect.top < rect.top) {
+            direction.y = -1;
+          }
+
+          if (direction.x || direction.y) {
+            // Order of events:
+            // 1. Adjust node for mouse move
+            // 2. Adjust node for pan
+            // 3. Actually pan the screen
+            // 4. Repeat 2-3
+            this.props.graph.once('changeNode', app.startAutoPan.bind(
+              app,
+              direction,
+              function (offset, direction, autoPanFn) {
+                var node = this.props.graph.getNode(this.props.nodeID);
+                var x = node.metadata.x + (offset/scale * direction.x);
+                var y = node.metadata.y + (offset/scale * direction.y);
+
+                this.props.graph.once('changeNode', autoPanFn);
+                this.props.graph.setNodeMetadata(this.props.nodeID, {
+                  x: x,
+                  y: y
+                });
+              }.bind(this)
+            ));
+          } else {
+            app.stopAutoPan();
+          }
+
           this.props.graph.setNodeMetadata(this.props.nodeID, {
             x: this.props.node.metadata.x + deltaX,
             y: this.props.node.metadata.y + deltaY
@@ -3933,6 +4114,7 @@ context.TheGraph.FONT_AWESOME = {
         var config = getNodeConfig();
         // Don't fire on graph
         event.stopPropagation();
+        this.props.app.stopAutoPan();
 
         var domNode = ReactDOM.findDOMNode(this);
         domNode.removeEventListener("track", onTrack);
@@ -5017,7 +5199,7 @@ context.TheGraph.FONT_AWESOME = {
       });
     },
     toggleExpand: function (event) {
-      event.stopPropagation()
+      event.stopPropagation();
       var expandEvent = new CustomEvent('the-graph-expand-port', {
         detail: {
           isIn: this.props.isIn,
@@ -5078,7 +5260,7 @@ context.TheGraph.FONT_AWESOME = {
         nextProps.isConnected !== this.props.isConnected
       );
     },
-    render: function() {
+    render: function () {
       var style;
       var maxChars = Math.floor(
         this.props.labelWidth * ((this.props.nodeWidth - 12) / 4)
@@ -5277,7 +5459,7 @@ context.TheGraph.FONT_AWESOME = {
     mixins: [
       TheGraph.mixins.Tooltip
     ],
-    componentWillMount: function() {
+    componentWillMount: function () {
     },
     componentDidMount: function () {
       var domNode = ReactDOM.findDOMNode(this);
@@ -5848,7 +6030,10 @@ context.TheGraph.FONT_AWESOME = {
       this.props.triggerMoveGroup(
         this.props.item.nodes,
         this.props.item.inports,
-        this.props.item.outports
+        this.props.item.outports,
+        null,
+        null,
+        true
       );
 
       if (this.props.isSelectionGroup) {
@@ -5862,6 +6047,7 @@ context.TheGraph.FONT_AWESOME = {
       }
 
       this.props.graph.endTransaction('movegroup');
+      this.props.app.stopAutoPan();
     },
     shouldComponentUpdate: function (nextProps, nextState) {
       return (

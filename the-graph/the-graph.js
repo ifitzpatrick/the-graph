@@ -64,7 +64,7 @@
     showTooltip: function (event) {
       if ( !this.shouldShowTooltip() ) { return; }
 
-      var tooltipEvent = new CustomEvent('the-graph-tooltip', { 
+      var tooltipEvent = new CustomEvent('the-graph-tooltip', {
         detail: {
           tooltip: this.props.label,
           x: event.clientX || event.x,
@@ -77,7 +77,7 @@
     hideTooltip: function (event) {
       if ( !this.shouldShowTooltip() ) { return; }
 
-      var tooltipEvent = new CustomEvent('the-graph-tooltip-hide', { 
+      var tooltipEvent = new CustomEvent('the-graph-tooltip-hide', {
         bubbles: true
       });
       if (this.isMounted()) {
@@ -98,7 +98,7 @@
 
   TheGraph.findMinMax = function (graph, nodes, inports, outports) {
     if (nodes === undefined && inports === undefined && outports == undefined) {
-      nodes = graph.nodes.map( function (node) {
+      nodes = graph.nodes.map(function (node) {
         return node.id;
       });
       // Only look at exports when calculating the whole graph
@@ -296,7 +296,7 @@
   // Reusable React classes
   TheGraph.SVGImage = React.createFactory( React.createClass({
     displayName: "TheGraphSVGImage",
-    render: function() {
+    render: function () {
         var html = '<image ';
         html = html +'xlink:href="'+ this.props.src + '"';
         html = html +'x="' + this.props.x + '"';
@@ -314,7 +314,7 @@
 
   TheGraph.TextBG = React.createFactory( React.createClass({
     displayName: "TheGraphTextBG",
-    render: function() {
+    render: function () {
       var text = this.props.text;
       if (!text) {
         text = "";
@@ -368,7 +368,7 @@
   };
 
   // The `merge` function provides simple property merging.
-  TheGraph.merge = function(src, dest, overwrite) {
+  TheGraph.merge = function (src, dest, overwrite) {
     // Do nothing if neither are true objects.
     if (!TheGraph.isObject(src) || !TheGraph.isObject(dest)) return dest;
 
@@ -396,7 +396,7 @@
     return dest;
   };
 
-  TheGraph.factories.createGroup = function(options, content) {
+  TheGraph.factories.createGroup = function (options, content) {
     var args = [options];
 
     if (Array.isArray(content)) {
@@ -406,35 +406,35 @@
     return React.DOM.g.apply(React.DOM.g, args);
   };
 
-  TheGraph.factories.createRect = function(options) {
+  TheGraph.factories.createRect = function (options) {
     return React.DOM.rect(options);
   };
 
-  TheGraph.factories.createText = function(options) {
+  TheGraph.factories.createText = function (options) {
     return React.DOM.text(options);
   };
 
-  TheGraph.factories.createCircle = function(options) {
+  TheGraph.factories.createCircle = function (options) {
     return React.DOM.circle(options);
   };
 
-  TheGraph.factories.createPath = function(options) {
+  TheGraph.factories.createPath = function (options) {
     return React.DOM.path(options);
   };
 
-  TheGraph.factories.createPolygon = function(options) {
+  TheGraph.factories.createPolygon = function (options) {
     return React.DOM.polygon(options);
   };
 
-  TheGraph.factories.createImg = function(options) {
+  TheGraph.factories.createImg = function (options) {
     return TheGraph.SVGImage(options);
   };
 
-  TheGraph.factories.createCanvas = function(options) {
+  TheGraph.factories.createCanvas = function (options) {
     return React.DOM.canvas(options);
   };
 
-  TheGraph.factories.createSvg = function(options, content) {
+  TheGraph.factories.createSvg = function (options, content) {
 
     var args = [options];
 
@@ -444,9 +444,9 @@
 
     return React.DOM.svg.apply(React.DOM.svg, args);
   };
-  
-  TheGraph.getOffset = function(domNode){
-    var getElementOffset = function(element){
+
+  TheGraph.getOffset = function (domNode) {
+    var getElementOffset = function (element) {
       var offset = { top: 0, left: 0},
           parentOffset;
       if(!element){

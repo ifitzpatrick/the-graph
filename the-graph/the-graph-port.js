@@ -119,7 +119,7 @@
       });
     },
     toggleExpand: function (event) {
-      event.stopPropagation()
+      event.stopPropagation();
       var expandEvent = new CustomEvent('the-graph-expand-port', {
         detail: {
           isIn: this.props.isIn,
@@ -180,7 +180,7 @@
         nextProps.isConnected !== this.props.isConnected
       );
     },
-    render: function() {
+    render: function () {
       var style;
       var maxChars = Math.floor(
         this.props.labelWidth * ((this.props.nodeWidth - 12) / 4)

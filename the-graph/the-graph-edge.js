@@ -82,7 +82,7 @@
     mixins: [
       TheGraph.mixins.Tooltip
     ],
-    componentWillMount: function() {
+    componentWillMount: function () {
     },
     componentDidMount: function () {
       var domNode = ReactDOM.findDOMNode(this);
