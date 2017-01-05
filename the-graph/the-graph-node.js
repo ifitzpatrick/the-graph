@@ -671,7 +671,7 @@
               var info = ports[key];
               var indexLabel = '[' + index + ']';
               var x = info.x;
-              var y = height / (count+1) * (i+1);
+              var y = info.indexY[index];
               var props = {
                 app: app,
                 graph: graph,
