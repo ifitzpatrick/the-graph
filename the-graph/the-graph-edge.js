@@ -386,24 +386,39 @@
         arrowLength *= -1;
       }
 
-      var getArrowPoints = function (x, y, m, l, flip) {
-        // Get the arrow points for an edge.
-        center = findLinePoint(x, y, m, b, -1*l/2);
-        var x = center[0];
-        var y = center[1];
-        var perp_m = -1/m;
-        var perp_b = y - perp_m * x;
-        var point1 = findLinePoint(x, y, perp_m, perp_b, (l * 0.9 / 2));
-        var point2 = findLinePoint(x, y, m, b, l - 2.5, flip);
-        var point3 = findLinePoint(x, y, perp_m, perp_b, (l * 0.9 / -2));
-        var point4 = findLinePoint(x, y, m, b, l, flip);
+      // find points of perpendicular line length l centered at x,y
+      var perpendicular = function (x, y, oldM, l) {
+        var m = -1/oldM;
+        var b = y - m*x;
+        var point1 = findLinePoint(x, y, m, b, l/2);
+        var point2 = findLinePoint(x, y, m, b, l/-2);
+        return [point1, point2];
+      };
 
-        return [point1, point2, point3, point4]
+      var getArrowPoints = function (edgeCenter, m, b, length, flip) {
+        // Get the arrow points for an edge.
+        var arrowCenter = findLinePoint(
+          edgeCenter[0],
+          edgeCenter[1],
+          m,
+          b,
+          -1*length/2
+        );
+        var x = arrowCenter[0];
+        var y = arrowCenter[1];
+
+        var perp = perpendicular(x, y, m, length * 0.9);
+        var perpPoint1 = perp[0];
+        var perpPoint2 = perp[1];
+        var tipPoint = findLinePoint(x, y, m, b, length, flip);
+        var cavePoint = findLinePoint(x, y, m, b, (length/5), flip);
+
+        return [perpPoint1, cavePoint, perpPoint2, tipPoint];
       };
 
       // For m === 0, figure out if arrow should be straight up or down
       var flip = plus[1] > minus[1] ? -1 : 1;
-      var points = getArrowPoints(center[0], center[1], m, arrowLength, flip);
+      var points = getArrowPoints(center, m, b, arrowLength, flip);
 
       var pointsArray = points.map(
         function (point) {return point.join(',');}).join(' ');
