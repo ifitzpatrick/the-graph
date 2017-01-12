@@ -38,18 +38,20 @@ function applyAutolayout(graph, keilerGraph, props, autolayoutCenter) {
         var klayChild = klayChildren[idx];
         if (klayChild.id) {
           graph.setNodeMetadata(klayChild.id, {
-            x: Math.round((klayNode.x + klayChild.x + center.x)/this.snap)*this.snap,
-            y: Math.round((klayNode.y + klayChild.y + center.y)/this.snap)*this.snap
+            x: Math.round((klayNode.x + klayChild.x + center.x)/props.snap)*props.snap,
+            y: Math.round((klayNode.y + klayChild.y + center.y)/props.snap)*props.snap
           });
         }
       }
     }
 
     // Encode nodes outside groups
+    var x = Math.round((klayNode.x + center.x)/props.snap)*props.snap;
+    var y = Math.round((klayNode.y + center.y)/props.snap)*props.snap;
     if (fbpNode) {
       graph.setNodeMetadata(klayNode.id, {
-        x: Math.round((klayNode.x + center.x)/this.snap)*this.snap,
-        y: Math.round((klayNode.y + center.y)/this.snap)*this.snap
+        x: x,
+        y: y
       });
     } else {
       // Find inport or outport
@@ -58,13 +60,13 @@ function applyAutolayout(graph, keilerGraph, props, autolayoutCenter) {
       var expKey = idSplit[1];
       if (expDirection==="inport" && graph.inports[expKey]) {
         graph.setInportMetadata(expKey, {
-          x: Math.round((klayNode.x + center.x)/this.snap)*this.snap,
-          y: Math.round((klayNode.y + center.y)/this.snap)*this.snap
+          x: x,
+          y: y
         });
       } else if (expDirection==="outport" && graph.outports[expKey]) {
         graph.setOutportMetadata(expKey, {
-          x: Math.round((klayNode.x + center.x)/this.snap)*this.snap,
-          y: Math.round((klayNode.y + center.y)/this.snap)*this.snap
+          x: x,
+          y: y
         });
       }
     }
