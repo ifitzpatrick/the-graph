@@ -140,7 +140,10 @@
             registerMarqueeSelectEvent: this.registerMarqueeSelectEvent,
             eventConfig: this.eventConfig,
             disabled: this.disabled,
-            hotKeys: this.hotKeys
+            hotKeys: this.hotKeys,
+            x: this.pan[0],
+            y: this.pan[1],
+            scale: this.scale
           }),
           this.$.svgcontainer
         );
@@ -153,6 +156,15 @@
         this.pan[0] = x;
         this.pan[1] = y;
         this.scale = scale;
+
+        this.dispatchEvent(new CustomEvent('pan-scale', {
+          detail: {
+            x: x,
+            y: y,
+            scale: scale
+          },
+          bubbles: true
+        }));
       },
       onEdgeSelection: function (itemKey, item, toggle) {
         if (itemKey === undefined) {
@@ -571,7 +583,8 @@
         if (!this.appView) { return; }
         this.appView.setState({
           x: this.pan[0],
-          y: this.pan[1]
+          y: this.pan[1],
+          scale: this.scale
         });
       },
       getScale: function () {
