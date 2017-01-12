@@ -1,5 +1,4 @@
-(function (context) {
-  "use strict";
+module.exports.register = function (context) {
 
   var TheGraph = context.TheGraph;
 
@@ -149,6 +148,4 @@
       return TheGraph.factories.menuPorts.createNodeMenuPortsGroup.call(this, containerOptions, containerContents);
     }
   }));
-
-
-})(this);
+};

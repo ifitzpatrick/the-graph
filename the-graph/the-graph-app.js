@@ -1,5 +1,4 @@
-(function (context) {
-  "use strict";
+module.exports.register = function (context) {
 
   var TheGraph = context.TheGraph;
 
@@ -63,9 +62,14 @@
     return TheGraph.ModalBG(options);
   }
 
+  var mixins = [];
+  if (window.React.Animate) {
+    mixins.push(React.Animate);
+  }
+
   TheGraph.App = React.createFactory( React.createClass({
     displayName: "TheGraphApp",
-    mixins: [React.Animate],
+    mixins: mixins,
     getInitialState: function () {
       if (this.props.autoFit) {
         // Autofit
@@ -428,6 +432,13 @@
       var fit = TheGraph.findAreaFit(
         point1, point2, this.state.width, this.state.height);
 
+      // Animation not available, jump right there
+      if (!this.animate) {
+        this.setState({ x: fit.x, y: fit.y, scale: fit.scale });
+        return;
+      }
+
+      // Animate zoom-out then zoom-in
       this.animate({
         x: fit.x,
         y: fit.y,
@@ -807,6 +818,4 @@
       return TheGraph.factories.app.createAppContainer.call(this, containerOptions, appContents);
     }
   }));
-
-
-})(this);
+};

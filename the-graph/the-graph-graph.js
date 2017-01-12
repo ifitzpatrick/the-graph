@@ -1,5 +1,4 @@
-(function (context) {
-  "use strict";
+module.exports.register = function (context) {
 
   var TheGraph = context.TheGraph;
 
@@ -82,8 +81,8 @@
 
   TheGraph.Graph = React.createFactory( React.createClass({
     displayName: "TheGraphGraph",
-    mixins: [TheGraph.mixins.FakeMouse],
-    getInitialState: function () {
+    mixins: [],
+    getInitialState: function() {
       return {
         graph: this.props.graph,
         displaySelectionGroup: true,
@@ -111,7 +110,7 @@
       this.props.graph.on("changeEdge", this.resetPortRoute);
       this.props.graph.on("removeInitial", this.resetPortRoute);
 
-      // Listen to noflo graph object's events
+      // Listen to fbp-graph graph object's events
       this.props.graph.on("changeNode", this.onChangeNode);
       this.props.graph.on("changeInport", this.markDirty);
       this.props.graph.on("changeOutport", this.markDirty);
@@ -1728,4 +1727,4 @@
     }
   }));
 
-})(this);
+};
