@@ -10,7 +10,7 @@ function getDefaultMenus(editor) {
     var pasted = TheGraph.Clipboard.paste(graph, this.$.graph.appView);
     this.selectedNodes = pasted.nodes;
     this.selectedEdges = [];
-  }.bind(this);
+  }.bind(editor);
   var pasteMenu = {
     icon: "paste",
     iconLabel: "paste",
@@ -34,7 +34,7 @@ function getDefaultMenus(editor) {
         }
       }
       this.selectedNodes = newSelection;
-    }.bind(this),
+    }.bind(editor),
     copy: function (graph, itemKey, item) {
       TheGraph.Clipboard.copy(graph, [itemKey]);
     }
@@ -54,7 +54,7 @@ function getDefaultMenus(editor) {
         }
       }
       this.selectedEdges = newSelection;
-    }.bind(this)
+    }.bind(editor)
   };
 
   var cancelPreview = function () {
@@ -63,7 +63,7 @@ function getDefaultMenus(editor) {
     if (node) {
       node.dispatchEvent(event);
     }
-  }.bind(this);
+  }.bind(editor);
 
   var menus = {
     main: {
@@ -120,7 +120,7 @@ function getDefaultMenus(editor) {
           var metadata = {x: x, y: y};
           graph.addInport(pub, item.process, item.port, metadata);
           cancelPreview();
-        }.bind(this)
+        }.bind(editor)
       }
     },
     nodeOutport: {
@@ -145,7 +145,7 @@ function getDefaultMenus(editor) {
           var metadata = {x: x, y: y};
           graph.addOutport(pub, item.process, item.port, metadata);
           cancelPreview();
-        }.bind(this)
+        }.bind(editor)
       }
     },
     graphInport: {
@@ -163,7 +163,7 @@ function getDefaultMenus(editor) {
             return;
           }
           graph.removeInport(itemKey);
-        }.bind(this)
+        }.bind(editor)
       }
     },
     graphOutport: {
@@ -181,7 +181,7 @@ function getDefaultMenus(editor) {
             return;
           }
           graph.removeOutport(itemKey);
-        }.bind(this)
+        }.bind(editor)
       }
     },
     group: {
@@ -195,7 +195,7 @@ function getDefaultMenus(editor) {
             return;
           }
           graph.removeGroup(itemKey);
-        }.bind(this)
+        }.bind(editor)
       },
       // TODO copy group?
       e4: pasteMenu
@@ -229,5 +229,5 @@ function getDefaultMenus(editor) {
 }
 
 module.exports = {
-  getDefaultMenus: getDefaultMenus, 
+  getDefaultMenus: getDefaultMenus
 };
