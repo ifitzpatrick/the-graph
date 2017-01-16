@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
-    "fbp-graph": "git@github.com:ifitzpatrick/fbp-graph.git#deploy",
+    "fbp-graph": "https://github.com/ifitzpatrick/fbp-graph.git#0.1.0-deploy",
     "font-awesome": "^4.6.3",
     "hammerjs": "^2.0.8",
     "klayjs-noflo": "^0.3.1",
