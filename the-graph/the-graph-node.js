@@ -7,7 +7,9 @@ module.exports.register = function (context) {
     snap: TheGraph.config.nodeSize,
     container: {},
     background: {
-      className: "node-bg",
+      className: "node-bg"
+    },
+    backgroundOptions: {
       heightPadding: 25
     },
     border: {
@@ -741,7 +743,7 @@ module.exports.register = function (context) {
           iconContent = TheGraph.factories.node.createNodeIconText.call(this, iconOptions);
       }
 
-      var backgroundRectOptions = TheGraph.merge(nodeConfig.background, { width: this.props.width, height: this.props.height + nodeConfig.background.heightPadding});
+      var backgroundRectOptions = TheGraph.merge(nodeConfig.background, { width: this.props.width, height: this.props.height + nodeConfig.backgroundOptions.heightPadding});
       var backgroundRect = TheGraph.factories.node.createNodeBackgroundRect.call(this, backgroundRectOptions);
 
       var borderRectOptions = TheGraph.merge(nodeConfig.border, { width: this.props.width, height: this.props.height });
@@ -905,7 +907,7 @@ module.exports.register = function (context) {
       ]);
 
       if (sublabelGroup) {
-        nodeContent.push(sublabelGroup);
+        nodeContents.push(sublabelGroup);
       }
 
       var nodeOptions = {

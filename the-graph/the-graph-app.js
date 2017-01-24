@@ -67,7 +67,7 @@ module.exports.register = function (context) {
     mixins.push(React.Animate);
   }
 
-  TheGraph.App = React.createFactory( React.createClass({
+  TheGraph.App = React.createClass({
     displayName: "TheGraphApp",
     mixins: mixins,
     getInitialState: function () {
@@ -106,6 +106,17 @@ module.exports.register = function (context) {
         snap: TheGraph.config.nodeSize / 2,
         grid: TheGraph.config.nodeSize
       };
+    },
+    componentWillReceiveProps: function (newProps) {
+      if (
+        newProps.width !== this.props.width ||
+        newProps.height !== this.props.height
+      ) {
+        this.setState({
+          width: newProps.width,
+          height: newProps.height
+        });
+      }
     },
     zoomFactor: 0,
     zoomX: 0,
@@ -525,8 +536,12 @@ module.exports.register = function (context) {
       document.addEventListener('keyup', this.keyUp);
 
       // Canvas background
-      this.bgCanvas = unwrap(ReactDOM.findDOMNode(this.refs.canvas));
-      this.bgContext = unwrap(this.bgCanvas.getContext('2d'));
+      this.bgCanvas = ReactDOM.findDOMNode(this.refs.canvas);
+      this.bgContext = this.bgCanvas.getContext('2d');
+      if (window.unwrap) {
+        this.bgCanvas = unwrap(this.bgCanvas);
+        this.bgContext = unwrap(this.bgContext);
+      }
       this.componentDidUpdate();
 
       window.addEventListener('mousemove', this.mouseMove);
@@ -764,7 +779,7 @@ module.exports.register = function (context) {
       }
 
       var graphElementOptions = {
-        graph: this.props.graph,
+        graph: this.props.graph || new window.fbpGraph.graph.Graph('', {caseSensitive: true}),
         scale: this.state.scale,
         grid: this.props.grid,
         snap: this.props.snap,
@@ -817,5 +832,5 @@ module.exports.register = function (context) {
       containerOptions.className += " " + scaleClass;
       return TheGraph.factories.app.createAppContainer.call(this, containerOptions, appContents);
     }
-  }));
+  });
 };

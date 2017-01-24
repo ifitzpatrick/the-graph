@@ -96,7 +96,7 @@
         this.$.svgcontainer.innerHTML = "";
         window.bench.mark('Start graph editor react component');
         this.appView = ReactDOM.render(
-          window.TheGraph.App({
+          React.createFactory(window.TheGraph.App({
             graph: this.graph,
             grid: this.grid,
             snap: this.snap,
@@ -125,7 +125,7 @@
             x: this.pan[0],
             y: this.pan[1],
             scale: this.scale
-          }),
+          })),
           this.$.svgcontainer
         );
         this.graphView = this.appView.refs.graph;

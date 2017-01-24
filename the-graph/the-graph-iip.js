@@ -71,7 +71,7 @@ module.exports.register = function (context) {
 
       var containerOptions = TheGraph.merge(TheGraph.config.iip.container, {
         title: this.props.label,
-        classNames: this.props.classNames || ""
+        className: this.props.classNames || ""
       });
       return TheGraph.factories.iip.createIIPContainer.call(this, containerOptions, containerContents);
     }

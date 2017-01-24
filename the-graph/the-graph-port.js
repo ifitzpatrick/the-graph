@@ -12,7 +12,9 @@ module.exports.register = function (context) {
     },
     arc: {
       className: "port-arc",
-      ref: "portArc",
+      ref: "portArc"
+    },
+    arcOptions: {
       bigArcRadius: 6
     },
     innerCircle: {
@@ -197,7 +199,7 @@ module.exports.register = function (context) {
       var inArc = TheGraph.arcs.inport;
       var outArc = TheGraph.arcs.outport;
       if (highlightPort && highlightPort.isIn === this.props.isIn && (highlightPort.type === this.props.port.type || this.props.port.type === 'any')) {
-        r = TheGraph.config.port.arc.bigArcRadius;
+        r = TheGraph.config.port.arcOptions.bigArcRadius;
         inArc = TheGraph.arcs.inportBig;
         outArc = TheGraph.arcs.outportBig;
       }

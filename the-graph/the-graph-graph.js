@@ -102,21 +102,40 @@ module.exports.register = function (context) {
         disabled: this.props.disabled
       };
     },
-    componentDidMount: function () {
-      window.bench.mark('Mounted graph editor react component');
+    addListeners: function (graph) {
       // To change port colors
-      this.props.graph.on("addEdge", this.onAddEdge);
-      this.props.graph.on("removeEdge", this.onRemoveEdge);
-      this.props.graph.on("changeEdge", this.resetPortRoute);
-      this.props.graph.on("removeInitial", this.resetPortRoute);
+      graph.on("addEdge", this.onAddEdge);
+      graph.on("removeEdge", this.onRemoveEdge);
+      graph.on("changeEdge", this.resetPortRoute);
+      graph.on("removeInitial", this.resetPortRoute);
 
       // Listen to fbp-graph graph object's events
-      this.props.graph.on("changeNode", this.onChangeNode);
-      this.props.graph.on("changeInport", this.markDirty);
-      this.props.graph.on("changeOutport", this.markDirty);
-      this.props.graph.on("renameInport", this.renameInport);
-      this.props.graph.on("renameOutport", this.renameOutport);
-      this.props.graph.on("endTransaction", this.markDirty);
+      graph.on("changeNode", this.onChangeNode);
+      graph.on("changeInport", this.markDirty);
+      graph.on("changeOutport", this.markDirty);
+      graph.on("renameInport", this.renameInport);
+      graph.on("renameOutport", this.renameOutport);
+      graph.on("endTransaction", this.markDirty);
+    },
+    removeListeners: function (graph) {
+      // To change port colors
+      graph.removeListener("addEdge", this.onAddEdge);
+      graph.removeListener("removeEdge", this.onRemoveEdge);
+      graph.removeListener("changeEdge", this.resetPortRoute);
+      graph.removeListener("removeInitial", this.resetPortRoute);
+
+      // Listen to fbp-graph graph object's events
+      graph.removeListener("changeNode", this.onChangeNode);
+      graph.removeListener("changeInport", this.markDirty);
+      graph.removeListener("changeOutport", this.markDirty);
+      graph.removeListener("renameInport", this.renameInport);
+      graph.removeListener("renameOutport", this.renameOutport);
+      graph.removeListener("endTransaction", this.markDirty);
+
+    },
+    componentDidMount: function () {
+      window.bench.mark('Mounted graph editor react component');
+      this.addListeners(this.props.graph);
 
       ReactDOM.findDOMNode(this).addEventListener("the-graph-cancel-preview-edge", this.cancelPreviewEdge);
       ReactDOM.findDOMNode(this).addEventListener("the-graph-node-remove", this.removeNode);
@@ -124,6 +143,14 @@ module.exports.register = function (context) {
       var appDomNode = ReactDOM.findDOMNode(this.props.app);
       appDomNode.addEventListener(
         this.getEvent('marqueeSelectStartEvent'), this.startMarqueeSelect);
+    },
+    componentWillReceiveProps: function (newProps) {
+      if (this.props.graph !== newProps.graph) {
+        this.removeListeners(this.props.graph);
+        this.addListeners(newProps.graph);
+        this.setState({graph: newProps.graph});
+        this.markDirty();
+      }
     },
     defaultEventConfig: {
       marqueeSelectStartEvent: 'mousedown',
