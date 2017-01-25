@@ -383,8 +383,8 @@ module.exports.register = function (context) {
         domNode.removeEventListener("trackend", onTrackEnd);
 
         // Snap to grid
-        var snapToGrid = true;
         var snap = this.props.snap || config.snap / 2;
+        var snapToGrid = snap !== 1;
         if (snapToGrid && !resize) {
           var x, y;
           if (this.props.export) {
