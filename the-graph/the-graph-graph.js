@@ -225,15 +225,15 @@ module.exports.register = function (context) {
           var rect = app.getBoundingRect();
           var direction = {x: 0, y: 0};
 
-          if (event.clientX > rect.right) {
+          if (event.clientX >= rect.right) {
             direction.x = 1;
-          } else if (event.clientX < rect.left) {
+          } else if (event.clientX <= rect.left) {
             direction.x = -1;
           }
 
-          if (event.clientY > rect.bottom) {
+          if (event.clientY >= rect.bottom) {
             direction.y = 1;
-          } else if (event.clientY < rect.top) {
+          } else if (event.clientY <= rect.top) {
             direction.y = -1;
           }
 
@@ -486,15 +486,15 @@ module.exports.register = function (context) {
       var rect = app.getBoundingRect();
       var direction = {x: 0, y: 0};
 
-      if (event.clientX > rect.right) {
+      if (event.clientX >= rect.right) {
         direction.x = 1;
-      } else if (event.clientX < rect.left) {
+      } else if (event.clientX <= rect.left) {
         direction.x = -1;
       }
 
-      if (event.clientY > rect.bottom) {
+      if (event.clientY >= rect.bottom) {
         direction.y = 1;
-      } else if (event.clientY < rect.top) {
+      } else if (event.clientY <= rect.top) {
         direction.y = -1;
       }
 
@@ -586,15 +586,15 @@ module.exports.register = function (context) {
       var limits  = TheGraph.findMinMax(this.props.graph, nodes, inports, outports);
       var direction = {x: 0, y: 0};
 
-      if (-1*limits.minX*scale > x) {
+      if (-1*limits.minX*scale >= x) {
         direction.x = -1;
-      } else if ( -1* limits.maxX * scale < x - app.state.width) {
+      } else if ( -1* limits.maxX * scale <= x - app.state.width) {
         direction.x = 1;
       }
 
-      if (-1*limits.minY*scale > y) {
+      if (-1*limits.minY*scale >= y) {
         direction.y = -1;
-      } else if ( -1* limits.maxY * scale < y - app.state.height) {
+      } else if ( -1* limits.maxY * scale <= y - app.state.height) {
         direction.y = 1;
       }
 
