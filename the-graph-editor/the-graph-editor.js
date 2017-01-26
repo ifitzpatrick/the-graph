@@ -25,6 +25,10 @@ function getDefaultMenus(editor) {
         return;
       }
       graph.removeNode(itemKey);
+
+      if (!this.selectedNodes) {
+        return;
+      }
       // Remove selection
       var newSelection = [];
       for (var i=0, len=this.selectedNodes.length; i<len; i++){
@@ -45,6 +49,11 @@ function getDefaultMenus(editor) {
         return;
       }
       graph.removeEdge(item.from.node, item.from.port, item.to.node, item.to.port);
+
+      if (!this.selectedEdges) {
+        return;
+      }
+
       // Remove selection
       var newSelection = [];
       for (var i=0, len=this.selectedEdges.length; i<len; i++){
