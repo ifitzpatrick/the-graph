@@ -125,7 +125,7 @@ module.exports.register = function (context) {
       // Context menu
       if (this.props.showContext) {
         domNode.addEventListener("contextmenu", this.showContext);
-        domNode.addEventListener("hold", this.showContext);
+        domNode.addEventListener("hold", this.onHold);
       }
 
       if (this.props.previewPort) {
@@ -221,6 +221,11 @@ module.exports.register = function (context) {
 
       var toggle = (TheGraph.metaKeyPressed || event.pointerType==="touch");
       this.props.onEdgeSelection(this.props.edgeID, this.props.edge, toggle);
+    },
+    onHold: function (event) {
+      if (event.pointerType !== 'mouse') {
+        this.showContext(event);
+      }
     },
     showContext: function (event) {
       // Don't show native context menu

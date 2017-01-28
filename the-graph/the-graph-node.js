@@ -166,7 +166,7 @@ module.exports.register = function (context) {
       // Context menu
       if (this.props.showContext) {
         ReactDOM.findDOMNode(this).addEventListener("contextmenu", this.showContext);
-        ReactDOM.findDOMNode(this).addEventListener("hold", this.showContext);
+        ReactDOM.findDOMNode(this).addEventListener("hold", this.onHold);
       }
 
     },
@@ -430,6 +430,11 @@ module.exports.register = function (context) {
       this.props.graph.setNodeMetadata(this.props.nodeID, {
         expandedPorts: expandedPorts
       });
+    },
+    onHold: function (event) {
+      if (event.pointerType !== 'mouse') {
+        this.showContext(event);
+      }
     },
     showContext: function (event) {
       // Don't show native context menu

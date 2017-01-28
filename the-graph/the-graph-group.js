@@ -60,7 +60,12 @@ module.exports.register = function (context) {
       // Context menu
       if (this.props.showContext) {
         domNode.addEventListener("contextmenu", this.showContext);
-        domNode.addEventListener("hold", this.showContext);
+        domNode.addEventListener("hold", this.onHold);
+      }
+    },
+    onHold: function (event) {
+      if (event.pointerType !== 'mouse') {
+        this.showContext(event);
       }
     },
     showContext: function (event) {
