@@ -109,6 +109,10 @@ module.exports.register = function (context) {
       graph.on("changeEdge", this.resetPortRoute);
       graph.on("addInitial", this.onAddEdge);
       graph.on("removeInitial", this.onAddEdge);
+      graph.on("addInport", this.onAddEdge);
+      graph.on("removeInport", this.onAddEdge);
+      graph.on("addOutport", this.onAddEdge);
+      graph.on("removeOutport", this.onAddEdge);
 
       // Listen to fbp-graph graph object's events
       graph.on("changeNode", this.onChangeNode);
@@ -125,6 +129,10 @@ module.exports.register = function (context) {
       graph.removeListener("changeEdge", this.resetPortRoute);
       graph.removeListener("addInitial", this.onAddEdge);
       graph.removeListener("removeInitial", this.onAddEdge);
+      graph.removeListener("addInport", this.onAddEdge);
+      graph.removeListener("removeInport", this.onAddEdge);
+      graph.removeListener("addOutport", this.onAddEdge);
+      graph.removeListener("removeOutport", this.onAddEdge);
 
       // Listen to fbp-graph graph object's events
       graph.removeListener("changeNode", this.onChangeNode);

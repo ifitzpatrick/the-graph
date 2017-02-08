@@ -7,7 +7,7 @@ function getDefaultMenus(editor) {
       dispatchDisabledEvent('paste');
       return;
     }
-    var pasted = TheGraph.Clipboard.paste(graph, this.$.graph.appView);
+    var pasted = TheGraph.Clipboard.paste(graph, this.getAppView());
     this.selectedNodes = pasted.nodes;
     this.selectedEdges = [];
   }.bind(editor);
@@ -68,7 +68,7 @@ function getDefaultMenus(editor) {
 
   var cancelPreview = function () {
     var event = new CustomEvent('the-graph-cancel-preview-edge', {});
-    var node = ReactDOM.findDOMNode(this.$.graph.graphView);
+    var node = ReactDOM.findDOMNode(this.getGraphView());
     if (node) {
       node.dispatchEvent(event);
     }
