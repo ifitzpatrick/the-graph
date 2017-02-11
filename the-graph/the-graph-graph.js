@@ -241,7 +241,7 @@ module.exports.register = function (context) {
             direction.x = -1;
           }
 
-          if (event.clientY >= rect.bottom) {
+          if (event.clientY + 1 >= rect.bottom) {
             direction.y = 1;
           } else if (event.clientY <= rect.top) {
             direction.y = -1;
