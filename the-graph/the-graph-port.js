@@ -39,7 +39,8 @@ module.exports.register = function (context) {
     createPortBackgroundCircle: TheGraph.factories.createCircle,
     createPortArc: TheGraph.factories.createPath,
     createPortInnerCircle: TheGraph.factories.createCircle,
-    createPortLabelText: TheGraph.factories.createText
+    createPortLabelText: TheGraph.factories.createText,
+    hideTooltip: false
   };
 
   // Port view
@@ -78,7 +79,7 @@ module.exports.register = function (context) {
       return (
         this.props.app.state.scale < TheGraph.zbpBig ||
         this.props.label.length > 8
-      );
+      ) && !TheGraph.factories.port.hideTooltip;
     },
     showContext: function (event) {
       // Don't show port menu on export node port
