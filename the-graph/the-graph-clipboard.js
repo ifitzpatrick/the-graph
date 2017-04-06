@@ -85,6 +85,9 @@ module.exports.register = function (context) {
         meta.x += 36;
         meta.y += 36;
       }
+      if (!app.props.library[node.component]) {
+        return pasted;
+      }
       var newNode = graph.addNode(makeNewId(node.component), node.component, meta);
       map[node.id] = newNode.id;
       pasted.nodes.push(newNode);
