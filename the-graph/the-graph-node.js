@@ -919,6 +919,7 @@ module.exports.register = function (context) {
         className: "node drag"+
           (this.props.selected ? " selected" : "")+
           (this.props.error ? " error" : "")+
+          (this.props.subgraph ? " subgraph" : "")+
           (this.props.classNames ? " " + this.props.classNames : ""),
         name: this.props.nodeID,
         key: this.props.nodeID,
