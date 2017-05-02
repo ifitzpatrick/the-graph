@@ -1574,7 +1574,7 @@ module.exports.register = function (context) {
           maxX: limits.maxX,
           maxY: limits.maxY,
           scale: self.props.scale,
-          label: group.name,
+          label: group.metadata.label ? group.metadata.label : group.name,
           nodes: group.nodes,
           description: group.metadata.description,
           color: group.metadata.color,
